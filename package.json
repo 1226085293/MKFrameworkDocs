@@ -4,9 +4,9 @@
 	"private": true,
 	"scripts": {
 		"generate:routes": "npx tsx scripts/generateRoutes.ts",
-		"dev": "npm run generate:routes && next dev",
-		"build": "npm run generate:routes && next build",
-		"start": "npm run generate:routes && next start",
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
 		"lint": "next lint"
 	},
 	"dependencies": {

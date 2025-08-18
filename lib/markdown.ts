@@ -6,7 +6,6 @@ import rehypePrism from "rehype-prism-plus";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeSlug from "rehype-slug";
 import rehypeCodeTitles from "rehype-code-titles";
-import { page_routes, ROUTES } from "./routes-config";
 import { visit } from "unist-util-visit";
 import matter from "gray-matter";
 import { getIconName, hasSupportedExtension } from "./utils";
@@ -28,6 +27,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { getPageRoutes, getRoutes } from "./server/getRoutes";
 
 // add custom components
 const components = {
@@ -112,10 +112,10 @@ export async function getDocsTocs(slug: string) {
 }
 
 export function getPreviousNext(path: string) {
-	const index = page_routes.findIndex(({ href }) => href == `/${path}`);
+	const index = getPageRoutes().findIndex(({ href }) => href == `/${path}`);
 	return {
-		prev: page_routes[index - 1],
-		next: page_routes[index + 1],
+		prev: getPageRoutes()[index - 1],
+		next: getPageRoutes()[index + 1],
 	};
 }
 
@@ -134,7 +134,7 @@ function justGetFrontmatterFromMD<Frontmatter>(rawMd: string): Frontmatter {
 
 export async function getAllChilds(pathString: string) {
 	const items = pathString.split("/").filter((it) => it != "");
-	let page_routes_copy = ROUTES;
+	let page_routes_copy = getRoutes();
 
 	let prevHref = "";
 	for (const it of items) {

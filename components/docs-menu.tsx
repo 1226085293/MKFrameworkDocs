@@ -1,16 +1,25 @@
 "use client";
 
-import { ROUTES } from "@/lib/routes-config";
+import { useState, useEffect } from "react";
 import SubLink from "./sublink";
 import { usePathname } from "next/navigation";
+import { EachRoute } from "@/lib/server/getRoutes";
 
 export default function DocsMenu({ isSheet = false }) {
 	const pathname = usePathname();
 	if (!pathname.startsWith("/docs")) return null;
 
+	const [routes, setRoutes] = useState<EachRoute[]>([]);
+
+	useEffect(() => {
+		fetch("/api/routes")
+			.then((r) => r.json())
+			.then((data) => setRoutes(data));
+	}, []);
+
 	return (
 		<div className="flex flex-col gap-3.5 mt-5 pr-2 pb-6 sm:text-base text-[14.5px]">
-			{ROUTES.map((item, index) => {
+			{routes.map((item, index) => {
 				const modifiedItems = {
 					...item,
 					href: `/docs${item.href}`,

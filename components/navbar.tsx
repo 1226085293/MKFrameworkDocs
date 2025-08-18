@@ -1,35 +1,15 @@
+"use client";
+
 import { ModeToggle } from "@/components/theme-toggle";
 import { GithubIcon, TwitterIcon, CommandIcon } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
 import Anchor from "./anchor";
 import { SheetLeftbar } from "./leftbar";
-import { page_routes } from "@/lib/routes-config";
 import { SheetClose } from "@/components/ui/sheet";
 import AlgoliaSearch from "./algolia-search";
-
-export const NAVLINKS = [
-	{
-		title: "Documentation",
-		href: `/docs${page_routes[0].href}`,
-	},
-	{
-		title: "Blog",
-		href: "/blog",
-	},
-	{
-		title: "Examples",
-		href: "#",
-	},
-	{
-		title: "Guides",
-		href: "#",
-	},
-	{
-		title: "Community",
-		href: "https://github.com/nisabmohd/Aria-Docs/discussions",
-	},
-];
+import { useState, useEffect } from "react";
+import { Page } from "@/lib/server/getRoutes";
 
 const algolia_props = {
 	appId: process.env.ALGOLIA_APP_ID!,
@@ -38,6 +18,30 @@ const algolia_props = {
 };
 
 export function Navbar() {
+	// ✅ Hooks 必须写在组件函数内部
+	const [pageRoutes, setPageRoutes] = useState<Page[]>([]);
+
+	useEffect(() => {
+		fetch("/api/pageRoutes")
+			.then((r) => r.json())
+			.then((data) => setPageRoutes(data));
+	}, []);
+
+	// ✅ 根据 pageRoutes 动态生成 NAVLINKS
+	const NAVLINKS = [
+		{
+			title: "Documentation",
+			href: pageRoutes.length > 0 ? `/docs${pageRoutes[0].href}` : "/docs",
+		},
+		{ title: "Blog", href: "/blog" },
+		{ title: "Examples", href: "#" },
+		{ title: "Guides", href: "#" },
+		{
+			title: "Community",
+			href: "https://github.com/nisabmohd/Aria-Docs/discussions",
+		},
+	];
+
 	return (
 		<nav className="w-full border-b h-16 sticky top-0 z-50 bg-background">
 			<div className="sm:container mx-auto w-[95vw] h-full flex items-center sm:justify-between md:gap-2">
@@ -93,7 +97,31 @@ export function Logo() {
 	);
 }
 
-export function NavMenu({ isSheet = false }) {
+export function NavMenu({ isSheet = false }: { isSheet?: boolean }) {
+	// ✅ Hooks 必须写在组件函数内部
+	const [pageRoutes, setPageRoutes] = useState<Page[]>([]);
+
+	useEffect(() => {
+		fetch("/api/pageRoutes")
+			.then((r) => r.json())
+			.then((data) => setPageRoutes(data));
+	}, []);
+
+	// ✅ 根据 pageRoutes 动态生成 NAVLINKS
+	const NAVLINKS = [
+		{
+			title: "Documentation",
+			href: pageRoutes.length > 0 ? `/docs${pageRoutes[0].href}` : "/docs",
+		},
+		{ title: "Blog", href: "/blog" },
+		{ title: "Examples", href: "#" },
+		{ title: "Guides", href: "#" },
+		{
+			title: "Community",
+			href: "https://github.com/nisabmohd/Aria-Docs/discussions",
+		},
+	];
+
 	return (
 		<>
 			{NAVLINKS.map((item) => {

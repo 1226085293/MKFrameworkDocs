@@ -1,10 +1,10 @@
 import DocsBreadcrumb from "@/components/docs-breadcrumb";
 import Pagination from "@/components/pagination";
 import Toc from "@/components/toc";
-import { page_routes } from "@/lib/routes-config";
 import { notFound } from "next/navigation";
 import { getCompiledDocsForSlug, getDocFrontmatter } from "@/lib/markdown";
 import { Typography } from "@/components/typography";
+import { getPageRoutes } from "@/lib/server/getRoutes";
 
 type PageProps = {
 	params: Promise<{ slug: string[] }>;
@@ -12,12 +12,25 @@ type PageProps = {
 
 export default async function DocsPage(props: PageProps) {
 	const params = await props.params;
-	const { slug = [] } = params;
+	let { slug = [] } = params;
+
+	// 根路径 /docs 特殊处理：自动使用第一个页面
+	if (slug.length === 0) {
+		const firstPage = getPageRoutes()[0];
+		if (!firstPage) notFound();
+		slug = firstPage.href.split("/").slice(1);
+	}
 
 	const pathName = slug.join("/");
-	const res = await getCompiledDocsForSlug(pathName);
 
-	if (!res) notFound();
+	let res;
+	try {
+		res = await getCompiledDocsForSlug(pathName);
+	} catch (err) {
+		console.warn("MDX file not found:", pathName, err);
+		notFound();
+	}
+
 	return (
 		<div className="flex items-start gap-10">
 			<div className="flex-[4.5] py-10 mx-auto">
@@ -43,7 +56,14 @@ export default async function DocsPage(props: PageProps) {
 
 export async function generateMetadata(props: PageProps) {
 	const params = await props.params;
-	const { slug = [] } = params;
+	let { slug = [] } = params;
+
+	// 根路径 /docs 特殊处理
+	if (slug.length === 0) {
+		const firstPage = getPageRoutes()[0];
+		if (!firstPage) return {};
+		slug = firstPage.href.split("/").slice(1);
+	}
 
 	const pathName = slug.join("/");
 	const res = await getDocFrontmatter(pathName);
@@ -56,7 +76,7 @@ export async function generateMetadata(props: PageProps) {
 }
 
 export function generateStaticParams() {
-	return page_routes.map((item) => ({
+	return getPageRoutes().map((item) => ({
 		slug: item.href.split("/").slice(1),
 	}));
 }

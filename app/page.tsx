@@ -1,9 +1,19 @@
+"use client";
 import { buttonVariants } from "@/components/ui/button";
-import { page_routes } from "@/lib/routes-config";
+import { EachRoute } from "@/lib/server/getRoutes";
 import { MoveUpRightIcon, TerminalSquareIcon } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+	const [pageRoutes, setPageRoutes] = useState<EachRoute[]>([]);
+
+	useEffect(() => {
+		fetch("/api/pageRoutes")
+			.then((r) => r.json())
+			.then((data) => setPageRoutes(data));
+	}, []);
+
 	return (
 		<div className="flex sm:min-h-[87.5vh] min-h-[82vh] flex-col sm:items-center justify-center text-center sm:py-8 py-14">
 			<Link
@@ -25,12 +35,14 @@ export default function Home() {
 				documentation needs.
 			</p>
 			<div className="sm:flex sm:flex-row grid grid-cols-2 items-center sm;gap-5 gap-3 mb-8">
-				<Link
-					href={`/docs${page_routes[0].href}`}
-					className={buttonVariants({ className: "px-6", size: "lg" })}
-				>
-					Get Stared
-				</Link>
+				{pageRoutes.length > 0 && (
+					<Link
+						href={`/docs${pageRoutes[0].href}`}
+						className={buttonVariants({ className: "px-6", size: "lg" })}
+					>
+						Get Started
+					</Link>
+				)}
 				<Link
 					href="/blog"
 					className={buttonVariants({
