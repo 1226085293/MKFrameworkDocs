@@ -1,4 +1,6 @@
-import DocsBreadcrumb from "@/components/docs-breadcrumb";
+import DocsBreadcrumb, {
+	BreadcrumbItemType,
+} from "@/components/docs-breadcrumb";
 import Pagination from "@/components/pagination";
 import Toc from "@/components/toc";
 import { notFound } from "next/navigation";
@@ -31,21 +33,45 @@ export default async function DocsPage(props: PageProps) {
 		notFound();
 	}
 
+	let breadcrumbItems: BreadcrumbItemType[] = [];
+
+	// 构建每一级路径和 title
+	let accumulatedSlug = "";
+	for (let i = 0; i < slug.length; i++) {
+		accumulatedSlug += (i === 0 ? "" : "/") + slug[i];
+		const docFrontmatter = await getDocFrontmatter(accumulatedSlug);
+		if (docFrontmatter) {
+			breadcrumbItems.push({
+				title: docFrontmatter.title,
+				href: "/docs/" + accumulatedSlug,
+				noLink: docFrontmatter.noLink,
+			});
+		} else {
+			breadcrumbItems.push({
+				title: slug[i], // 如果没找到 title，就用 slug
+				href: "/docs/" + accumulatedSlug,
+				noLink: false,
+			});
+		}
+	}
+
 	return (
 		<div className="flex items-start gap-10">
 			<div className="flex-[4.5] py-10 mx-auto">
 				<div className="w-full mx-auto">
-					<DocsBreadcrumb paths={slug} />
-					<Typography>
-						<h1 className="sm:text-3xl text-2xl !-mt-0.5">
-							{res.frontmatter.title}
-						</h1>
-						<p className="-mt-4 text-muted-foreground sm:text-[16.5px] text-[14.5px]">
-							{res.frontmatter.description}
-						</p>
-						<div>{res.content}</div>
-						<Pagination pathname={pathName} />
-					</Typography>
+					<DocsBreadcrumb items={breadcrumbItems} />
+					{res && (
+						<Typography>
+							<h1 className="sm:text-3xl text-2xl !-mt-0.5">
+								{res.frontmatter.title}
+							</h1>
+							<p className="-mt-4 text-muted-foreground sm:text-[16.5px] text-[14.5px]">
+								{res.frontmatter.description}
+							</p>
+							<div>{res.content}</div>
+							<Pagination pathname={pathName} />
+						</Typography>
+					)}
 				</div>
 			</div>
 

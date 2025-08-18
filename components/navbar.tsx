@@ -9,7 +9,7 @@ import { SheetLeftbar } from "./leftbar";
 import { SheetClose } from "@/components/ui/sheet";
 import AlgoliaSearch from "./algolia-search";
 import { useState, useEffect } from "react";
-import { Page } from "@/lib/server/getRoutes";
+import { EachRoute, Page } from "@/lib/server/getRoutes";
 
 const algolia_props = {
 	appId: process.env.ALGOLIA_APP_ID!,
@@ -18,37 +18,13 @@ const algolia_props = {
 };
 
 export function Navbar() {
-	// ✅ Hooks 必须写在组件函数内部
-	const [pageRoutes, setPageRoutes] = useState<Page[]>([]);
-
-	useEffect(() => {
-		fetch("/api/pageRoutes")
-			.then((r) => r.json())
-			.then((data) => setPageRoutes(data));
-	}, []);
-
-	// ✅ 根据 pageRoutes 动态生成 NAVLINKS
-	const NAVLINKS = [
-		{
-			title: "Documentation",
-			href: pageRoutes.length > 0 ? `/docs${pageRoutes[0].href}` : "/docs",
-		},
-		{ title: "Blog", href: "/blog" },
-		{ title: "Examples", href: "#" },
-		{ title: "Guides", href: "#" },
-		{
-			title: "Community",
-			href: "https://github.com/nisabmohd/Aria-Docs/discussions",
-		},
-	];
-
 	return (
 		<nav className="w-full border-b h-16 sticky top-0 z-50 bg-background">
 			<div className="sm:container mx-auto w-[95vw] h-full flex items-center sm:justify-between md:gap-2">
 				<div className="flex items-center sm:gap-5 gap-2.5">
 					<SheetLeftbar />
 					<div className="flex items-center gap-6">
-						<div className="lg:flex hidden">
+						<div className="md:flex hidden">
 							<Logo />
 						</div>
 						<div className="md:flex hidden items-center gap-4 text-sm font-medium text-muted-foreground">
@@ -70,7 +46,7 @@ export function Navbar() {
 							>
 								<GithubIcon className="h-[1.1rem] w-[1.1rem]" />
 							</Link>
-							<Link
+							{/* <Link
 								href="#"
 								className={buttonVariants({
 									variant: "ghost",
@@ -78,7 +54,7 @@ export function Navbar() {
 								})}
 							>
 								<TwitterIcon className="h-[1.1rem] w-[1.1rem]" />
-							</Link>
+							</Link> */}
 							<ModeToggle />
 						</div>
 					</div>
@@ -92,33 +68,33 @@ export function Logo() {
 	return (
 		<Link href="/" className="flex items-center gap-2.5">
 			<CommandIcon className="w-6 h-6 text-muted-foreground" strokeWidth={2} />
-			<h2 className="text-md font-bold font-code">AriaDocs</h2>
+			<h2 className="text-md font-bold font-code">MKFramework</h2>
 		</Link>
 	);
 }
 
 export function NavMenu({ isSheet = false }: { isSheet?: boolean }) {
 	// ✅ Hooks 必须写在组件函数内部
-	const [pageRoutes, setPageRoutes] = useState<Page[]>([]);
+	const [routes, setRoutes] = useState<EachRoute[]>([]);
 
 	useEffect(() => {
-		fetch("/api/pageRoutes")
+		fetch("/api/routes")
 			.then((r) => r.json())
-			.then((data) => setPageRoutes(data));
+			.then((data) => setRoutes(data));
 	}, []);
 
 	// ✅ 根据 pageRoutes 动态生成 NAVLINKS
 	const NAVLINKS = [
 		{
-			title: "Documentation",
-			href: pageRoutes.length > 0 ? `/docs${pageRoutes[0].href}` : "/docs",
+			title: "文档",
+			href: routes.length > 0 ? `/docs${routes[0].href}` : "/docs",
 		},
-		{ title: "Blog", href: "/blog" },
-		{ title: "Examples", href: "#" },
-		{ title: "Guides", href: "#" },
+		{ title: "博客", href: "/blog" },
+		// { title: "Examples", href: "#" },
+		// { title: "Guides", href: "#" },
 		{
-			title: "Community",
-			href: "https://github.com/nisabmohd/Aria-Docs/discussions",
+			title: "讨论",
+			href: "https://github.com/1226085293/MKFramework/discussions",
 		},
 	];
 

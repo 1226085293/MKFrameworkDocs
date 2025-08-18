@@ -64,7 +64,7 @@ function _getRoutes(dir: string): EachRoute[] {
 				order: fm.order,
 			};
 		})
-		.sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0));
+		.sort((a, b) => Number(a.order ?? 999) - Number(b.order ?? 999));
 }
 
 function getRecurrsiveAllLinks(node: EachRoute) {
