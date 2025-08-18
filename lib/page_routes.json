@@ -1,0 +1,83 @@
+[
+  {
+    "title": "Getting Started",
+    "href": "/getting-started",
+    "noLink": true,
+    "items": [
+      {
+        "title": "标题",
+        "href": "/1-test"
+      },
+      {
+        "title": "标题2",
+        "href": "/2-testcopy"
+      },
+      {
+        "title": "Getting Started with Algolia DocSearch",
+        "href": "/algolia-search"
+      },
+      {
+        "title": "Components",
+        "href": "/components",
+        "items": [
+          {
+            "title": "Code Block",
+            "href": "/code-block"
+          },
+          {
+            "title": "Custom Components",
+            "href": "/custom"
+          },
+          {
+            "title": "File System",
+            "href": "/file-system"
+          },
+          {
+            "title": "Image and Link",
+            "href": "/image-link"
+          },
+          {
+            "title": "Note",
+            "href": "/note"
+          },
+          {
+            "title": "Stepper",
+            "href": "/stepper"
+          },
+          {
+            "title": "Tabs",
+            "href": "/tabs"
+          }
+        ]
+      },
+      {
+        "title": "Customize",
+        "href": "/customize"
+      },
+      {
+        "title": "Internationalization",
+        "href": "/i18n"
+      },
+      {
+        "title": "Installation",
+        "href": "/installation"
+      },
+      {
+        "title": "Introduction",
+        "href": "/introduction"
+      },
+      {
+        "title": "Project Structure",
+        "href": "/project-structure"
+      },
+      {
+        "title": "Quick Start Guide",
+        "href": "/quick-start-guide"
+      },
+      {
+        "title": "Themes",
+        "href": "/themes"
+      }
+    ]
+  }
+]
