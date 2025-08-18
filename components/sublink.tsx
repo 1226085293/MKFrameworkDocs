@@ -1,4 +1,3 @@
-import { EachRoute } from "@/lib/routes-config";
 import Anchor from "./anchor";
 import {
 	Collapsible,
@@ -10,6 +9,7 @@ import { SheetClose } from "@/components/ui/sheet";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { EachRoute } from "@/lib/server/getRoutes";
 
 export default function SubLink({
 	title,
