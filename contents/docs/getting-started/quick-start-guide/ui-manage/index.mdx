@@ -16,7 +16,7 @@ order: 0
 使用 `mk.ViewBase` 代替 `Component`
 
 ```ts
-@ccclass("NewComponent")
+@ccclass('NewComponent')
 export class NewComponent extends mk.ViewBase {}
 ```
 
@@ -36,12 +36,12 @@ export class NewComponent extends mk.ViewBase {}
 
    ```ts
    // 注册一个可多次加载的模块，资源在 db://assets/resources/Test/Test.prefab，默认父节点为 Scene
-   mk.uiManage.regis(NewComponent, "Test/Test", null, {
-   	isRepeat: true,
-   	parent: () => cc.director.getScene(),
-   	loadConfig: {
-   		bundleStr: "resources",
-   	},
+   mk.uiManage.regis(NewComponent, 'Test/Test', null, {
+     isRepeat: true,
+     parent: () => cc.director.getScene(),
+     loadConfig: {
+       bundleStr: 'resources',
+     },
    });
    ```
 
@@ -56,15 +56,15 @@ export class NewComponent extends mk.ViewBase {}
 示例为在点击回调中关闭自身的三种方式
 
 ```ts
-@ccclass("NewComponent")
+@ccclass('NewComponent')
 export class NewComponent extends mk.ViewBase {
-	clickClose(): void {
-		// 类型
-		mk.uiManage.close(NewComponent);
-		// 类型对象
-		mk.uiManage.close(this);
-		// 节点
-		mk.uiManage.close(this.node);
-	}
+  clickClose(): void {
+    // 类型
+    mk.uiManage.close(NewComponent);
+    // 类型对象
+    mk.uiManage.close(this);
+    // 节点
+    mk.uiManage.close(this.node);
+  }
 }
 ```

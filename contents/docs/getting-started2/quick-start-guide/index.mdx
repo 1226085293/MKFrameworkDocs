@@ -12,10 +12,8 @@ Follow these simple instructions to set up your project efficiently and begin cr
 ## Documentation
 
 1. **Configure Routing**
-
    - Open the `@lib/route-config.ts` file and add your routing pages:
 
-   
      ```typescript:route-config.ts
      export const ROUTES: EachRoute[] = [
        // Add new route below
@@ -32,31 +30,30 @@ Follow these simple instructions to set up your project efficiently and begin cr
      ```
 
 2. **Create Content Structure**
-
    - Navigate to the `@content/docs` directory and create a folder named `fundamentals`, as defined in the `route-config` file. Within this folder, create a subfolder named `http-server`, and inside that, create an `index.mdx` file that will render when you navigate to `/fundamentals/http-server`:
 
 <Files
   items={[
     {
-      type: "folder",
-      name: "content",
+      type: 'folder',
+      name: 'content',
       isOpen: true,
       children: [
         {
-          type: "folder",
-          name: "docs",
+          type: 'folder',
+          name: 'docs',
           isOpen: true,
           children: [
             {
-              type: "folder",
-              name: "fundamentals",
+              type: 'folder',
+              name: 'fundamentals',
               isOpen: true,
               children: [
                 {
-                  type: "folder",
-                  name: "http-server",
+                  type: 'folder',
+                  name: 'http-server',
                   isOpen: true,
-                  children: [{ type: "file", name: "index.mdx" }],
+                  children: [{ type: 'file', name: 'index.mdx' }],
                 },
               ],
             },
@@ -67,13 +64,12 @@ Follow these simple instructions to set up your project efficiently and begin cr
   ]}
 />
 
-
 3. **Write Your Markdown Content**
    - Start writing your markdown content inside the `index.mdx` file.
 
 <Note type="warning">
-  Be sure to include frontmatter at the beginning of the file, which is used for
-  the page title and description:
+  Be sure to include frontmatter at the beginning of the file, which is used for the page title and
+  description:
 </Note>
 
      ```markdown:index.mdx showLineNumbers {1-4}
@@ -95,8 +91,7 @@ To get started with blogs, follow these steps:
 - Navigate to the `@content/blogs` directory and create a file with a unique name prefixed with `.mdx`, then start writing the markdown content inside.
 
 <Note type="warning">
-  Make sure to add the following frontmatter to format data for the blogs
-  properly
+  Make sure to add the following frontmatter to format data for the blogs properly
 </Note>
 
 ```markdown:blog-name.mdx

@@ -5,7 +5,6 @@ description: Learn how to integrate Algolia DocSearch into your documentation.
 
 [Algolia DocSearch](https://docsearch.algolia.com/) provides a fast, relevant search experience for documentation sites. It powers the search in this project (**Ariadocs**). Follow this guide to integrate it into your documentation.
 
-
 ## Apply for DocSearch
 
 Algolia provides **DocSearch** for open-source projects for free. To apply:
@@ -20,8 +19,7 @@ Algolia provides **DocSearch** for open-source projects for free. To apply:
    - **Search API Key**
    - **Index Name**
 
-
-##  Install DocSearch in Your Project
+## Install DocSearch in Your Project
 
 To integrate DocSearch, install the required package:
 
@@ -30,6 +28,7 @@ npm install @docsearch/react@3
 ```
 
 ## Create a Search Component
+
 In your React project, create a Search Component using `@docsearch/react`:
 
 ```jsx
@@ -38,12 +37,6 @@ import { DocSearch } from '@docsearch/react';
 import '@docsearch/css';
 
 export function Search() {
-  return (
-    <DocSearch
-      appId="YOUR_APP_ID"
-      indexName="YOUR_INDEX_NAME"
-      apiKey="YOUR_SEARCH_API_KEY"
-    />
-  );
+  return <DocSearch appId="YOUR_APP_ID" indexName="YOUR_INDEX_NAME" apiKey="YOUR_SEARCH_API_KEY" />;
 }
 ```

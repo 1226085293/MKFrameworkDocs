@@ -13,38 +13,38 @@ This example represents a Next.js project structure:
 
 <Files
   items={[
-    { type: "file", name: "package.json" },
-    { type: "file", name: "tsconfig.json" },
+    { type: 'file', name: 'package.json' },
+    { type: 'file', name: 'tsconfig.json' },
     {
-      type: "folder",
-      name: "src",
+      type: 'folder',
+      name: 'src',
       children: [
-        { type: "file", name: "index.tsx" },
-        { type: "file", name: "globals.css" },
+        { type: 'file', name: 'index.tsx' },
+        { type: 'file', name: 'globals.css' },
         {
-          type: "folder",
-          name: "components",
+          type: 'folder',
+          name: 'components',
           isOpen: true,
           children: [
-            { type: "file", name: "Navbar.tsx" },
-            { type: "file", name: "Footer.tsx" },
+            { type: 'file', name: 'Navbar.tsx' },
+            { type: 'file', name: 'Footer.tsx' },
           ],
         },
         {
-          type: "folder",
-          name: "pages",
+          type: 'folder',
+          name: 'pages',
           children: [
-            { type: "file", name: "index.tsx" },
-            { type: "file", name: "about.tsx" },
+            { type: 'file', name: 'index.tsx' },
+            { type: 'file', name: 'about.tsx' },
           ],
         },
       ],
     },
-    { type: "file", name: "next.config.js" },
-    { type: "file", name: ".gitignore" },
-    { type: "file", name: "extension.kt" },
+    { type: 'file', name: 'next.config.js' },
+    { type: 'file', name: '.gitignore' },
+    { type: 'file', name: 'extension.kt' },
   ]}
-/>{" "}
+/>
 
 ### Sorted File Structure with Changes
 
@@ -53,36 +53,37 @@ In this example, the file system has been modified:
 <Files
   sorted
   items={[
-    { type: "file", name: "package.json" },
-    { type: "file", name: "tsconfig.json" },
+    { type: 'file', name: 'package.json' },
+    { type: 'file', name: 'tsconfig.json' },
     {
-      type: "folder",
-      name: "src",
-      indicator: "add",
+      type: 'folder',
+      name: 'src',
+      indicator: 'add',
       children: [
-        { type: "file", name: "index.tsx" },
-        { type: "file", name: "globals.css" },
+        { type: 'file', name: 'index.tsx' },
+        { type: 'file', name: 'globals.css' },
         {
-          type: "folder",
-          name: "components",
+          type: 'folder',
+          name: 'components',
           isOpen: true,
           children: [
-            { type: "file", name: "Navbar.tsx" },
-            { type: "file", name: "Footer.tsx" },
-            { type: "file", name: "Button.tsx", highlight: true },
+            { type: 'file', name: 'Navbar.tsx' },
+            { type: 'file', name: 'Footer.tsx' },
+            { type: 'file', name: 'Button.tsx', highlight: true },
           ],
         },
       ],
     },
-    { type: "file", name: "next.config.js" },
-    { type: "file", name: ".gitignore" },
-    { type: "folder", name: "public", indicator: "delete",
-    children: [
-           { type: "file", name: "index.html" },   
-      ], 
+    { type: 'file', name: 'next.config.js' },
+    { type: 'file', name: '.gitignore' },
+    {
+      type: 'folder',
+      name: 'public',
+      indicator: 'delete',
+      children: [{ type: 'file', name: 'index.html' }],
     },
   ]}
-/>{" "}
+/>
 
 ## Props
 
@@ -99,26 +100,26 @@ In this example, the file system has been modified:
 
 ```md
 <Files
-  items={[
-    { type: "file", name: "package.json" },
-    { type: "file", name: "tsconfig.json" },
-    {
-      type: "folder",
-      name: "src",
-      children: [
-        { type: "file", name: "index.tsx" },
-        { type: "file", name: "globals.css" },
-        {
-          type: "folder",
-          name: "components",
-          children: [
-            { type: "file", name: "Navbar.tsx" },
-            { type: "file", name: "Footer.tsx" },
-          ],
-        },
-      ],
-    },
-    { type: "file", name: "next.config.js" },
-  ]}
+items={[
+{ type: "file", name: "package.json" },
+{ type: "file", name: "tsconfig.json" },
+{
+type: "folder",
+name: "src",
+children: [
+{ type: "file", name: "index.tsx" },
+{ type: "file", name: "globals.css" },
+{
+type: "folder",
+name: "components",
+children: [
+{ type: "file", name: "Navbar.tsx" },
+{ type: "file", name: "Footer.tsx" },
+],
+},
+],
+},
+{ type: "file", name: "next.config.js" },
+]}
 />
 ```
