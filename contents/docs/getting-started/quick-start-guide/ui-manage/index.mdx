@@ -1,0 +1,43 @@
+---
+title: UI 管理
+description: 
+order: 0
+---
+
+## 替换 Component
+
+对于重复利用的模块而言，onEnable、onDisable 并不能代替模块的加载/卸载，所以需要一个单独的生命周期基类代替 Component
+
+<Tabs defaultValue="动态模块" className="pt-5 pb-1">
+  <TabsList>
+    <TabsTrigger value="动态模块">动态模块</TabsTrigger>
+    <TabsTrigger value="静态模块">静态模块</TabsTrigger>
+  </TabsList>
+  <TabsContent value="动态模块">
+    使用 `mk.ViewBase` 代替 `Component`
+    ```ts
+    @ccclass("NewComponent")
+    export class NewComponent extends mk.ViewBase {}
+    ```
+    > 什么是动态模块？ 使用 `mk.uiManage` 打开的模块即为动态模块
+  </TabsContent>
+  <TabsContent value="静态模块">
+    使用 `mk.StaticViewBase` 代替 `Component`
+    ```ts
+    @ccclass("NewComponent")
+    export class NewComponent extends mk.StaticViewBase {}
+    ```
+    > 什么是静态模块？ 直接挂载到场景或者动态模块组件下的节点即为静态模块
+  </TabsContent>
+</Tabs>
+
+### 生命周期回调
+
+| 函数名       | 何时被调用  | 描述                                      |
+|--------------|-------|--------------------------------------------------|
+| `create` | 静态:onLoad时，动态:添加父节点后 | onLoad 的替代品，用于初始化视图 |
+| `open` |  |  |
+| `close` |  |  |
+| `lateClose` |  |  |
+
+### 加载动态模块

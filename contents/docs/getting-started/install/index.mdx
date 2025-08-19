@@ -1,7 +1,30 @@
 ---
-title: 安装框架
-description:
+title: 安装
+description: 如何在当前项目安装框架
 order: 0
 ---
 
-内容...
+import Image from "next/image";
+
+<Stepper>
+	<StepperItem title="步骤 1: 在 Cocos 商店下载安装插件">
+		1. 打开[此链接](https://store.cocos.com/app/detail/6426)页面后点击**添加到项目**跳转到Cocos
+		Dashboard 下载页面 
+        2. 在 Cocos Dashboard 下载页面再次点击**添加到项目**, 选择安装项目后点击确认等待下载成功
+	</StepperItem>
+	<StepperItem title="步骤 2: 安装插件依赖的 NPM 包">
+        <img src="/docs/4d607e16-4dbe-4007-90ec-965671ac076a.png" alt="安装菜单" style={{ width: "479", height: "141" }} />
+		1. 使用命令行工具 `cd` 到 "安装项目根目录\extensions\MKFramework"
+        2. 在命令行工具执行 `npm i`，等待安装完成，如遇到下载问题可开启全局 VPN 或更换 NPM 源
+        3. 重启或者启动 Cocos 编辑器
+	</StepperItem>
+	<StepperItem title="步骤 3: 安装框架">
+        1. 点击编辑器的顶部菜单/扩展/MKFramework/安装框架/稳定版本 
+        <img src="/docs/6a46e42d-5a3b-4e70-ad66-fa45fc504df3.png" alt="安装菜单" style={{ width: "485", height: "263" }} />
+        2. 等待安装完成，如下图
+        <img src="/docs/34171595-064d-441c-b517-804172f4ea7d.png" alt="安装菜单" style={{ width: "208", height: "265" }} />
+        3. 重启 Cocos 编辑器后即可使用框架
+        <img src="/docs/d723b10d-8166-4a91-991e-354759e4a14a.png" alt="安装菜单" style={{ width: "208", height: "265" }} />
+	</StepperItem>
+</Stepper>
+
