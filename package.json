@@ -3,7 +3,6 @@
 	"version": "2.0.0",
 	"private": true,
 	"scripts": {
-		"generate:routes": "npx tsx scripts/generateRoutes.ts",
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
