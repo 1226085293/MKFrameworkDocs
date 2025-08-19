@@ -36,7 +36,7 @@ export default function Home() {
 				MKFramework 游戏框架
 			</h1>
 			<h1 className="text-[1.0rem] leading-8 sm:px-8 md:leading-[4.5rem] font-bold mb-4 sm:text-2xl text-left sm:text-center">
-				CocosCreator 游戏引擎框架
+				适用于 CocosCreator 游戏引擎
 			</h1>
 			<p className="mb-8 md:text-lg text-base  max-w-[1200px] text-muted-foreground text-left sm:text-center">
 				免费，开源，类型安全，完善的生命周期/新手引导/资源管理系统，支持纯脚本/组件式开发，支持单脚本多预制
