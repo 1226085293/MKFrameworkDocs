@@ -1,43 +1,71 @@
 ---
 title: UI 管理
-description: 
+description: 关于 UI 管理的使用描述
 order: 0
 ---
 
+{/* prettier-ignore */}
+<Note type="warning" title="前置知识">
+	- 创建脚本：https://docs.cocos.com/creator/3.8/manual/zh/scripting/setup.html
+	- Component 生命周期：https://docs.cocos.com/creator/3.8/manual/zh/scripting/life-cycle-callbacks.html
+</Note>
+
 ## 替换 Component
 
-对于重复利用的模块而言，onEnable、onDisable 并不能代替模块的加载/卸载，所以需要一个单独的生命周期基类代替 Component
+对于重复利用的节点而言，节点上组件的 onEnable、onDisable 并不能代替节点的加载/卸载回调，所以需要一个单独的生命周期基类代替 Component
 
-<Tabs defaultValue="动态模块" className="pt-5 pb-1">
-  <TabsList>
-    <TabsTrigger value="动态模块">动态模块</TabsTrigger>
-    <TabsTrigger value="静态模块">静态模块</TabsTrigger>
-  </TabsList>
-  <TabsContent value="动态模块">
-    使用 `mk.ViewBase` 代替 `Component`
-    ```ts
-    @ccclass("NewComponent")
-    export class NewComponent extends mk.ViewBase {}
-    ```
-    > 什么是动态模块？ 使用 `mk.uiManage` 打开的模块即为动态模块
-  </TabsContent>
-  <TabsContent value="静态模块">
-    使用 `mk.StaticViewBase` 代替 `Component`
-    ```ts
-    @ccclass("NewComponent")
-    export class NewComponent extends mk.StaticViewBase {}
-    ```
-    > 什么是静态模块？ 直接挂载到场景或者动态模块组件下的节点即为静态模块
-  </TabsContent>
-</Tabs>
+使用 `mk.ViewBase` 代替 `Component`
+
+```ts
+@ccclass("NewComponent")
+export class NewComponent extends mk.ViewBase {}
+```
 
 ### 生命周期回调
 
-| 函数名       | 何时被调用  | 描述                                      |
-|--------------|-------|--------------------------------------------------|
-| `create` | 静态:onLoad时，动态:添加父节点后 | onLoad 的替代品，用于初始化视图 |
-| `open` |  |  |
-| `close` |  |  |
-| `lateClose` |  |  |
+| 函数名   | 何时被调用                        | 描述                            |
+| -------- | --------------------------------- | ------------------------------- |
+| `create` | 动态:添加父节点后，静态:onLoad 时 | onLoad 的替代品，用于初始化视图 |
+| `open`   |                                   | 模块打开回调                    |
+| `close`  |                                   | 模块关闭回调                    |
 
-### 加载动态模块
+## 打开动态模块(加载)
+
+1. 注册
+
+   注册只需执行一次，用于保存加载模块时只需传递单次的数据，第四个参数为配置，可以在 VSCode 中转到定义查看详细信息
+
+   ```ts
+   // 注册一个可多次加载的模块，资源在 db://assets/resources/Test/Test.prefab，默认父节点为 Scene
+   mk.uiManage.regis(NewComponent, "Test/Test", null, {
+   	isRepeat: true,
+   	parent: () => cc.director.getScene(),
+   	loadConfig: {
+   		bundleStr: "resources",
+   	},
+   });
+   ```
+
+2. 打开
+
+   ```ts
+   mk.uiManage.open(NewComponent);
+   ```
+
+## 关闭动态模块
+
+示例为在点击回调中关闭自身的三种方式
+
+```ts
+@ccclass("NewComponent")
+export class NewComponent extends mk.ViewBase {
+	clickClose(): void {
+		// 类型
+		mk.uiManage.close(NewComponent);
+		// 类型对象
+		mk.uiManage.close(this);
+		// 节点
+		mk.uiManage.close(this.node);
+	}
+}
+```
