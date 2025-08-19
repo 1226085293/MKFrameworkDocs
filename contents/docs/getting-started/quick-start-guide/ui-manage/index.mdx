@@ -32,24 +32,24 @@ export class NewComponent extends mk.ViewBase {}
 
 1. 注册
 
-   注册只需执行一次，用于保存加载模块时只需传递单次的数据，第四个参数为配置，可以在 VSCode 中转到定义查看详细信息
+    注册只需执行一次，用于保存加载模块时只需传递单次的数据，第四个参数为配置，可以在 VSCode 中转到定义查看详细信息
 
-   ```ts
-   // 注册一个可多次加载的模块，资源在 db://assets/resources/Test/Test.prefab，默认父节点为 Scene
-   mk.uiManage.regis(NewComponent, 'Test/Test', null, {
-     isRepeat: true,
-     parent: () => cc.director.getScene(),
-     loadConfig: {
-       bundleStr: 'resources',
-     },
-   });
-   ```
+    ```ts
+    // 注册一个可多次加载的模块，资源在 db://assets/resources/Test/Test.prefab，默认父节点为 Scene
+    mk.uiManage.regis(NewComponent, 'Test/Test', null, {
+        isRepeat: true,
+        parent: () => cc.director.getScene(),
+        loadConfig: {
+            bundleStr: 'resources',
+        },
+    });
+    ```
 
 2. 打开
 
-   ```ts
-   mk.uiManage.open(NewComponent);
-   ```
+    ```ts
+    mk.uiManage.open(NewComponent);
+    ```
 
 ## 关闭动态模块
 
@@ -58,13 +58,13 @@ export class NewComponent extends mk.ViewBase {}
 ```ts
 @ccclass('NewComponent')
 export class NewComponent extends mk.ViewBase {
-  clickClose(): void {
-    // 类型
-    mk.uiManage.close(NewComponent);
-    // 类型对象
-    mk.uiManage.close(this);
-    // 节点
-    mk.uiManage.close(this.node);
-  }
+    clickClose(): void {
+        // 类型
+        mk.uiManage.close(NewComponent);
+        // 类型对象
+        mk.uiManage.close(this);
+        // 节点
+        mk.uiManage.close(this.node);
+    }
 }
 ```
