@@ -1,18 +1,48 @@
-import { getDocsTocs } from "@/lib/markdown";
-import TocObserver from "./toc-observer";
-import { ScrollArea } from "@/components/ui/scroll-area";
+// components/toc.tsx
+'use client';
 
-export default async function Toc({ path }: { path: string }) {
-  const tocs = await getDocsTocs(path);
+import React, { useMemo } from 'react';
+import { allDocs } from 'contentlayer/generated';
+import TocObserver from './toc-observer';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-  return (
-    <div className="xl:flex toc hidden w-[20rem] py-9 sticky top-16 h-[96.95vh] pl-6">
-      <div className="flex flex-col gap-3 w-full pl-2">
-        <h3 className="font-medium text-sm">On this page</h3>
-        <ScrollArea className="pb-2 pt-0.5 overflow-y-auto">
-          <TocObserver data={tocs} />
-        </ScrollArea>
-      </div>
-    </div>
-  );
+type TocItem = {
+    level: number;
+    text: string;
+    href: string;
+};
+
+function slugify(text: string) {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '');
+}
+
+export default function Toc({ path }: { path: string }) {
+    const doc = allDocs.find(
+        (d) =>
+            d.slug === path ||
+            d._raw?.flattenedPath === `docs/${path}/index` ||
+            d._raw?.flattenedPath === `docs/${path}`
+    );
+
+    if (!doc) return null;
+
+    // 解析出 items（兼顾 computed field 和回退方案）
+    const items = useMemo(() => doc.toc, [doc]);
+
+    // 使用你原来的布局和 ScrollArea + TocObserver（保持样式与交互）
+    return (
+        <div className="xl:flex toc hidden w-[20rem] py-9 sticky top-16 h-[96.95vh] pl-6">
+            <div className="flex flex-col gap-3 w-full pl-2">
+                <h3 className="font-medium text-sm">On this page</h3>
+                <ScrollArea className="pb-2 pt-0.5 overflow-y-auto">
+                    {/* TocObserver 期待的数据结构应与之前 getDocsTocs 返回一致：{level, text, href}[] */}
+                    <TocObserver data={items} />
+                </ScrollArea>
+            </div>
+        </div>
+    );
 }

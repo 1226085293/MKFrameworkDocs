@@ -1,80 +1,129 @@
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
+// lib/server/getRoutes.ts
+import { allDocs } from 'contentlayer/generated';
 
-export type EachRoute = {
-	title: string;
-	href: string;
-	noLink?: boolean; // noLink will create a route segment (section) but cannot be navigated
-	items?: EachRoute[];
-	tag?: string;
-	/** 排序顺序 */
-	order?: number;
-};
-
-export type Page = { title: string; href: string };
-
-export function getRoutes(): EachRoute[] {
-	return _getRoutes("contents/docs/");
+export interface RouteItem {
+    title: string;
+    href: string;
+    items?: RouteItem[];
+    tag?: string;
+    order?: number;
+    noLink?: boolean;
 }
 
-export function getPageRoutes(): Page[] {
-	// 不把根节点当成一个页面返回，只返回其子项
-	const routes = getRoutes();
-
-	// 假设只有一个根节点 /docs
-	return routes.flatMap((it) => {
-		// 只返回 children
-		return it.items
-			? it.items
-					.map((sub) =>
-						getRecurrsiveAllLinks({ ...sub, href: `${it.href}${sub.href}` })
-					)
-					.flat()
-			: [];
-	});
+export interface TocItem {
+    level: number;
+    text: string;
+    href: string;
 }
 
-function readFrontmatter(dir: string) {
-	const indexFile = path.join(dir, "index.mdx");
-	const content = fs.readFileSync(indexFile, "utf-8");
-	return matter(content).data as Partial<EachRoute>;
+// 获取前后页面
+export function getPreviousNext(pathname: string) {
+    const pages = getPageRoutes();
+    const currentIndex = pages.findIndex((page) => page.href === `/${pathname}`);
+
+    return {
+        prev: currentIndex > 0 ? pages[currentIndex - 1] : undefined,
+        next: currentIndex < pages.length - 1 ? pages[currentIndex + 1] : undefined,
+    };
 }
 
-function _getRoutes(dir: string): EachRoute[] {
-	return fs
-		.readdirSync(dir, { withFileTypes: true })
-		.filter((e) => e.isDirectory())
-		.map((e) => {
-			const folder = path.join(dir, e.name);
-			const fm = readFrontmatter(folder);
+// 排序
+export function sortRoutes<T extends { order?: number; title: string }>(routes: T[]): T[] {
+    return routes.sort((a, b) => {
+        const orderA = a.order ?? 999;
+        const orderB = b.order ?? 999;
 
-			// href 总是仅使用当前的目录名
-			const href = `/${e.name}`;
+        if (orderA !== orderB) {
+            return orderA - orderB;
+        }
 
-			// 用 folder 作为递归路径，不拼在 href 中
-			const children = _getRoutes(folder);
-
-			return {
-				title: fm.title!,
-				href,
-				noLink: fm.noLink,
-				tag: fm.tag,
-				items: children.length > 0 ? children : undefined,
-				order: fm.order,
-			};
-		})
-		.sort((a, b) => Number(a.order ?? 999) - Number(b.order ?? 999));
+        return a.title.localeCompare(b.title);
+    });
 }
 
-function getRecurrsiveAllLinks(node: EachRoute) {
-	const ans: Page[] = [];
-	if (!node.noLink) {
-		ans.push({ title: node.title, href: node.href });
-	}
-	node.items?.forEach((subNode) => {
-		const temp = { ...subNode, href: `${node.href}${subNode.href}` };
-		ans.push(...getRecurrsiveAllLinks(temp));
-	});
-	return ans;
+export function getRoutes(): RouteItem[] {
+    const routes: RouteItem[] = [];
+
+    // 首先按路径深度排序，确保父级在处理子级之前被处理
+    const sortedDocs = [...allDocs].sort((a, b) => a.slugArray.length - b.slugArray.length);
+
+    sortedDocs.forEach((doc) => {
+        if (!doc.slugArray || doc.slugArray.length === 0) return;
+
+        let currentLevel = routes;
+        let currentPath = '';
+
+        for (let i = 0; i < doc.slugArray.length; i++) {
+            const slugPart = doc.slugArray[i];
+            currentPath += (i === 0 ? '' : '/') + slugPart;
+
+            const isLast = i === doc.slugArray.length - 1;
+
+            let existingItem = currentLevel.find((item) => item.href === `/${slugPart}`);
+
+            if (!existingItem) {
+                // 查找当前路径的文档以获取标题
+                const currentDoc = allDocs.find((d) => d.slug === currentPath);
+
+                existingItem = {
+                    title: currentDoc?.title || slugPart,
+                    href: `/${slugPart}`,
+                    items: [],
+                    tag: currentDoc?.tag,
+                    order: currentDoc?.order,
+                    noLink: currentDoc?.noLink,
+                };
+                currentLevel.push(existingItem);
+            }
+
+            if (!isLast && existingItem.items) {
+                currentLevel = existingItem.items;
+            }
+        }
+    });
+
+    // 排序
+    const _sortRoutes = (routes: RouteItem[]): RouteItem[] => {
+        return sortRoutes(routes).map((route) => {
+            let items = _sortRoutes(route.items!);
+            return {
+                ...route,
+                items: items.length ? items : undefined,
+            };
+        });
+    };
+
+    return _sortRoutes(routes);
+}
+
+export function getPageRoutes(): RouteItem[] {
+    // 扁平化路由列表
+    const flattenRoutes = (routes: RouteItem[]): RouteItem[] => {
+        return routes.flatMap((route) => {
+            const flatRoute = {
+                title: route.title,
+                href: route.href,
+                tag: route.tag,
+                order: route.order,
+            };
+            return route.items ? [flatRoute, ...flattenRoutes(route.items)] : [flatRoute];
+        });
+    };
+
+    return flattenRoutes(getRoutes());
+}
+
+// 新增：获取指定路径的所有子文档
+export function getChildRoutes(path: string): RouteItem[] {
+    const pathParts = path.split('/').filter((p) => p);
+    const routes = getRoutes();
+
+    let currentLevel = routes;
+    for (const part of pathParts) {
+        const found = currentLevel.find((item) => item.href === `/${part}`);
+        if (!found || !found.items) return [];
+        currentLevel = found.items;
+    }
+
+    return currentLevel;
 }
