@@ -8,44 +8,7 @@ import { notFound } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatDate } from '@/lib/utils';
 import Image from 'next/image';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Pre from '@/components/markdown/pre';
-import Note from '@/components/markdown/note';
-import { Stepper, StepperItem } from '@/components/markdown/stepper';
-import ImageComponent from '@/components/markdown/image';
-import LinkComponent from '@/components/markdown/link';
-import Outlet from '@/components/markdown/outlet';
-import Files from '@/components/markdown/files';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 import MdxRenderer from '@/components/mdx-renderer'; // 导入新的客户端组件
-
-const components = {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-    pre: Pre,
-    Note,
-    Stepper,
-    StepperItem,
-    img: ImageComponent,
-    a: LinkComponent,
-    Outlet,
-    Files,
-    table: Table,
-    thead: TableHeader,
-    th: TableHead,
-    tr: TableRow,
-    tbody: TableBody,
-    t: TableCell,
-};
 
 type PageProps = {
     params: Promise<{ slug: string }>;

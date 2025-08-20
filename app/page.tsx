@@ -1,7 +1,6 @@
 'use client';
 import { buttonVariants } from '@/components/ui/button';
 import { RouteItem } from '@/lib/server/getRoutes';
-import { MoveUpRightIcon, TerminalSquareIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 

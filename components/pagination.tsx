@@ -2,7 +2,6 @@
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import { buttonVariants } from './ui/button';
-import { allDocs } from 'contentlayer/generated';
 import { getPreviousNext } from '@/lib/server/getRoutes';
 
 export default function Pagination({ pathname }: { pathname: string }) {

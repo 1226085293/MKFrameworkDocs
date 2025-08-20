@@ -6,20 +6,6 @@ import { allDocs } from 'contentlayer/generated';
 import TocObserver from './toc-observer';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-type TocItem = {
-    level: number;
-    text: string;
-    href: string;
-};
-
-function slugify(text: string) {
-    return text
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
-}
-
 export default function Toc({ path }: { path: string }) {
     const doc = allDocs.find(
         (d) =>

@@ -28,7 +28,7 @@ export default async function DocsPage(props: PageProps) {
 
     if (!doc) notFound();
 
-    let breadcrumbItems: BreadcrumbItemType[] = [];
+    const breadcrumbItems: BreadcrumbItemType[] = [];
 
     // 构建面包屑
     const slugParts = slug;

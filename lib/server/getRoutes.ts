@@ -85,7 +85,7 @@ export function getRoutes(): RouteItem[] {
     // 排序
     const _sortRoutes = (routes: RouteItem[]): RouteItem[] => {
         return sortRoutes(routes).map((route) => {
-            let items = _sortRoutes(route.items!);
+            const items = _sortRoutes(route.items!);
             return {
                 ...route,
                 items: items.length ? items : undefined,
