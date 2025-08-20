@@ -12,6 +12,7 @@ export default function Image({
     ...props
 }: ComponentProps<'img'>) {
     if (!src) return null;
+    console.log('加载图片', src);
     return (
         <NextImage
             src={typeof src === 'string' ? src : URL.createObjectURL(src)}

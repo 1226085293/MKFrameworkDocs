@@ -1,7 +1,10 @@
 // components/mdx-renderer.tsx
 'use client';
 
-// import { useMDXComponent } from 'next-contentlayer/hooks';
+import * as React from 'react';
+import * as ReactJSXRuntime from 'react/jsx-runtime';
+import * as ReactDOM from 'react-dom/client';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Pre from '@/components/markdown/pre';
 import Note from '@/components/markdown/note';
@@ -18,9 +21,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import * as React from 'react';
-import * as ReactJSXRuntime from 'react/jsx-runtime';
-import * as ReactDOM from 'react-dom/client';
 
 const components = {
     Tabs,
@@ -43,11 +43,15 @@ const components = {
     t: TableCell,
 };
 
-interface MdxRendererProps {
-    code: string;
+// 条件导入 next-contentlayer/hooks 的 useMDXComponent
+let useNextContentlayerMDXComponent: ((code: string) => any) | undefined;
+if (process.env.NODE_ENV === 'development') {
+    const { useMDXComponent: nextUseMDXComponent } = require('next-contentlayer/hooks');
+    useNextContentlayerMDXComponent = nextUseMDXComponent;
 }
 
-export const useMDXComponent = (code: string, globals: Record<string, any> = {}) => {
+// 自定义 useMDXComponent（生产模式）
+const CustomUseMDXComponent = (code: string, globals: Record<string, any> = {}) => {
     return React.useMemo(() => {
         const scope = {
             React,
@@ -65,7 +69,17 @@ export const useMDXComponent = (code: string, globals: Record<string, any> = {})
     }, [code, globals]);
 };
 
+interface MdxRendererProps {
+    code: string;
+}
+
 export default function MdxRenderer({ code }: MdxRendererProps) {
+    const useMDXComponent =
+        process.env.NODE_ENV === 'development'
+            ? useNextContentlayerMDXComponent!
+            : CustomUseMDXComponent;
+
     const MDXContent = useMDXComponent(code);
+
     return <MDXContent components={components} />;
 }

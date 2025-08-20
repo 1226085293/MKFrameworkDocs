@@ -8,9 +8,14 @@ const nextConfig: NextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'img.freepik.com/**',
+                hostname: '**', // 允许所有域名
+            },
+            {
+                protocol: 'http',
+                hostname: '**', // 如果有 HTTP 图片也允许
             },
         ],
+        unoptimized: true, // 禁用 Next.js 图片优化器
     },
     productionBrowserSourceMaps: true, // ✅ 输出浏览器可用的 sourceMap（便于排查）
     reactStrictMode: true,
