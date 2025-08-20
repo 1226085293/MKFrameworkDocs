@@ -14,10 +14,10 @@ export default function Toc({ path }: { path: string }) {
             d._raw?.flattenedPath === `docs/${path}`
     );
 
-    if (!doc) return null;
-
     // 解析出 items（兼顾 computed field 和回退方案）
-    const items = useMemo(() => doc.toc, [doc]);
+    const items = useMemo(() => doc?.toc ?? [], [doc]);
+
+    if (!doc) return null;
 
     // 使用你原来的布局和 ScrollArea + TocObserver（保持样式与交互）
     return (
