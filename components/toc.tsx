@@ -25,7 +25,6 @@ export default function Toc({ path }: { path: string }) {
             <div className="flex flex-col gap-3 w-full pl-2">
                 <h3 className="font-medium text-sm">On this page</h3>
                 <ScrollArea className="pb-2 pt-0.5 overflow-y-auto">
-                    {/* TocObserver 期待的数据结构应与之前 getDocsTocs 返回一致：{level, text, href}[] */}
                     <TocObserver data={items} />
                 </ScrollArea>
             </div>
