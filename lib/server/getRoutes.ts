@@ -19,7 +19,8 @@ export interface TocItem {
 // 获取前后页面
 export function getPreviousNext(pathname: string) {
     const pages = getPageRoutes();
-    const currentIndex = pages.findIndex((page) => page.href === `/${pathname}`);
+    const fullPath = pathname.startsWith('/') ? pathname : `/${pathname}`;
+    const currentIndex = pages.findIndex((page) => page.href === fullPath);
 
     return {
         prev: currentIndex > 0 ? pages[currentIndex - 1] : undefined,
@@ -97,16 +98,17 @@ export function getRoutes(): RouteItem[] {
 }
 
 export function getPageRoutes(): RouteItem[] {
-    // 扁平化路由列表
-    const flattenRoutes = (routes: RouteItem[]): RouteItem[] => {
+    const flattenRoutes = (routes: RouteItem[], parentPath = ''): RouteItem[] => {
         return routes.flatMap((route) => {
+            // 拼接父路径
+            const fullPath = `${parentPath}${route.href}`;
             const flatRoute = {
                 title: route.title,
-                href: route.href,
+                href: fullPath, // 使用完整路径
                 tag: route.tag,
                 order: route.order,
             };
-            return route.items ? [flatRoute, ...flattenRoutes(route.items)] : [flatRoute];
+            return route.items ? [flatRoute, ...flattenRoutes(route.items, fullPath)] : [flatRoute];
         });
     };
 
