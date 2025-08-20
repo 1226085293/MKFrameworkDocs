@@ -21,12 +21,22 @@ export default function Anchor({
 }: AnchorProps) {
     const path = usePathname();
     let isMatch = absolute
-        ? props.href.toString().split('/')[1] == path.split('/')[1]
+        ? props.href.toString().split('/')[1] === path.split('/')[1]
         : path === props.href;
 
-    if (props.href.toString().includes('http')) isMatch = false;
+    const hrefStr = props.href.toString();
+    const isExternal = hrefStr.startsWith('http');
 
     if (disabled) return <div className={cn(className, 'cursor-not-allowed')}>{children}</div>;
+
+    if (isExternal) {
+        return (
+            <a href={hrefStr} className={className} target="_blank" rel="noopener noreferrer">
+                {children}
+            </a>
+        );
+    }
+
     return (
         <Link className={cn(className, isMatch && activeClassName)} {...props}>
             {children}
