@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
             },
         ],
     },
+    productionBrowserSourceMaps: true, // ✅ 输出浏览器可用的 sourceMap（便于排查）
+    reactStrictMode: true,
     // if used turbopack
     // transpilePackages: ["next-mdx-remote"],
 };
