@@ -1,3 +1,4 @@
+'use client';
 import Anchor from './anchor';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
