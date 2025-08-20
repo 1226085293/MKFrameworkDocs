@@ -13,20 +13,32 @@ order: 0
 
 对于重复利用的节点而言，节点上组件的 onEnable、onDisable 并不能代替节点的加载/卸载回调，所以需要一个单独的生命周期基类代替 Component
 
-使用 `mk.ViewBase` 代替 `Component`
+使用 `mk.ViewBase` 或 `mk.StaticViewBase` 代替 `Component`
 
 ```ts
 @ccclass('NewComponent')
 export class NewComponent extends mk.ViewBase {}
 ```
 
+#### 相同点
+
+`mk.ViewBase` 和 `mk.StaticViewBase` 都是继承于 `mk.LifeCycle`，有相同的生命周期回调函数。
+
+#### 不同点
+
+-   `mk.ViewBase` 是动态视图基类，可以被 `mk.uiManage` 管理(打开/关闭)。
+
+-   `mk.StaticViewBase` 是静态视图基类，不被 `mk.uiManage` 管理，也没有 `mk.ViewBase` 的属性面板配置和层级控制。
+
+你也可以只用 `mk.ViewBase` 来替换 Component，`mk.StaticViewBase` 是为了屏蔽掉多余的属性面板展示
+
 ### 生命周期回调
 
-| 函数名   | 何时被调用                        | 描述                            |
-| -------- | --------------------------------- | ------------------------------- |
-| `create` | 动态:添加父节点后，静态:onLoad 时 | onLoad 的替代品，用于初始化视图 |
-| `open`   |                                   | 模块打开回调                    |
-| `close`  |                                   | 模块关闭回调                    |
+| 函数名   | 何时被调用                                  | 描述                            |
+| -------- | ------------------------------------------- | ------------------------------- |
+| `create` | 动态视图：添加父节点后。静态视图：onLoad 时 | onLoad 的替代品，用于初始化视图 |
+| `open`   | create -> 递归子组件 create 和 open-> open  | 模块打开回调                    |
+| `close`  | close -> 递归子组件 close                   | 模块关闭回调                    |
 
 ## 打开动态模块(加载)
 
