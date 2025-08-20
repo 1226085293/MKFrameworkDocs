@@ -8,8 +8,7 @@ import Anchor from './anchor';
 import { SheetLeftbar } from './leftbar';
 import { SheetClose } from '@/components/ui/sheet';
 import AlgoliaSearch from './algolia-search';
-import { useState, useEffect } from 'react';
-import { RouteItem } from '@/lib/server/getRoutes';
+import { getRoutes } from '@/lib/server/getRoutes';
 
 const algolia_props = {
     appId: process.env.ALGOLIA_APP_ID!,
@@ -74,14 +73,7 @@ export function Logo() {
 }
 
 export function NavMenu({ isSheet = false }: { isSheet?: boolean }) {
-    // ✅ Hooks 必须写在组件函数内部
-    const [routes, setRoutes] = useState<RouteItem[]>([]);
-
-    useEffect(() => {
-        fetch('/api/routes')
-            .then((r) => r.json())
-            .then((data) => setRoutes(data));
-    }, []);
+    const routes = getRoutes();
 
     // ✅ 根据 pageRoutes 动态生成 NAVLINKS
     const NAVLINKS = [

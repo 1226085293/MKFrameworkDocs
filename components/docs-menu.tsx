@@ -1,8 +1,8 @@
 import SubLink from './sublink';
 import { getRoutes } from '@/lib/server/getRoutes';
 
-export default async function DocsMenu({ isSheet = false }) {
-    const routes = await getRoutes();
+export default function DocsMenu({ isSheet = false }) {
+    const routes = getRoutes();
 
     return (
         <div className="flex flex-col gap-3.5 mt-5 pr-2 pb-6 sm:text-base text-[14.5px]">

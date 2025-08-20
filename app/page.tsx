@@ -1,18 +1,10 @@
 'use client';
 import { buttonVariants } from '@/components/ui/button';
-import { RouteItem } from '@/lib/server/getRoutes';
+import { getRoutes } from '@/lib/server/getRoutes';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 export default function Home() {
-    const [routes, setRoutes] = useState<RouteItem[]>([]);
-
-    useEffect(() => {
-        fetch('/api/routes')
-            .then((r) => r.json())
-            .then((data) => setRoutes(data));
-    }, []);
-
+    const routes = getRoutes();
     return (
         <div className="flex sm:min-h-[87.5vh] min-h-[82vh] flex-col sm:items-center justify-center text-center sm:py-8 py-14">
             {/* <Link

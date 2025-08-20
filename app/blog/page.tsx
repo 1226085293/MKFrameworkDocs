@@ -42,7 +42,7 @@ function getAllBlogsFrontmatter() {
         .sort((a, b) => stringToDate(b.date).getTime() - stringToDate(a.date).getTime());
 }
 
-export default async function BlogIndexPage() {
+export default function BlogIndexPage() {
     const blogs = getAllBlogsFrontmatter();
 
     return (
