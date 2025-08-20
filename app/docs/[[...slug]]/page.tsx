@@ -3,11 +3,7 @@ import { allDocs } from 'contentlayer/generated';
 import { notFound } from 'next/navigation';
 import { BreadcrumbItemType } from '@/components/docs-breadcrumb';
 import { getPageRoutes } from '@/lib/server/getRoutes';
-import MdxRenderer from '@/components/mdx-renderer';
-import Pagination from '@/components/pagination';
-import Toc from '@/components/toc';
-import { Typography } from '@/components/typography';
-import { title } from 'process';
+import DocsClient from '@/components/docs-client';
 
 type PageProps = {
     params: Promise<{ slug: string[] }>;
@@ -53,22 +49,12 @@ export default async function DocsPage(props: PageProps) {
     }
 
     return (
-        <div className="flex items-start gap-10">
-            <div className="flex-[4.5] py-10 mx-auto">
-                <div className="w-full mx-auto">
-                    <Typography>
-                        <h1 className="sm:text-3xl text-2xl !-mt-0.5">{title}</h1>
-                        <p className="-mt-4 text-muted-foreground sm:text-[16.5px] text-[14.5px]">
-                            {doc.description}
-                        </p>
-                        <MdxRenderer code={doc.body.code} />
-                        <Pagination pathname={pathName} />
-                    </Typography>
-                </div>
-            </div>
-
-            <Toc path={pathName} />
-        </div>
+        <DocsClient
+            title={doc.title}
+            description={doc.description}
+            code={doc.body.code}
+            pathName={pathName}
+        />
     );
 }
 

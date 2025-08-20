@@ -1,10 +1,7 @@
 // components/mdx-renderer.tsx
 'use client';
 
-import * as React from 'react';
-import * as ReactJSXRuntime from 'react/jsx-runtime';
-import * as ReactDOM from 'react-dom/client';
-
+import { useMDXComponent } from 'next-contentlayer/hooks';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Pre from '@/components/markdown/pre';
 import Note from '@/components/markdown/note';
@@ -43,43 +40,26 @@ const components = {
     t: TableCell,
 };
 
-// 条件导入 next-contentlayer/hooks 的 useMDXComponent
-let useNextContentlayerMDXComponent: ((code: string) => any) | undefined;
-if (process.env.NODE_ENV === 'development') {
-    const { useMDXComponent: nextUseMDXComponent } = require('next-contentlayer/hooks');
-    useNextContentlayerMDXComponent = nextUseMDXComponent;
-}
-
-// 自定义 useMDXComponent（生产模式）
-const CustomUseMDXComponent = (code: string, globals: Record<string, any> = {}) => {
-    return React.useMemo(() => {
-        const scope = {
-            React,
-            ReactDOM,
-            _jsx_runtime: ReactJSXRuntime,
-            process: { env: { NODE_ENV: process?.env?.NODE_ENV || 'development' } },
-            ...globals,
-        };
-
-        return function MDXContent(props: any) {
-            const fn = new Function(...Object.keys(scope), code);
-            const Component = fn(...Object.values(scope)).default;
-            return <Component {...props} />;
-        };
-    }, [code, globals]);
-};
-
 interface MdxRendererProps {
     code: string;
 }
 
 export default function MdxRenderer({ code }: MdxRendererProps) {
-    const useMDXComponent =
-        process.env.NODE_ENV === 'development'
-            ? useNextContentlayerMDXComponent!
-            : CustomUseMDXComponent;
+    // ---- 防护：在浏览器端注入最小 process polyfill ----
+    if (typeof window !== 'undefined') {
+        // eslint-disable-next-line no-prototype-builtins
+        if (!(window as any).process) {
+            // 只提供 env 对象，避免暴露任何敏感值
+            (window as any).process = { env: {} };
+            // 可选：在开发环境打印提示，帮助定位哪个模块用到了 process
+            if (process.env.NODE_ENV === 'development') {
+                // 注意这里的 process 现在是我们刚注入的对象
+                console.warn('[polyfill] window.process injected for MDX client runtime');
+            }
+        }
+    }
+    // ------------------------------------------------
 
     const MDXContent = useMDXComponent(code);
-
     return <MDXContent components={components} />;
 }
