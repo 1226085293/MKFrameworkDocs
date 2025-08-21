@@ -42,4 +42,6 @@ content:
         sort: order
         order: asc
       layout: tree            # 树形显示以展示文件夹结构
-      node: index.mdx
+      node: 
+        filename: index.mdx
+        hideDirs: nodes
