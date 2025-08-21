@@ -20,8 +20,8 @@ const nextConfig: NextConfig = {
     },
     productionBrowserSourceMaps: true, // ✅ 输出浏览器可用的 sourceMap（便于排查）
     reactStrictMode: true,
-    basePath: isProd ? '/' : '',
-    assetPrefix: isProd ? '/' : '',
+    basePath: '',
+    assetPrefix: isProd ? 'https://mkframework.muzzik.cc/' : '',
 };
 
 export default withContentlayer(nextConfig);
