@@ -6,7 +6,7 @@ import Pagination from '@/components/pagination';
 import Toc from '@/components/toc';
 
 // 动态导入 MdxRenderer（这里才可以 ssr:false）
-const DocsMdxWrapper = dynamic(() => import('@/components/docs-mdx-wrapper'), {
+const MdxRenderer = dynamic(() => import('@/components/mdx-renderer'), {
     ssr: false,
 });
 
@@ -30,7 +30,7 @@ export default function DocsClient({
                         <p className="-mt-4 text-muted-foreground sm:text-[16.5px] text-[14.5px]">
                             {description}
                         </p>
-                        <DocsMdxWrapper code={code} />
+                        <MdxRenderer code={code} />
                         <Pagination pathname={pathName} />
                     </Typography>
                 </div>
