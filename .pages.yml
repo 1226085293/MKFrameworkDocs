@@ -36,7 +36,7 @@ content:
             type: number
           - name: body
             label: 内容
-            type: rich-text
+            type: text
       view:
           fields: [title, description, order, noLink, tag]
           primary: title
