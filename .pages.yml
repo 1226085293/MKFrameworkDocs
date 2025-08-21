@@ -1,8 +1,10 @@
-# 媒体配置（可选，如果你的文档中有图片或附件）
+# .pages.yml
+
+# 媒体配置
 media:
   label: 资源
-  input: public/docs
-  output: public/docs
+  input: public/docs        # 仓库里实际存放在 public/docs
+  output: /docs             # 站点访问路径，从站点根开始 -> public 对应 /
   categories: [ image, document ]
 
 # 内容配置
@@ -11,7 +13,8 @@ content:
     label: 文档
     type: collection
     path: contents/docs
-    subfolders: false  # 允许子文件夹
+    subfolders: true        # 允许子文件夹（你的 module/* 结构）
+    format: yaml-frontmatter  # 明确使用 YAML frontmatter（适用于 .md/.mdx 带 frontmatter 的文件）
     fields:
       - name: title
         label: Title
@@ -37,6 +40,8 @@ content:
       default:
         search: ''
         sort: order
-      layout: tree  # 使用树形显示子文件夹
+        order: asc
+      layout: tree            # 树形显示以展示文件夹结构
       node:
         filename: index.mdx
+        hideDirs: all         # 隐藏只有子目录的空目录显示，或改为 'nodes' / 'others' 根据你想法调整
