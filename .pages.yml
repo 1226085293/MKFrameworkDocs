@@ -45,4 +45,4 @@ content:
       layout: tree            # 树形显示以展示文件夹结构
       node: 
         filename: index.mdx
-        hideDirs: others
+        hideDirs: all
