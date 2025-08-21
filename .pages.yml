@@ -1,7 +1,7 @@
 # 媒体配置（可选，如果你的文档中有图片或附件）
 media:
-  input: contents/docs/media
-  output: /media
+  input: contents/docs
+  output: contents/docs
   categories: [ image, document ]
 
 # 内容配置
