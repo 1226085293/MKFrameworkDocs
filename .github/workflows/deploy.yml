@@ -3,7 +3,7 @@ name: Deploy Next.js to GitHub Pages
 on:
     push:
         branches:
-            - main # 这里改成你的默认分支
+            - main # 改成你的默认分支
 
 jobs:
     build-and-deploy:
@@ -17,12 +17,19 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: 18
-                  cache: pnpm
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
               with:
-                  version: 9 # 建议和你本地 pnpm 版本一致
+                  version: 9 # 和你本地 pnpm 版本一致
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v4
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pnpm-
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
@@ -39,8 +46,8 @@ jobs:
         needs: build-and-deploy
         runs-on: ubuntu-latest
         permissions:
-            pages: write # 部署 GitHub Pages 的权限
-            id-token: write # 用于 OIDC 认证
+            pages: write
+            id-token: write
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
