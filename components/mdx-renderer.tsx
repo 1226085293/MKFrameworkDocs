@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { useMDXComponent } from 'next-contentlayer/hooks';
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Pre from '@/components/markdown/pre';
 import Note from '@/components/markdown/note';

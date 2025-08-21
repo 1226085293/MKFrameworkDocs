@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// contentlayer.config.ts
 import { defineDocumentType, makeSource } from 'contentlayer/source-files';
 import rehypePrism from 'rehype-prism-plus';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
@@ -153,6 +151,7 @@ export default makeSource({
     documentTypes: [Doc, Blog],
     disableImportAliasWarning: true, // 添加这行来禁用警告
     mdx: {
+        cwd: process.cwd(),
         remarkPlugins: [remarkGfm],
         rehypePlugins: [
             preProcess,
