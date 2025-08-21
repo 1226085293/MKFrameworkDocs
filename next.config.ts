@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 import { withContentlayer } from 'next-contentlayer';
 
+const isProd = process.env.NODE_ENV === 'production';
 const nextConfig: NextConfig = {
     output: 'export',
     /* config options here */
@@ -19,8 +20,8 @@ const nextConfig: NextConfig = {
     },
     productionBrowserSourceMaps: true, // ✅ 输出浏览器可用的 sourceMap（便于排查）
     reactStrictMode: true,
-    // if used turbopack
-    // transpilePackages: ["next-mdx-remote"],
+    basePath: isProd ? '/MKFrameworkDocs' : '',
+    assetPrefix: isProd ? '/MKFrameworkDocs/' : '',
 };
 
 export default withContentlayer(nextConfig);

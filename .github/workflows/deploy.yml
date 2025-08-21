@@ -1,0 +1,46 @@
+name: Deploy Next.js to GitHub Pages
+
+on:
+    push:
+        branches:
+            - main # 这里改成你项目的默认分支
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 18
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Build project
+              run: npm run build
+
+            - name: Upload build output
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: ./out
+
+    deploy:
+        needs: build-and-deploy
+        runs-on: ubuntu-latest
+        permissions:
+            pages: write # 部署 GitHub Pages 的权限
+            id-token: write # 用于 OIDC 认证
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
