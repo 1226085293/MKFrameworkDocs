@@ -17,12 +17,14 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: 22 # 和你本地保持一致
-                  cache: pnpm
 
-            - name: Setup pnpm (from package.json)
+            - name: Setup pnpm
               uses: pnpm/action-setup@v4
+              with:
+                  version: 9 # 可以写死版本，和你本地保持一致
+                  run_install: false
 
-            - name: Cache pnpm modules
+            - name: Cache pnpm store
               uses: actions/cache@v4
               with:
                   path: ~/.pnpm-store
