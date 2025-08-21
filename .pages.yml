@@ -14,7 +14,7 @@ content:
     type: collection
     path: contents/docs
     subfolders: true        # 允许子文件夹（你的 module/* 结构）
-    filename: 'index.mdx'
+    filename: index.mdx
     format: yaml-frontmatter  # 明确使用 YAML frontmatter（适用于 .md/.mdx 带 frontmatter 的文件）
     fields:
       - name: title
@@ -43,3 +43,4 @@ content:
         sort: order
         order: asc
       layout: tree            # 树形显示以展示文件夹结构
+      node: index.mdx
