@@ -10,8 +10,7 @@
         "build:debug": "cross-env NEXT_DEBUG=true next build",
         "start": "next start",
         "lint": "next lint",
-        "postinstall": "contentlayer build || exit 0",
-        "contentlayer": "contentlayer build || exit 0"
+        "contentlayer": "contentlayer build"
     },
     "dependencies": {
         "@docsearch/react": "^3.9.0",
