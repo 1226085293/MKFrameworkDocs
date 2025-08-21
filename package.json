@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "next build",
+        "build": "set NODE_ENV=production && next build",
         "preview": "cd out && npx http-server -c-1 --cors",
         "build-preview": "npm run build && npm run preview",
         "build:debug": "set NEXT_DEBUG=true && next build",
