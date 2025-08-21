@@ -9,7 +9,7 @@ content:
   - name: docs
     label: Documentation
     type: collection
-    path: content/docs
+    path: contents/docs
     subfolders: true  # 允许子文件夹
     fields:
       - name: title
