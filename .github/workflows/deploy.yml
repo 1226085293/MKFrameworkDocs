@@ -16,7 +16,8 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: 18
+                  node-version: 22 # 和你本地保持一致
+                  cache: pnpm
 
             - name: Setup pnpm (from package.json)
               uses: pnpm/action-setup@v4
