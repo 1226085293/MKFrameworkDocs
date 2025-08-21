@@ -18,10 +18,8 @@ jobs:
               with:
                   node-version: 18
 
-            - name: Setup pnpm
+            - name: Setup pnpm (from package.json)
               uses: pnpm/action-setup@v4
-              with:
-                  version: 9 # 和你本地 pnpm 版本一致
 
             - name: Cache pnpm modules
               uses: actions/cache@v4
