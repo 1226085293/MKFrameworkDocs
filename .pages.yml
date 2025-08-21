@@ -37,8 +37,6 @@ content:
       default:
         search: ''
         sort: order
-        order: asc
       layout: tree  # 使用树形显示子文件夹
       node:
         filename: index.mdx
-        hideDirs: all
