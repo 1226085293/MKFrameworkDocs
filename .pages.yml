@@ -35,7 +35,7 @@ content:
             label: Order
             type: number
       view:
-          fields: [title, order, tag, description]
+          fields: [title, description, order, tag]
           primary: title
           sort: [order, title]
           default:
