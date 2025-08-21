@@ -11,7 +11,7 @@ content:
     label: 文档
     type: collection
     path: contents/docs
-    subfolders: true  # 允许子文件夹
+    subfolders: false  # 允许子文件夹
     fields:
       - name: title
         label: Title
