@@ -18,22 +18,25 @@ content:
       format: yaml-frontmatter # 明确使用 YAML frontmatter（适用于 .md/.mdx 带 frontmatter 的文件）
       fields:
           - name: title
-            label: Title
+            label: 标题
             type: string
             required: true
           - name: description
-            label: Description
+            label: 描述
             type: text
           - name: noLink
-            label: Hide Link
+            label: 不可点击
             type: boolean
             default: false
           - name: tag
-            label: Tag
+            label: 标签
             type: string
           - name: order
-            label: Order
+            label: 排序
             type: number
+          - name: body
+            label: 内容
+            type: rich-text
       view:
           fields: [title, description, order, noLink, tag]
           primary: title
