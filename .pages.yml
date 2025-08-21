@@ -1,36 +1,46 @@
-media:
-  label: 资源
-  input: public/docs
-  output: /docs
-  categories: [ image, document ]
+# .pages.yml
 
+# 媒体配置
+media:
+    label: 资源
+    input: public/docs # 仓库里实际存放在 public/docs
+    output: /docs # 站点访问路径，从站点根开始 -> public 对应 /
+    categories: [image, document]
+
+# 内容配置
 content:
-  - name: docs
-    label: 文档
-    type: collection
-    path: contents/docs
-    subfolders: true
-    format: yaml-frontmatter
-    fields:
-      - name: title
-        label: Title
-        type: string
-        required: true
-      - name: description
-        label: Description
-        type: text
-      - name: noLink
-        label: Hide Link
-        type: boolean
-        default: false
-      - name: tag
-        label: Tag
-        type: string
-      - name: order
-        label: Order
-        type: number
-    view:
-      primary: title
-      fields: [ title, order, tag ]
-      sort: [ order ]
-      layout: list    # 临时改为 list 便于排查
+    - name: docs
+      label: 文档
+      type: collection
+      path: contents/docs
+      subfolders: true # 允许子文件夹（你的 module/* 结构）
+      filename: index.mdx
+      format: yaml-frontmatter # 明确使用 YAML frontmatter（适用于 .md/.mdx 带 frontmatter 的文件）
+      fields:
+          - name: title
+            label: Title
+            type: string
+            required: true
+          - name: description
+            label: Description
+            type: text
+          - name: noLink
+            label: Hide Link
+            type: boolean
+            default: false
+          - name: tag
+            label: Tag
+            type: string
+          - name: order
+            label: Order
+            type: number
+      view:
+          fields: [title, order, tag]
+          primary: title
+          sort: [order, title]
+          default:
+              search: ''
+              sort: order
+              order: asc
+          layout: tree # 树形显示以展示文件夹结构
+          node: index.mdx

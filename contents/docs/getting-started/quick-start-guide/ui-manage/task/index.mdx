@@ -1,0 +1,74 @@
+---
+title: 课后实践
+description: 本节学习后的课后实践任务
+order: 0
+---
+
+## 制作一个弹窗
+
+目标：在场景中打开一个弹窗，并点击弹窗内的关闭按钮关闭弹窗
+
+## 实现参考
+
+如果你尝试过还是不知道怎么做，那就看看这里的内容吧
+
+<details>
+	<summary>点击展开/折叠</summary>
+
+    ### 项目 assets 结构
+
+<Files
+    items={[
+        { type: 'file', name: 'Main.scene' },
+        { type: 'file', name: 'Main.ts' },
+        {
+            type: 'folder',
+            name: 'resources',
+            children: [
+                {
+                    type: 'folder',
+                    name: 'Module',
+                    children: [
+                        {
+                            type: 'folder',
+                            name: 'Window',
+                            children: [
+                                { type: 'file', name: 'ResourcesWindow.ts' },
+                                { type: 'file', name: 'ResourcesWindow.prefab' },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        },
+    ]}
+/>
+
+### 实现步骤
+
+{/* prettier-ignore */}
+<Stepper>
+  <StepperItem title="步骤 1: 挂载 Main.ts">
+    将 Main.ts 组件的父类修改为 `mk.StaticViewBase`，将其挂载到 Main.scene 中的 Canvas 节点上，这样生命周期回调就可以被正常调用
+  </StepperItem>
+  <StepperItem title="Step 2: 实现 ResourcesWindow.ts">
+    1. 将 ResourcesWindow.ts 组件的父类修改为 `mk.ViewBase`，将其挂载到 ResourcesWindow.prefab 预制体上
+    2. 在 ResourcesWindow.ts 内新建一个按钮回调函数，内部使用 `mk.uiManage.close` 关闭自身
+    3. 在预制体内新建一个按钮，设置按钮回调函数为上一步创建的函数
+  </StepperItem>
+  <StepperItem title="步骤 3: 打开弹窗">
+    1. 在 Main.ts 的 open 回调中使用 `mk.uiManage.regis` 注册 ResourcesWindow 模块
+        ```ts
+        mk.uiManage.regis(ResourcesWindow, "Module/Window/ResourcesWindow", this, {
+            loadConfig: {
+                bundleStr: "resources",
+            },
+        });
+        ```
+    2. 在下一行使用 `mk.uiManage.open` 打开 ResourcesWindow 模块
+  </StepperItem>
+</Stepper>
+
+当你完成以上步骤，运行场景后应该会看到 ResourcesWindow 预制体被成功加载，并且点击按钮会关闭 ResourcesWindow
+
+</details>
