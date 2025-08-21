@@ -1,5 +1,6 @@
 # 媒体配置（可选，如果你的文档中有图片或附件）
 media:
+  label: 资源
   input: public/docs
   output: public/docs
   categories: [ image, document ]
@@ -7,7 +8,7 @@ media:
 # 内容配置
 content:
   - name: docs
-    label: Documentation
+    label: 文档
     type: collection
     path: contents/docs
     subfolders: true  # 允许子文件夹
