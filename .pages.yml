@@ -35,12 +35,7 @@ content:
         label: Order
         type: number
     view:
-      fields: [ title, order, tag ]
       primary: title
-      sort: [ order, title ]
-      default:
-        search: ''
-        sort: order
-        order: asc
+      sort: [ title ]
       layout: tree            # 树形显示以展示文件夹结构
       node: index.mdx
