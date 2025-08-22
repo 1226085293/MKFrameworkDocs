@@ -18,7 +18,7 @@ export interface TocItem {
 
 // 获取前后页面
 export function getPreviousNext(pathname: string) {
-    const pages = getPageRoutes();
+    const pages = getPageRoutes().filter((page) => !page.noLink);
     const fullPath = pathname.startsWith('/') ? pathname : `/${pathname}`;
     const currentIndex = pages.findIndex((page) => page.href === fullPath);
 
@@ -107,7 +107,8 @@ export function getPageRoutes(): RouteItem[] {
                 href: fullPath, // 使用完整路径
                 tag: route.tag,
                 order: route.order,
-            };
+                noLink: route.noLink,
+            } as RouteItem;
             return route.items ? [flatRoute, ...flattenRoutes(route.items, fullPath)] : [flatRoute];
         });
     };
