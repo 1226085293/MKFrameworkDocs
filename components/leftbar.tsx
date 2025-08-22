@@ -28,8 +28,8 @@ export function SheetLeftbar() {
             <SheetContent className="flex flex-col gap-4 px-0" side="left">
                 <DialogTitle className="sr-only">Menu</DialogTitle>
                 <SheetHeader>
-                    <SheetClose className="px-5" asChild>
-                        <Logo />
+                    <SheetClose asChild>
+                        <Logo className="px-5" />
                     </SheetClose>
                 </SheetHeader>
                 <div className="flex flex-col gap-4 overflow-y-auto">
