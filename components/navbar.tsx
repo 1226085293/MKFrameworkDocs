@@ -16,8 +16,6 @@ const algolia_props = {
     apiKey: process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY!,
 };
 
-let a = 0;
-
 export function Navbar() {
     return (
         <nav className="w-full border-b h-16 sticky top-0 z-50 bg-background">
