@@ -1,4 +1,4 @@
-name: Deploy Next.js to GitHub Pages
+name: 部署网站
 
 on:
     push:
@@ -16,7 +16,7 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: 22 # 和你本地保持一致
+                  node-version: 22
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
@@ -36,6 +36,10 @@ jobs:
 
             - name: Build project
               run: pnpm build
+              env:
+                  ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
+                  ALGOLIA_INDEX: ${{ secrets.ALGOLIA_INDEX }}
+                  ALGOLIA_SEARCH_API_KEY: ${{ secrets.ALGOLIA_SEARCH_API_KEY }}
 
             - name: Upload build output
               uses: actions/upload-pages-artifact@v3
