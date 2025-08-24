@@ -37,7 +37,9 @@ export function Navbar() {
                     <div className="flex items-center justify-between sm:gap-2">
                         <div className="flex ml-4 sm:ml-0">
                             <Link
-                                href="https://github.com/1226085293/MKFrameworkDocs"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href="https://github.com/1226085293/MKFramework"
                                 className={buttonVariants({
                                     variant: 'ghost',
                                     size: 'icon',

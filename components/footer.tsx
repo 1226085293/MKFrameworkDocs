@@ -11,14 +11,18 @@ export function Footer() {
                         Build by{' '}
                         <Link
                             className="px-1 underline underline-offset-2"
-                            href="https://github.com/nisabmohd"
+                            href="https://github.com/1226085293"
+                            target="_blank"
+                            rel="noopener noreferrer"
                         >
-                            nisabmohd
+                            muzzik
                         </Link>
                         . The source code is available on{' '}
                         <Link
                             className="px-1 underline underline-offset-2"
-                            href="https://github.com/nisabmohd/Aria-Docs"
+                            href="https://github.com/1226085293/MKFrameworkDocs"
+                            target="_blank"
+                            rel="noopener noreferrer"
                         >
                             GitHub
                         </Link>
