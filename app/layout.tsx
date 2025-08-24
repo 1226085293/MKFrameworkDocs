@@ -40,6 +40,10 @@ export default function RootLayout({
                     type="text/css"
                     href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
                 />
+                <meta
+                    name="google-site-verification"
+                    content="kQDVFhUTNG12MduVr7DiXr2BFyYzW2urmCHB7o2uvmM"
+                />
             </head>
             <body
                 className={`${sansFont.variable} ${monoFont.variable} font-regular antialiased tracking-wide`}
