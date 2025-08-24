@@ -10,13 +10,7 @@ import { SheetClose } from '@/components/ui/sheet';
 import AlgoliaSearch from './algolia-search';
 import { getRoutes } from '@/lib/server/getRoutes';
 
-const algolia_props = {
-    appId: process.env.ALGOLIA_APP_ID!,
-    indexName: process.env.ALGOLIA_INDEX!,
-    apiKey: process.env.ALGOLIA_SEARCH_API_KEY!,
-};
-
-export function Navbar() {
+export function NavbarClient({ algoliaProps }: { algoliaProps: any }) {
     return (
         <nav className="w-full border-b h-16 sticky top-0 z-50 bg-background">
             <div className="sm:container mx-auto w-[95vw] h-full flex items-center sm:justify-between md:gap-2">
@@ -33,7 +27,7 @@ export function Navbar() {
                 </div>
 
                 <div className="flex items-center sm:justify-normal justify-between sm:gap-3 ml-1 sm:w-fit w-[90%]">
-                    <AlgoliaSearch {...algolia_props} />
+                    <AlgoliaSearch {...algoliaProps} />
                     <div className="flex items-center justify-between sm:gap-2">
                         <div className="flex ml-4 sm:ml-0">
                             <Link
