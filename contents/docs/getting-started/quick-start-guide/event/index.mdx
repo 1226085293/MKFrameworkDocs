@@ -4,4 +4,63 @@ description: 游戏中对象的通信方式
 noLink: false
 order: 1
 ---
-框架中的事件对象类型是 `mk.EventTarget`，继承于 `cc.EventTarget`，且所有接口都是类型安全的📦
+
+框架中的事件对象类型是 `mk.EventTarget`，继承于 `cc.EventTarget`，且所有接口都是类型安全的 📦
+
+## 创建事件对象
+
+```ts
+interface EventType {
+    /** 测试事件 */
+    test: (
+        /** 测试参数 */
+        num: number
+    ) => string;
+}
+
+const event = new mk.EventTarget<EventType>();
+```
+
+## 事件派发
+
+```
+event.emit(event.key.test, 123);
+```
+
+## 事件监听
+
+当使用 `emit` 派发事件时, 可以使用 `on` 或 `once` 接口监听指定的事件派发
+
+```
+const onTest = (): void => {
+	// ...事件回调逻辑
+};
+
+event.on(event.key.test, onTest, this);
+```
+
+## 事件注销
+
+当想要取消 `on` 和 `once` 注册的事件回调时，可以使用 `off` 和 `targetOff` 取消事件监听
+
+```ts
+// 取消类型为 test 的事件
+event.off(event.key.test);
+// 取消类型为 test 且回调函数为 onTest 的事件
+event.off(event.key.test, onTest);
+// 取消类型为 test 且回调函数为 onTest 且事件目标为 this 的事件
+event.off(event.key.test, onTest, this);
+// 取消所有事件目标为 this 的事件
+event.targetOff(this);
+```
+
+## 事件请求（框架扩展）
+
+事件请求接口 `request` 相当于 `emit`，但是可以获取 `on` 或 `once` 回调函数的返回值
+
+```ts
+Promise.all(event.request(event.key.test, 123)).then((resultList) => {
+    // 所有 test 类型事件的返回值
+    console.log(resultList);
+});
+```
