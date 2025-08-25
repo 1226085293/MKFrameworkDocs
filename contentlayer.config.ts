@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm';
 import { getIconName, hasSupportedExtension } from './lib/utils';
 import { visit } from 'unist-util-visit';
 import GithubSlugger from 'github-slugger';
+import { rehypePlantuml } from './lib/rehypePlantuml';
 
 // 定义 Docs 文档类型
 export const Doc = defineDocumentType(() => ({
@@ -157,6 +158,7 @@ export default makeSource({
             preProcess,
             rehypeCodeTitles,
             rehypeCodeTitlesWithLogo,
+            rehypePlantuml,
             rehypePrism as any,
             rehypeSlug,
             [

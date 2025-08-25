@@ -3,3 +3,41 @@ title: 资源
 description: 游戏中资源的加载与释放
 order: 2
 ---
+
+{/* prettier-ignore */}
+<Note type="warning" title="前置知识">
+	- 获取和加载资源：https://docs.cocos.com/creator/3.8/manual/zh/scripting/load-assets.html
+</Note>
+
+在编辑器中我们可以通过 `@property` 装饰器来引用资源，但是在游戏中大部分时候都是需要通过资源路径来加载资源使用的
+
+## 加载本地资源
+
+```ts
+mk.asset.get('资源路径', SpriteFrame, 资源跟随释放对象, {
+    bundleStr: 'resources',
+});
+```
+
+-   `资源路径`：bundle 下的资源路径
+-   `SpriteFrame`：资源类型
+-   `资源跟随释放对象`：可以填写 `mk.ViewBase` 或者 `mk.StaticViewBase` 对象，资源将在对象的 close 后释放
+-   `bundleStr`：bundle 名称
+
+## 加载远程资源
+
+```ts
+mk.asset.get('https://xxx', cc.SpriteFrame, 资源跟随释放对象, { remote_option: {} });
+```
+
+第四个参数存在 remote_option 即为远程资源
+
+## 释放资源
+
+### 自动释放
+
+使用 `mk.asset.get` 时，第三个参数可以填写 `mk.ViewBase` 或 `mk.StaticViewBase` 对象，资源将在这个对象的 close 生命周期后进行释放（decRef）
+
+### 手动释放
+
+使用 `mk.asset.get` 时，第三个参数可以填写 `null` 代表自行管理，然后调用资源的 `decRef` 或使用 `mk.asset.release` 接口释放资源

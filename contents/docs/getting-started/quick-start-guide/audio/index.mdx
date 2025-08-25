@@ -3,3 +3,81 @@ title: 音频
 description: 在游戏中播放音频的方式
 order: 3
 ---
+
+## 创建引音频单元
+
+### 属性面板
+
+可以直接拖动音频资源到属性面板的 music 上
+
+```ts
+@ccclass('NewComponent')
+export class NewComponent extends mk.ViewBase {
+    @property(mk.Audio_.Unit)
+    music = new mk.Audio_.Unit();
+}
+```
+
+### 动态加载
+
+```ts
+@ccclass('NewComponent')
+export class NewComponent extends mk.ViewBase {
+    music: mk.Audio_.Unit!;
+
+    open(): void {
+        this.music = (await mk.audio.add('资源路径', this, {
+            type: GlobalConfig.Audio.Type.Music,
+            loadConfig: {
+                bundleStr: 'resources',
+            },
+        }))!;
+    }
+}
+```
+
+## 播放/恢复
+
+`play` 接口的参数如果是未播放的音频单元，则会开始播放，如果是正在暂停的音频单元，则会恢复播放
+
+```ts
+mk.audio.play(this.music);
+```
+
+## 暂停
+
+```ts
+mk.audio.pause(this.music);
+```
+
+## 分组管理
+
+下面以音乐类型的分组举例
+
+### 播放
+
+```ts
+mk.audio.getGroup(GlobalConfig.Audio.Type.Music).play();
+```
+
+### 暂停
+
+暂停分组内当前的音频
+
+```ts
+mk.audio.getGroup(GlobalConfig.Audio.Type.Music).pause();
+```
+
+### 停止
+
+调用 `stop` 将停止现在播放的音频，并阻止后续的音频播放
+
+```ts
+mk.audio.getGroup(GlobalConfig.Audio.Type.Music).stop();
+```
+
+恢复播放可以使用 `stop(false)`
+
+```ts
+mk.audio.getGroup(GlobalConfig.Audio.Type.Music).stop(false);
+```
