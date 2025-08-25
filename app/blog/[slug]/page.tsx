@@ -52,14 +52,10 @@ export default async function BlogPage(props: PageProps) {
                 <p className="text-muted-foreground text-sm">{formatDate(blog.date)}</p>
                 <h1 className="sm:text-3xl text-2xl font-extrabold">{blog.title}</h1>
                 <div className="mt-6 flex flex-col gap-3">
-                    <p className="text-sm text-muted-foreground">Posted by</p>
+                    <p className="text-sm text-muted-foreground">来自于</p>
                     <Authors authors={blog.authors} />
                 </div>
             </div>
-            {/* <div className="mt-6 flex flex-col gap-3">
-                            <p className="text-sm text-muted-foreground">Posted by</p>
-                            <Authors authors={blog.authors} />
-                        </div> */}
             <div className="!w-full">
                 <div className="w-full mb-7">
                     <Image

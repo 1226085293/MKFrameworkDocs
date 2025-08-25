@@ -45,17 +45,16 @@ export function helperSearch(
 
 // Thursday, May 23, 2024
 export function formatDate(dateStr: string): string {
-    const [day, month, year] = dateStr.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
+    const date = new Date(dateStr);
 
-    const options: Intl.DateTimeFormatOptions = {
-        weekday: 'long',
+    return new Intl.DateTimeFormat('zh-CN', {
         year: 'numeric',
-        month: 'long',
+        month: 'numeric',
         day: 'numeric',
-    };
-
-    return date.toLocaleDateString('en-US', options);
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false, // 24小时制
+    }).format(date);
 }
 
 //  May 23, 2024

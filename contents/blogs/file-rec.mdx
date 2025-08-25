@@ -1,7 +1,7 @@
 ---
 title: 'Building a Recursive File System with React: A Deep Dive'
 description: 'Explore how to create a recursive file system in React. This blog post provides a comprehensive guide on building a file system where folders and files can be nested, added, renamed, and deleted.'
-date: 02-09-2024
+date: 2024-5-8 01:02:03
 authors:
     - avatar: 'https://ui.shadcn.com/avatars/02.png'
       handle: nisabmohd
@@ -20,10 +20,10 @@ Check out the project on [GitHub](https://github.com/nisabmohd/recursive-file-sy
 
 The Recursive File System project is designed to simulate a file management system where users can interact with folders and files dynamically. It supports the following features:
 
-- **Adding New Folders and Files**: Create new folders and files within any existing folder.
-- **Renaming Items**: Change the name of folders and files.
-- **Deleting Items**: Remove folders and files from the file system.
-- **Nested Structure**: Handle nested folders and files to create a hierarchical view.
+-   **Adding New Folders and Files**: Create new folders and files within any existing folder.
+-   **Renaming Items**: Change the name of folders and files.
+-   **Deleting Items**: Remove folders and files from the file system.
+-   **Nested Structure**: Handle nested folders and files to create a hierarchical view.
 
 ## Key Features and Implementation
 
@@ -49,7 +49,7 @@ const folder = {
 
 The project includes several key components to handle different aspects of the file system:
 
-- **FileExplorer**: Displays the entire file system and handles rendering folders and files.
+-   **FileExplorer**: Displays the entire file system and handles rendering folders and files.
 
 ```jsx:file-explorer.jsx
 import React, { useState } from "react";
@@ -98,7 +98,7 @@ const FileExplorer = () => {
 export default FileExplorer;
 ```
 
-- **Folder**: Renders folders and handles nested items.
+-   **Folder**: Renders folders and handles nested items.
 
 ```jsx:folder.jsx
 import React from "react";
@@ -120,7 +120,7 @@ const Folder = ({ folder, onAdd, onRename, onDelete }) => {
 export default Folder;
 ```
 
-- **File**: Renders individual files with options to rename and delete.
+-   **File**: Renders individual files with options to rename and delete.
 
 ```jsx:file.jsx
 import React from "react";
