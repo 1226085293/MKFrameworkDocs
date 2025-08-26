@@ -1,5 +1,59 @@
 ---
 title: Layer
-description:
+description: Layer 负责组件节点的显示层级控制，是所有视图组件最上层的基类。
 order: 0
 ---
+
+Layer 控制的显示层级是同一父节点下节点之间的展示顺序。也就是节点在父节点中的下标 `siblingIndex`，
+但是 Layer 提供了 **层类型** 和 **层级** 方便用户进行更精细的控制
+
+## 层类型
+
+层类型是对渲染顺序进行的一个类型划分，所有 Layer 组件都会先依赖层类型进行渲染排序
+
+-   属性名： `layerTypeNum`
+-   类型： `GlobalConfig.View.LayerType`
+
+类型定义在 GlobalConfig 文件中，如图所示
+
+![视图层级类型](/docs/aff29d32-ac72-4fe8-bf52-27d7d97f2cdb.png)
+
+**枚举中的顺序也对应了这些层级的渲染顺序**，例如图中的类型在运行中时是 **内容** 在最下方展示，然后依次是窗口、提示...
+
+如果你想修改层类型定义，只需要改这个枚举即可。
+
+### 在代码中使用
+
+```ts
+@ccclass('NewComponent')
+export class NewComponent extends mk.ViewBase {
+    layerTypeNum = GlobalConfig.View.LayerType.内容;
+}
+```
+
+## 层级
+
+在相同的层类型下，如果想要进行渲染排序，则可以依赖层级属性控制。层级大的节点会在上层展示
+
+-   属性名： `childLayerNum`
+-   类型： `number`
+-   范围： `0 - (GlobalConfig.View.config.layerSpacingNum - 1)`
+
+层级的范围定义也在 GlobalConfig 文件中，如图所示
+
+![层级的范围定义](/docs/c9dbd284-1888-436c-ae44-63ee3cf7f431.png)
+
+框架定义了默认值，但是你可以自由的修改层间隔的大小
+
+**同层类型同层级** 的情况下，则会按照更新时间来排序，最后更新渲染层级的组件节点在最上层
+
+### 在代码中使用
+
+```ts
+@ccclass('NewComponent')
+export class NewComponent extends mk.ViewBase {
+    open(): void {
+        this.childLayerNum = 99;
+    }
+}
+```

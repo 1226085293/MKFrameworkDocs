@@ -1,5 +1,44 @@
 ---
-title: UI
+title: UI 架构
 description:
 order: 0
 ---
+
+在框架中，视图组件的基类是 ViewBase 或 StaticViewBase，但是它们还有父类，下面就是它们的结构
+
+```plantuml
+@startuml
+skinparam dpi 96
+top to bottom direction
+
+' 样式
+skinparam Shadowing true
+skinparam RoundCorner 6
+skinparam BackgroundColor #ffffff
+skinparam BorderColor #333333
+skinparam ArrowColor #000000ff
+
+rectangle "Layer" as Layer #eef2ff
+rectangle "LifeCycle" as LifeCycle #f0f9ff
+rectangle "SceneDrive" as SceneDrive #fff7ed
+rectangle "ViewBase" as ViewBase #fff7ed
+rectangle "StaticViewBase" as StaticViewBase #fff7ed
+
+Layer --> LifeCycle
+LifeCycle --> SceneDrive
+LifeCycle --> ViewBase
+LifeCycle --> StaticViewBase
+@enduml
+```
+
+-   Layer: 显示层级控制
+
+-   LifeCycle: 组件的生命周期
+
+-   SceneDrive：场景驱动（作为用户很少接触到它）
+
+-   ViewBase：视图基类
+
+-   StaticViewBase：静态视图基类
+
+> 想更深入的了解这些类型可以展开菜单继续查看
