@@ -24,7 +24,9 @@ export default function Pagination({ pathname }: { pathname: string }) {
                             <ChevronLeftIcon className="w-[1rem] h-[1rem] mr-1" />
                             Previous
                         </span>
-                        <span className="mt-1 ml-1">{res.prev.title}</span>
+                        <span className="mt-1 ml-1 break-words whitespace-normal">
+                            {res.prev.title}
+                        </span>
                     </Link>
                 )}
             </div>
@@ -42,7 +44,9 @@ export default function Pagination({ pathname }: { pathname: string }) {
                             Next
                             <ChevronRightIcon className="w-[1rem] h-[1rem] ml-1" />
                         </span>
-                        <span className="mt-1 mr-1">{res.next.title}</span>
+                        <span className="mt-1 mr-1 break-words whitespace-normal text-right">
+                            {res.next.title}
+                        </span>
                     </Link>
                 )}
             </div>

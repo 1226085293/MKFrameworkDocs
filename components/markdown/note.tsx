@@ -18,13 +18,10 @@ export default function Note({ children, title = 'Note', type = 'note' }: NotePr
 
     return (
         <div
-            className={cn(
-                'flex items-center border rounded-md px-5 mt-5 mb-7 text-sm tracking-wide',
-                noteClassNames
-            )}
+            className={cn('border rounded-md px-5 mt-5 mb-7 text-sm tracking-wide', noteClassNames)}
         >
-            <p className="font-bold">{title}：</p>
-            <span className="ml-1">{children}</span>
+            <p className="font-bold">{title}:</p>
+            <div className="-mt-1">{children}</div>
         </div>
     );
 }
