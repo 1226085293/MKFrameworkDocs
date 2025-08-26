@@ -4,10 +4,10 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeSlug from 'rehype-slug';
 import rehypeCodeTitles from 'rehype-code-titles';
 import remarkGfm from 'remark-gfm';
-import { getIconName, hasSupportedExtension } from './lib/utils';
 import { visit } from 'unist-util-visit';
 import GithubSlugger from 'github-slugger';
-import { rehypePlantuml } from './lib/rehypePlantuml';
+import { rehypePlantuml } from './lib/rehype-plugins/rehype-plantuml';
+import { rehypeCodeTitlesWithLogo } from './lib/rehype-plugins/rehype-code-titles-with-logo';
 
 // 定义 Docs 文档类型
 export const Doc = defineDocumentType(() => ({
@@ -96,38 +96,6 @@ export const Blog = defineDocumentType(() => ({
         },
     },
 }));
-
-// 自定义 rehype 插件
-function rehypeCodeTitlesWithLogo() {
-    return (tree: any) => {
-        visit(tree, 'element', (node) => {
-            if (
-                node?.tagName === 'div' &&
-                node?.properties?.className?.includes('rehype-code-title')
-            ) {
-                const titleTextNode = node.children.find((child: any) => child.type === 'text');
-                if (!titleTextNode) return;
-
-                const titleText = titleTextNode.value;
-                const match = hasSupportedExtension(titleText);
-                if (!match) return;
-
-                const splittedNames = titleText.split('.');
-                const ext = splittedNames[splittedNames.length - 1];
-                const iconClass = `devicon-${getIconName(ext)}-plain text-[17px]`;
-
-                if (iconClass) {
-                    node.children.unshift({
-                        type: 'element',
-                        tagName: 'i',
-                        properties: { className: [iconClass, 'code-icon'] },
-                        children: [],
-                    });
-                }
-            }
-        });
-    };
-}
 
 const preProcess = () => (tree: any) => {
     visit(tree, (node) => {
