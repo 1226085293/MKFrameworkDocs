@@ -1,10 +1,10 @@
 ---
 title: Layer
-description: Layer 负责组件节点的显示层级控制，是所有视图组件最上层的基类。
+description: Layer 负责组件节点的显示层级控制
 order: 0
 ---
 
-Layer 控制的显示层级是同一父节点下节点之间的展示顺序。也就是节点在父节点中的下标 `siblingIndex`，
+Layer 继承于 Cocos 的 Component，Layer 控制的显示层级是同一父节点下节点之间的展示顺序。也就是节点在父节点中的下标 `siblingIndex`，
 但是 Layer 提供了 **层类型** 和 **层级** 方便用户进行更精细的控制
 
 ## 层类型
