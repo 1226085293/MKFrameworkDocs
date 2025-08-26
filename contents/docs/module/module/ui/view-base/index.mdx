@@ -1,5 +1,129 @@
 ---
 title: ViewBase
-description:
+description: 视图基类，继承自 LifeCycle，提供 UI 动画、遮罩、编辑器快捷操作等扩展功能
 order: 2
 ---
+
+`ViewBase` 是所有视图类的基类，继承自 [`LifeCycle`](./life-cycle)，在生命周期管理的基础上，扩展了以下能力：
+
+-   **视图展示配置**（单独展示、弹窗动画配置）
+-   **编辑器快捷操作**（遮罩、Widget、BlockInputEvents）
+-   **模块类型**
+
+---
+
+## 生命周期扩展
+
+### `open`
+
+在模块打开时触发，主要执行 **打开动画**。
+
+-   如果配置了 `openAnimationStr`，会调用对应的动画函数。
+-   可配置是否 **等待动画执行完成** 后再进入下个生命周期。
+
+```ts
+protected async open(): Promise<void> {
+  const openAnimationFunc = ViewBase._config.windowAnimationTab?.open?.[this.animationConfig?.openAnimationStr];
+  if (openAnimationFunc) {
+    if (this.animationConfig.isWaitAnimationComplete) {
+      await openAnimationFunc(this.node);
+    } else {
+      openAnimationFunc(this.node);
+    }
+  }
+}
+```
+
+---
+
+### `close(config?)`
+
+触发模块关闭。
+
+-   若当前不在关闭流程，说明是外部调用，则交由 `mkUIManage.close` 执行。
+-   支持传入部分 `CloseConfig` 配置。
+
+---
+
+### `lateClose`
+
+在 `close` 之后调用，主要执行 **关闭动画**。
+
+-   关闭动画仅在以下条件满足时执行：
+
+    1. 非重启中（`!mkGame.isRestarting`）
+    2. 非切换场景（`!mkBundle.isSwitchScene`）
+    3. 存在对应的关闭动画函数
+
+---
+
+## 只读属性
+
+### `typeStr`
+
+-   类型：`string`
+-   默认值：`"default"`
+-   说明：模块类型标识，用于区分不同的 UI 模块。模块类型可在 `uiManage.regis` 时注册，
+    不同的模块类型代表了不同的预制体
+
+---
+
+## 属性配置
+
+### `isShowAlone`
+
+-   类型：`boolean`
+-   分组：视图配置
+-   说明：勾选后，打开该视图时会 **隐藏所有下级视图**，关闭该视图后恢复原状。
+
+---
+
+### `animationConfig`
+
+-   类型：`AnimationConfig`
+-   分组：视图配置
+-   说明：配置 **打开/关闭动画**，并决定是否等待动画执行完成。
+
+#### `AnimationConfig`
+
+| 属性                      | 类型      | 说明                                                         |
+| ------------------------- | --------- | ------------------------------------------------------------ |
+| `isWaitAnimationComplete` | `boolean` | 是否等待动画执行完成再执行生命周期 `open`，默认为 `true`     |
+| `openAnimationStr`        | `string`  | 打开动画的 key（编辑器中通过枚举选择，实际运行时取对应函数） |
+| `closeAnimationStr`       | `string`  | 关闭动画的 key（编辑器中通过枚举选择，实际运行时取对应函数） |
+
+---
+
+### 编辑器快捷操作
+
+这些属性仅在 **编辑器环境** 下生效，便于快速为视图节点添加常用组件。
+
+#### `isAutoMask`
+
+-   类型：`boolean`
+-   说明：自动在视图根节点下添加 **遮罩节点**，关闭时自动销毁。
+-   遮罩节点来源于 `GlobalConfig.View.maskDataTab.prefabPathStr`。
+
+#### `isAutoWidget`
+
+-   类型：`boolean`
+-   说明：在节点上添加 **Widget** 组件，并设置 **0 边距**（顶/底/左/右）。
+
+#### `isAutoBlockInput`
+
+-   类型：`boolean`
+-   说明：在节点上添加 **BlockInputEvents**，阻止事件穿透。
+
+---
+
+### 遮罩逻辑
+
+-   `isAutoMask = true` 时：
+
+    -   自动实例化遮罩 prefab
+    -   命名为 `GlobalConfig.View.maskDataTab.nodeNameStr`
+    -   放置在节点层级最底部
+
+-   `isAutoMask = false` 时：
+
+    -   自动销毁遮罩节点
