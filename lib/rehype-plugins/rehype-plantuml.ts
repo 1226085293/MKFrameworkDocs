@@ -39,7 +39,7 @@ export function rehypePlantuml() {
                 tagName: 'div',
                 properties: {
                     // 使用内联样式，避免依赖 Tailwind JIT safelist
-                    style: 'width:100%; overflow:auto; margin:1rem 0; max-height:60vh; -webkit-overflow-scrolling: touch;',
+                    style: 'width:100%; overflow:auto; margin:1rem 0; -webkit-overflow-scrolling: touch;',
                     // 如果你不想限制高度，把 max-height:60vh 去掉即可
                 },
                 children: [imgNode],
