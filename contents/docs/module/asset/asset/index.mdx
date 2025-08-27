@@ -1,0 +1,175 @@
+---
+title: Asset
+description: 资源的加载、释放、管理
+order: 0
+---
+
+`asset` 提供统一的资源加载 / 托管 / 释放机制。它封装了引擎的加载接口、引用计数规则和自动释放策略，目标是让资源管理**安全、稳定且低耦合**。
+
+主要能力一览：
+
+-   统一加载接口：`get`（单个资源）和 `getDir`（目录资源）
+-   支持编辑器环境与运行时（bundle）两种加载方式
+-   自动处理图片类型后缀（`SpriteFrame` / `Texture2D`）与路径规范（`db://assets/...`）
+-   支持远程加载（`remoteOption`）与加载进度、重试机制
+-   引用计数与自动回收（默认资源被管理时引用初始为 2；降为 1 后会进入延迟回收队列）
+-   支持“跟随释放对象”（followRelease）——当目标释放时自动释放资源
+-   释放时会清理动态图集（若启用）并调用底层 `assetManager.releaseAsset`
+-   程序重启 / 场景切换时的强制回收与清理逻辑
+
+---
+
+## 快速使用示例
+
+```ts
+// 常见：加载预制体
+const prefab = await asset.get('path/to/prefab', Prefab, someFollowTarget);
+
+// 加载 SpriteFrame（无需写后缀）
+const spriteFrame = await asset.get('ui/icons/iconName', SpriteFrame, null);
+
+// 远程图片加载
+const remote = await asset.get('https://example.com/a.png', Texture2D, null, {
+    remoteOption: { url: 'https://example.com/a.png' },
+    progressFunc: (cur, total) => console.log(cur / total),
+});
+
+// 获取文件夹内所有资源（例如某文件夹下的所有配置）
+const list = await asset.getDir('path/to/dir', JsonAsset, null);
+
+// 释放资源（手动）
+asset.release(prefab);
+```
+
+---
+
+## API 概览
+
+### 获取资源（get）
+
+`get(path: string, type: Constructor<T>, target: TypeFollowReleaseObject | null, config?: GetConfig<T>): Promise<T | null>`
+
+加载单个资源，工作方式：
+
+-   支持运行期 bundle 路径，也支持编辑器（Editor）和远程加载。
+-   `path` 在非编辑器/非远程时会自动去后缀；对于图片类型会自动追加 `/spriteFrame` 或 `/texture`。
+-   支持进度回调 `progressFunc`、完成回调 `completedFunc`、失败重试 `retryNum`。
+-   `remoteOption` 存在时走远程加载（`assetManager.loadRemote`），否则走 bundle 加载或编辑器查询 uuid。
+-   若传入 `target` 并且 `target.followRelease` 方法存在，加载完成后会将资源与该目标绑定（目标释放时自动释放资源）。
+
+**常用配置（`GetConfig`）**
+
+| 字段                           | 含义                                                                                          |
+| ------------------------------ | --------------------------------------------------------------------------------------------- |
+| `bundleStr`                    | 指定 bundle 名（编辑器默认 `resources`；运行时默认使用当前 scene 所在 bundle 或 `resources`） |
+| `progressFunc(current, total)` | 进度回调                                                                                      |
+| `completedFunc(error, asset)`  | 完成回调                                                                                      |
+| `remoteOption`                 | 远程加载参数（传则视为远程资源）                                                              |
+| `retryNum`                     | 加载失败重试次数（默认取 `GlobalConfig` 配置）                                                |
+
+---
+
+### 获取文件夹资源（getDir）
+
+`getDir(path: string, type: Constructor<T>, target: TypeFollowReleaseObject | null, config?: GetDirConfig<T>): Promise<T[] | null>`
+
+加载某个目录下的所有资源（返回数组）：
+
+-   编辑器下此接口不可用（会报错）。
+-   运行时会使用 bundle 的目录查询接口获取文件列表并逐一加载，支持进度回调与最终回调。
+-   若提供 `target`，会把返回的每个资源都绑定为跟随释放。
+
+`GetDirConfig` 除了 `GetConfig` 的字段外，`completedFunc` 的签名为 `(errors|null, assets[])`。
+
+---
+
+### 释放资源（release）
+
+`release(asset | asset[]) : void`
+
+手动释放资源：
+
+-   会处理动态图集（`DynamicAtlasManager`）中对应的资源：若是 `SpriteFrame` / `Texture2D`，会尝试从动态图集中删除。
+-   会根据资源的 `refCount` 调用 `decRef(false)` 直到计数降为 0，然后调用 `assetManager.releaseAsset(v)` 真正释放底层内存。
+-   同时会从内部的资源管理表移除该资源，停止框架对其托管。
+
+---
+
+## 行为细节（重要）
+
+### 引用计数与自动释放
+
+-   当资源第一次纳入 `asset` 管理时（经过 `_assetInit`），框架会对该 `Asset` 调用两次 `addRef()`（确保初始引用高于 1），并把它放入资源管理表。
+-   框架覆写了 `Asset.prototype.decRef`：当某个 `Asset` 的引用回落到 `1` 时，会把它放入 `_assetReleaseMap` 延迟释放表，等待 `cacheLifetimeMsNum`（来自 `GlobalConfig.Asset.config`）到期后自动释放。
+-   这保证了“引用为 1（仅被框架持有）”时资源不会被立刻销毁，从而避免“释放后立刻重新加载得到已释放对象” 的竞态问题。
+-   若 `cacheLifetimeMsNum === 0`，则会立即触发自动释放逻辑。
+
+### 自动释放定时器与强制释放
+
+-   `asset` 会在内部根据 `cacheLifetimeMsNum` 启动定时器，定期遍历 `_assetReleaseMap` 进行过期资源释放。
+-   在程序重启或场景切换流程中，会触发一次强制释放（`_autoReleaseAsset(true)`），立即释放队列中的资源并清理定时器与全部 bundle（`assetManager.bundles.forEach(v => v.releaseAll())`）。
+
+### 跟随释放（followRelease）
+
+-   当调用 `get` / `getDir` 时，如果传入 `target` 且 `target.followRelease` 存在，框架会在加载完成后执行 `target.followRelease(asset)`，这样当 `target` 被释放时可以自动触发资源释放。
+-   此机制适用于“资源应随某对象生命周期而释放”的场景（例如某个模块关闭时释放其专属资源）。
+
+### 编辑器（EDITOR）支持
+
+-   在编辑器环境下，路径会保留 `db://assets/...` 前缀，框架通过 Editor.Message 请求 uuid 并用 `assetManager.loadAny` 加载资源。
+-   编辑器模式下部分运行时逻辑（例如 bundle 推断）会有所不同，且 `getDir` 不被支持。
+
+### 图片 / 纹理路径处理
+
+-   对于 `SpriteFrame`：若路径没有以 `/spriteFrame` 结尾，框架会自动添加该后缀；对于 `Texture2D`，自动添加 `/texture`。
+-   在运行时（非远程、非编辑器）会自动删除路径后缀（文件扩展名），以匹配 bundle 的资源索引。
+
+### 动态图集清理
+
+-   释放资源时，如果引擎启用了 `DynamicAtlasManager`，对于 `SpriteFrame` / `Texture2D` 类型会尝试删除动态图集中的条目，避免动态图集中保留无用纹理。
+
+---
+
+## 错误处理与重试
+
+-   `get` / `getDir` 支持失败重试（`retryNum`），失败时会根据配置递归尝试重新加载直至重试次数耗尽并最终返回错误。
+-   `completedFunc` 与 `progressFunc` 可用于感知加载状态与做 UI 展示。
+
+---
+
+## 常见场景与建议
+
+-   **想让资源随模块生命周期自动释放**：在 `get` 时传入模块的 release 对象（实现 `followRelease`），框架会在目标释放时自动释放资源。
+-   **频繁打开/关闭同类窗口**：使用 `regis` + 对象池（UI 管理器层面）并让资源随模块对象绑定，避免重复加载。
+-   **加载远程图片**：通过 `get(..., Texture2D, null, { remoteOption: { url: '...' }, progressFunc })`；记得在不需要时 `release`。
+-   **调试加载路径问题（编辑器）**：在 Editor 模式下，框架会使用 UUID 查询，路径需以 `db://assets/...` 开始以便正确定位资源。
+-   **避免“释放后马上再加载得到已释放对象”**：asset 已通过延迟释放与引用计数覆盖逻辑处理了常见竞态，但仍建议在设计上避免复杂的并发加载/释放竞争（比如：在关闭逻辑中先等待加载任务结束再释放）。
+
+---
+
+## 常见问题（FAQ）
+
+**Q：资源为何没有马上被释放？**
+A：框架在 `decRef` 到 `1` 时会把资源放入延迟释放表，等待 `cacheLifetimeMsNum` 到期再释放（或在重启时强制释放）。这是为了避免释放—重载的竞态问题，保证稳定性。
+
+**Q：我要立即释放某些资源，如何做？**
+A：使用 `asset.release(asset)` 会立即销毁并从管理表移除；在重启/场景切换时框架也会强制清理。
+
+**Q：remote 图片加载失败会自动重试吗？**
+A：是的，`get` 接受 `retryNum`，失败时会依据该值自动重试（默认取自 `GlobalConfig`）。
+
+**Q：如何确保回收不会造成内存泄漏？**
+A：务必使用 `followRelease` 将资源与它们的 owning 对象绑定；同时把 `monitor` / 事件监听等 target 设置为框架可清理的对象（如 `this`），以便 `asset`, `MKMonitor`, `MKUIManage` 等在关闭时正确释放。
+
+---
+
+## 小结
+
+`asset` 是对底层 `assetManager` 的安全封装，提供：
+
+-   统一的加载入口（本地 / 远程 / 编辑器）
+-   引用计数与延迟回收，避免竞态问题
+-   跟随释放支持，方便资源与模块生命周期绑定
+-   动态图集清理和 bundle 释放协同
+
+按上述规范使用 `get` / `getDir` / `release`，配合 `uiManage` 的对象池与 `followRelease`，可以搭建既高效又安全的资源加载与回收策略。
