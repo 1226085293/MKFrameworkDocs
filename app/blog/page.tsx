@@ -1,13 +1,13 @@
 // app/blog/page.tsx
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { formatDate2, stringToDate } from '@/lib/utils';
+import { formatDate, stringToTimeStamp } from '@/lib/utils';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { allBlogs } from 'contentlayer/generated';
 
 export const metadata: Metadata = {
-    title: 'AriaDocs - Blog',
+    title: 'MKFrameworkDocs - Blog',
 };
 
 // 定义作者类型
@@ -39,7 +39,7 @@ function getAllBlogsFrontmatter() {
             cover: blog.cover,
             authors: blog.authors || [],
         }))
-        .sort((a, b) => stringToDate(b.date).getTime() - stringToDate(a.date).getTime());
+        .sort((a, b) => stringToTimeStamp(b.date) - stringToTimeStamp(a.date));
 }
 
 export default function BlogIndexPage() {
@@ -48,11 +48,9 @@ export default function BlogIndexPage() {
     return (
         <div className="flex flex-col gap-1 sm:min-h-[91vh] min-h-[88vh] pt-2">
             <div className="mb-7 flex flex-col gap-2">
-                <h1 className="sm:text-3xl text-2xl font-extrabold">
-                    The latest blogs of this product
-                </h1>
+                <h1 className="sm:text-3xl text-2xl font-extrabold">最近博客</h1>
                 <p className="text-muted-foreground sm:text-[16.5px] text-[14.5px]">
-                    All the latest blogs and news, straight from the team.
+                    所有博客和新闻内容均直接来自开发者
                 </p>
             </div>
             <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 sm:gap-8 gap-4 mb-5">
@@ -95,9 +93,7 @@ function BlogCard({ date, title, description, slug, cover, authors }: BlogCardPr
             </div>
             <p className="text-sm text-muted-foreground">{description}</p>
             <div className="flex items-center justify-between w-full mt-auto">
-                <p className="text-[13px] text-muted-foreground">
-                    Published on {formatDate2(date)}
-                </p>
+                <p className="text-[13px] text-muted-foreground">发布于 {formatDate(date)}</p>
                 <AvatarGroup users={authors} />
             </div>
         </Link>
