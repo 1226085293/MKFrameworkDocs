@@ -23,22 +23,24 @@ order: 0
 
 ```ts
 // 常见：加载预制体
-const prefab = await asset.get('path/to/prefab', Prefab, someFollowTarget);
+const prefab = await mk.asset.get('path/to/prefab', Prefab, someFollowTarget);
 
 // 加载 SpriteFrame（无需写后缀）
-const spriteFrame = await asset.get('ui/icons/iconName', SpriteFrame, null);
+const spriteFrame = await mk.asset.get('ui/icons/iconName', SpriteFrame, null, {
+    bundleStr: 'bundle 名',
+});
 
 // 远程图片加载
-const remote = await asset.get('https://example.com/a.png', Texture2D, null, {
-    remoteOption: { url: 'https://example.com/a.png' },
+const remote = await mk.asset.get('https://example.com/a.png', ImageAsset, null, {
+    remoteOption: { ext: '.png' },
     progressFunc: (cur, total) => console.log(cur / total),
 });
 
 // 获取文件夹内所有资源（例如某文件夹下的所有配置）
-const list = await asset.getDir('path/to/dir', JsonAsset, null);
+const list = await mk.asset.getDir('path/to/dir', JsonAsset, null);
 
 // 释放资源（手动）
-asset.release(prefab);
+mk.asset.release(prefab);
 ```
 
 ---
