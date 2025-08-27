@@ -4,5 +4,6 @@ description: 静态视图基类，继承自 LifeCycle，屏蔽了多余的视图
 order: 4
 ---
 
-如果你不想要 ViewBase 在属性面板上的配置，而且又不是通过 `uiManage.open` 打开的模块，
-则可以使用 StaticViewBase
+`StaticViewBase` 是静态视图基类，无法被 `uiManage` 打开，继承自 [`LifeCycle`](./life-cycle)
+
+如果你不想要 ViewBase 在属性面板上的配置展示，又不需要通过 `uiManage.open` 打开当前模块，则可以使用 StaticViewBase
