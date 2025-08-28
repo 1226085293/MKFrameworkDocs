@@ -37,7 +37,7 @@ uiManage 是在在 mk 下的实例对象，是整个 UI 模块系统的核心管
 
 ## 主要 API
 
-### 注册
+### regis
 
 `regis(key, source, target?, config?) : Promise<void>`
 
@@ -67,7 +67,7 @@ await mk.uiManage.regis(Test, 'Module/Test/Test111.prefab', this, {
 
 ---
 
-### 取消注册
+### unregis
 
 `unregis(key) : Promise<void>`
 
@@ -82,7 +82,7 @@ await mk.uiManage.regis(Test, 'Module/Test/Test111.prefab', this, {
 
 ---
 
-### 获取模块
+### get
 
 `get()` / `get(key)` / `get(key, type)`
 
@@ -107,7 +107,7 @@ const panelOfTypeA = mk.uiManage.get(Test, 'default');
 
 ---
 
-### 打开模块
+### open
 
 `open(key, config?) : Promise<module | null>`
 
@@ -129,7 +129,7 @@ const test = await mk.uiManage.open(Test, { init: { id: 1 }, type: 'default' });
 
 ---
 
-### 关闭模块
+### close
 
 `close(args, config?) : Promise<boolean>`
 
