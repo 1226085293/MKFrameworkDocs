@@ -4,7 +4,19 @@ description: 资源的加载、释放、管理
 order: 0
 ---
 
-框架中的 Asset 模块负责资源的加载、释放，并且可以避免
+## 模块概览
+
+`mk.asset` 负责：
+
+-   统一加载接口为：`get` 和 `getDir`。
+
+-   兼容三种加载场景：本地资源、编辑器（EDITOR）、远程资源
+-   管理引用计数与延迟回收，避免短时间内重复加载释放同一资源
+-   支持资源跟随释放，把资源与对象的生命周期绑定
+-   释放时清理资源的动态合图（如果启用）
+-   路径优化：自动处理图片后缀（`SpriteFrame` / `Texture2D`），自动去掉文件扩展名
+
+使用时优先把资源的生命周期 **交给框架管理**（通过 `followRelease`），必要时可手动 `mk.asset.release(...)`。
 
 ## 加载本地资源
 
@@ -76,12 +88,151 @@ get<T extends Asset>(
 
 ## 加载远程资源
 
-...
+远程资源依赖 `remoteOption` 配置，内部基于 `assetManager.loadRemote` 实现。
+
+```ts
+const tex = await mk.asset.get<Texture2D>('http://xxx.com/test.png', Texture2D, this, {
+    remoteOption: { ext: '.png' }, // 必填：指定扩展名
+    retryNum: 3, // 可选：失败重试次数
+});
+```
+
+要点：
+
+-   必须在 `remoteOption` 中指定文件扩展名（`.png` / `.jpg` 等），否则无法识别类型。
+-   推荐传入跟随释放对象（如 View / Scene），避免忘记释放导致内存泄漏。
+-   支持进度与完成回调，与本地资源保持一致。
+
+---
 
 ## 加载编辑器资源
 
-...
+在 **EDITOR 环境** 下，可以直接加载 `resources` 目录内的资源，用于工具面板、预览器等场景。
+
+```ts
+const prefab = await mk.asset.get('db://xxx/xxx.png', Prefab, null, {
+    bundleStr: 'resources',
+});
+```
+
+要点：
+
+-   资源路径必须为 db 路径
+-   常用于编辑器扩展（如 UI 编辑、配置预览）。
+
+---
 
 ## 加载文件夹资源
 
-...
+通过 `getDir` 一次性加载目录下的所有资源。
+
+```ts
+getDir<T extends Asset>(
+    pathStr_: string,
+    type_: Constructor<T>,
+    target_: MKAsset_.TypeFollowReleaseObject | null,
+    config_?: MKAsset_.GetConfig<T>
+): Promise<T[]>;
+```
+
+示例：
+
+```ts
+const sprites = await mk.asset.getDir('icons', SpriteFrame, this, {
+    bundleStr: 'resources',
+});
+
+for (const sp of sprites) {
+    // 使用 SpriteFrame
+}
+```
+
+说明：
+
+-   目录路径与单文件路径规则一致（支持全路径和 bundle 路径）。
+-   返回一个数组，顺序与资源在 `assetManager` 的遍历顺序保持一致。
+-   适合加载整套图标、音效等批量资源。
+
+---
+
+## 常见问题（FAQ）
+
+1. **为什么有时资源没释放？**
+
+    - 检查是否正确传入了 `target_`（跟随释放对象）。
+
+    - 资源没被引用时会在缓存时间释放，配置在 `GlobalConfig.Asset.config.cacheLifetimeMsNum`
+
+2. **远程资源需要手动释放吗？**
+
+    - 一般无需，跟随释放对象会自动回收。
+
+    - 如果用 `null` 加载（全局缓存），则需手动调用 `mk.asset.release(url)`。
+
+3. **数组资源如何释放？**
+
+    - 和 `get` 得到的资源一致
+
+4. **我能直接用框架的 `assetManager` 加载资源吗？**
+
+    - 可以，但会绕过引用计数与跟随释放机制，使用不当容易造成内存泄漏。
+
+    - 推荐始终用 `mk.asset` 提供的封装接口。
+
+---
+
+## 生命周期图
+
+参考图示可以帮助你更容易理解
+
+```plantuml
+@startuml
+title Asset 生命周期图
+
+skinparam backgroundColor #ffffff
+skinparam state {
+  BackgroundColor #E8F5E9
+  BorderColor #388E3C
+  FontColor black
+  ArrowColor #4CAF50
+}
+
+state "加载阶段" as Loading {
+  state "解析路径" as Parse
+  state "检查缓存" as Check
+  state "命中缓存" as Hit
+  state "发起加载" as Load
+  state "返回资源" as Return
+
+  [*] --> Parse
+  Parse --> Check
+  Check --> Hit : 命中
+  Hit --> Return : 引用计数 + 1
+  Check --> Load : 未命中
+  Load --> Return : 引用计数 + 2
+}
+
+state "返回资源" as Return {
+    [*] --> 使用中
+    使用中 --> 跟随释放对象 : followRelease
+    跟随释放对象 --> 生命周期结束 : View close / Scene 切换
+    生命周期结束 --> 释放阶段
+}
+
+
+state "释放阶段" as Releasing {
+  state "decRef" as DecRef
+  state "如果引用计数为一" as One
+  state "等待缓存时间" as Wait
+  state "释放资源" as Clean
+
+  [*] --> DecRef
+  DecRef --> One
+  One --> Wait
+  Wait --> Clean : 引用计数没变
+  Wait --> One : 引用计数变化
+  Clean --> [*]
+}
+@enduml
+
+```
