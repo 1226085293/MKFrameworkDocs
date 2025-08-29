@@ -161,19 +161,19 @@ for (const sp of sprites) {
 
     - 检查是否正确传入了 `target_`（跟随释放对象）。
 
-    - 资源没被引用时会在缓存时间释放，配置在 `GlobalConfig.Asset.config.cacheLifetimeMsNum`
+    - 资源没被引用时会在缓存时间后才释放，配置在 `GlobalConfig.Asset.config.cacheLifetimeMsNum`
 
 2. **远程资源需要手动释放吗？**
 
-    - 一般无需，跟随释放对象会自动回收。
+    - 如果你在加载时传递了 `target_`（跟随释放对象），资源会由 `target_` 控制何时释放。
 
-    - 如果用 `null` 加载（全局缓存），则需手动调用 `mk.asset.release(url)`。
+    - `target_` 传递 `null`，则代表手动管理，需手动调用 `decRef` 或 `mk.asset.release`。
 
 3. **数组资源如何释放？**
 
     - 和 `get` 得到的资源一致
 
-4. **我能直接用框架的 `assetManager` 加载资源吗？**
+4. **我能直接用引擎提供的 `assetManager` 加载资源吗？**
 
     - 可以，但会绕过引用计数与跟随释放机制，使用不当容易造成内存泄漏。
 

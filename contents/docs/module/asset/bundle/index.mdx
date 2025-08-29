@@ -15,6 +15,7 @@ order: 1
 核心能力：
 
 -   加载（load）与预加载（preloadScene）场景；
+
 -   支持远程/本地 bundle、bundle 热更（reload）；
 -   切换前 / 切换后事件（bundle/scene）；
 -   提供 `BundleManageBase` 作为 bundle 级管理器基类，方便注册生命周期、管理对象池、网络与资源释放；
@@ -25,6 +26,7 @@ order: 1
 ## 重要概念与属性
 
 -   `bundleMap: Map<string, BundleData>`：已知的 bundle 信息表（`BundleInfo` + 可选 `manage`）。
+
 -   `bundleStr`：当前运行场景所属 bundle（getter/setter 会触发 bundle 切换流程）。
 -   `sceneStr`：当前场景名（setter 会触发场景切换事件）。
 -   `isSwitchScene`：当前是否处于场景切换流程中（loadScene 期间为 true）。
@@ -74,6 +76,7 @@ await mk.bundle.load({
 行为要点：
 
 -   等待引擎初始化完成（`game` 的 `EVENT_GAME_INITED`）。
+
 -   若 bundle 已在 `assetManager` 中，则直接返回并触发一次 `progressCallbackFunc(1,1)`（用于兼容 UI 进度）。
 -   若需下载，会走 `assetManager.loadBundle(originStr, {version, onFileProgress}, cb)`。对于非远程 bundle，会在加载成功后模拟一次完成回调（`progressCallbackFunc(1,1)`）。
 
@@ -101,6 +104,7 @@ await mk.bundle.loadScene('MainScene', {
 4. 如果不是预加载并且 preload 成功：
 
     - 标记 `isSwitchScene = true`；
+
     - 若即将切换的 bundle 与当前 `bundleStr` 不同，会 `event.request(beforeBundleSwitch)`（可被拦截/等待）；
     - 发 `beforeSceneSwitch` 事件并等待所有监听完成；
     - 调用 `bundle.loadScene(sceneName, cb)`，完成后 `director.runScene(sceneAsset, beforeLoadCallback, onLaunched)`；
@@ -120,6 +124,7 @@ await mk.bundle.loadScene('MainScene', {
 `reload` 的主要步骤（实现细节）：
 
 -   验证 `versionStr` 与非在当前 bundle 场景中；
+
 -   收集并清理系统脚本缓存（System / scriptCache），删除该 bundle 的脚本模块；
 -   注销、清理 ccclass（通过 `js.unregisterClass`）；
 -   清理并 `releaseAll`（非 main bundle）并从 `assetManager` 移除原 bundle；
@@ -137,6 +142,7 @@ await mk.bundle.loadScene('MainScene', {
 关键点：
 
 -   `abstract nameStr: string`：子类必须提供 bundle 名。构造时会自动把实例注册到 `mk.bundle.bundleMap`。
+
 -   构造阶段会在下帧把自己加入 `mk.bundle`，并在非 EDITOR 环境运行父类生命周期 `init`/`open`/`close`（`mkToolFunc.runParentFunc`）。
 -   `nodePoolTab`：按需创建 `NodePool`，方便复用节点。
 -   `followRelease(object)` / `cancelRelease(object)`：通过内部 `_releaseManage` 管理对象释放，当管理器 `close()` 时会 `releaseAll()`。
@@ -236,83 +242,4 @@ A：`BundleManageBase.close()` 内禁止关闭 `main`（会抛异常 `"中断"`�
 
 ## 图示（帮助理解）
 
-### Bundle 生命周期（PlantUML）
-
-```plantuml
-@startuml
-title Bundle 生命周期
-
-skinparam backgroundColor #FFFFFF
-skinparam state {
-  BackgroundColor #E8F5E9
-  BorderColor #388E3C
-  FontColor black
-}
-
-[*] --> 引擎初始化 : 等待 Game.EVENT_GAME_INITED
-
-state "启动流程" as Start {
-  引擎初始化 --> 等待首场景: game inited
-  等待首场景 --> 初始化 main bundle : Director.EVENT_BEFORE_SCENE_LAUNCH
-  初始化 main bundle --> main.open : 调用 manage.init / open
-  main.open --> 运行中
-}
-
-运行中 --> 请求 load(bundle) : 调用 mk.bundle.load
-请求 load(bundle) --> 成功/返回 bundle
-成功/返回 bundle --> 预加载场景?
-
-alt 预加载
-  --> bundle.preloadScene --> 预加载完成 --> 等待是否要真正切换
-else 真正切换
-  --> event.beforeBundleSwitch?
-  --> event.beforeSceneSwitch?
-  --> bundle.loadScene -> director.runScene
-  --> 更新 bundleStr, sceneStr
-  --> event.afterSceneSwitch / afterBundleSwitch
-end
-
-运行中 --> reload(bundle) : 热更（reload）
-reload(bundle) --> 清理脚本缓存 / 注销 ccclass / 释放 bundle 资源
-清理完成 --> load(new bundle)
-
-@enduml
-```
-
-### 交互序列（PlantUML）
-
-```plantuml
-@startuml
-title mk.bundle 交互图
-
-actor Dev as Dev
-participant "User Code" as User
-participant "mk.bundle (MKBundle)" as MKBundle
-participant "AssetManager\n(assetManager)" as AM
-participant "BundleManage\n(manage)" as Manage
-participant "Director" as Director
-
-Dev -> User : 调用 mk.bundle.loadScene(scene, config)
-User -> MKBundle : loadScene(scene, config)
-activate MKBundle
-MKBundle -> MKBundle : await init task
-MKBundle -> MKBundle : load(bundle) 或 preloadScene
-alt load bundle
-  MKBundle -> AM : loadBundle(origin, {onFileProgress}, cb)
-  AM --> MKBundle : bundle
-end
-MKBundle -> MKBundle : event.request(beforeBundleSwitch) // 可阻塞
-MKBundle -> MKBundle : event.request(beforeSceneSwitch)
-MKBundle -> AM : bundle.loadScene(scene, cb)
-AM --> MKBundle : sceneAsset
-MKBundle -> Director : runScene(sceneAsset, beforeLoad, launchedCb)
-Director --> MKBundle : launchedCb(error, scene)
-MKBundle -> MKBundle : 更新 bundleStr / sceneStr
-MKBundle -> MKBundle : event.emit(afterSceneSwitch/afterBundleSwitch)
-deactivate MKBundle
-
-== reload ==
-User -> MKBundle : reload(info)
-MKBundle -> MKBundle : 清理脚本缓存、注销 ccclass、releaseAll、removeBundle
-MKBundle -> MKBundle : load(new bundle)
-```
+### Bundle 管理器生命周期（PlantUML）
