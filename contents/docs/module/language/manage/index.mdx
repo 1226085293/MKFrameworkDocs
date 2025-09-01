@@ -1,0 +1,65 @@
+---
+title: 管理器
+description: 多语言数据和设置
+order: 0
+---
+
+## 介绍
+
+多语言管理器提供
+
+-   添加、获取多语言文本/图片数据
+-   语言类型切换
+-   多语言事件监听
+
+## 概念
+
+在添加多语言数据时，例如文本，通常只有一张表，而且体积会随时间增加也很难清理。
+所以 MK 框架增加了一个多语言类型
+
+多语言类型用于划分多语言数据为多份。例如多语言类型可以为**全局、bundle、模块**，
+这些都是可以自定义的
+
+多语言类型键类型为 `_MKLanguageManage.TypeType`（string 或 number），数据类型为 `Language_.TypeDataStruct`
+
+## 配置
+
+多语言系统的配置位于 `GlobalConfig.Language` 下
+
+### 多语言类型
+
+在 `privateTypeTab` 中修改，例如
+
+````ts
+/** 中文(中华人民共和国) */
+zhCn: {
+    dire: Layout.HorizontalDirection.LEFT_TO_RIGHT,
+},
+```
+
+定义了一个从左到右的语言类型，名字为 zhCn
+
+
+## 属性
+
+### event
+
+管理器的事件，使用方式参考[此处](/docs/getting-started/quick-start-guide/event)
+
+### labelDataTab
+
+文本数据表，类型为 `Record<_MKLanguageManage.TypeType, Language_.TypeDataStruct>`
+
+```ts
+let globalLabelData = mk.languageManage.labelDataTab['gl'];
+
+// 获取的数据类似
+// {
+//     xxx: {
+//         zhCn: "中文内容",
+//         enUs: "英文内容",
+//         ...
+//     },
+//     ...
+// }
+````
