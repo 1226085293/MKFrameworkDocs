@@ -1,5 +1,54 @@
 ---
 title: 数据共享器
-description:
+description: 在不同模块和系统间共享数据
 order: 1
 ---
+
+## 介绍
+
+`mk.dataSharer` 主要解决了动态数据共享问题，例如货币展示的位置、玩家的头像位置等等。同时也支持静态数据，也支持所有数据的重置
+
+## 创建
+
+```ts
+class Data {
+    test!: number;
+}
+
+let data = Data;
+```
+
+## 主要接口
+
+### 设置数据
+
+`data.test = 0`
+
+### 获取数据（同步）
+
+`let a = data.test`
+
+### key
+
+`data.key`
+
+数据键，你可以通过 `key` 属性获取到所有的数据键，可让编辑器自动提示且方便同步修改键名
+
+### request
+
+`data.request(data.key.test)`
+
+请求数据，如果数据为 `undefined`，则等待返回下次的赋值数据
+
+### reset
+
+`data.reset()`
+
+重置数据，重置当前所有数据到 class 中的默认值，例如示例中的 test 为 `undefined`
+
+### source
+
+`data.source.test`
+
+原始数据，`mk.dataSharer` 返回的是一个 Proxy 对象，而 `source` 则是这个对象的原始数据，
+你可以用于数据监听、获取值（避免 Proxy 性能更好）、设置值（避免 Proxy 性能更好，但是会跳过 request）
