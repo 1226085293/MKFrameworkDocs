@@ -1,5 +1,111 @@
 ---
 title: 数据监听器
-description:
+description: 监听数据的变更
 order: 2
 ---
+
+## 介绍
+
+`mk.monitor` 是一个类似事件接口的数据监听工具，可以监听对象内指定属性的赋值操作，可用于 MVVM 实现、游戏调试使用
+
+## 主要接口
+
+### on
+
+```ts
+let data = {
+    test: 0,
+};
+
+mk.monitor.on(
+    data,
+    'test',
+    (newValue, oldValue) => {
+        // 数据修改回调
+        console.log('新值：', newValue, '旧值：', oldValue);
+    },
+    () => {
+        // 取消监听回调
+    },
+    this
+);
+```
+
+监听数据变更，其中 **取消监听回调** 可以不传递，如下
+
+`mk.monitor.on(data, "test", ()=> { }, this)`
+
+### onRecursion
+
+和 on 的功能一致，区别是会递归监听对象中的每个属性
+
+### once
+
+和 on 的功能一致，区别是只会触发一次
+
+### off
+
+```ts
+mk.monitor.off(data, 'test', this);
+// 数据修改回调为 on 函数第三个参数
+mk.monitor.off(data, 'test', 数据修改回调, this);
+```
+
+取消监听的事件
+
+### offRecursion
+
+和 off 的功能一致，区别是会递归取消监听对象中的每个属性
+
+### clear
+
+```ts
+mk.monitor.clear(this);
+```
+
+清理目标所关联的所有数据监听事件，目标对象为 `on, once, onRecursion` 的最后一个参数
+
+### sync
+
+```ts
+let data = {
+    test: 0,
+};
+
+let data2 = {
+    test2: 0,
+};
+
+mk.monitor.sync(data, 'test', data2, 'test2', this);
+```
+
+同步数据，当 `data.test` 变更时，数据会同步到 `data2.test2`
+
+### wait
+
+```ts
+data.test = 1;
+await mk.monitor.wait(data, 'test');
+```
+
+等待监听回调执行完成，如果之前监听了 `data.test`，你又需要确保监听的异步回调函数已经执行完成则可以使用 `wait`
+
+### disable
+
+```ts
+mk.monitor.disable(this);
+mk.monitor.disable(data, 'test', this);
+mk.monitor.disable(data, 'test', 监听函数回调, this);
+```
+
+禁用 on 事件回调，执行后即使你监听了对象的修改，也不会执行回调。注意这不是删除事件回调而是禁用
+
+### enable
+
+```ts
+mk.monitor.enable(this);
+mk.monitor.enable(data, 'test', this);
+mk.monitor.enable(data, 'test', 监听函数回调, this);
+```
+
+启用 on 事件回调，恢复 `disable` 禁用的事件
