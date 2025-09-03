@@ -78,7 +78,7 @@ function BlogCard({ date, title, description, slug, cover, authors }: BlogCardPr
     return (
         <Link
             href={`/blog/${slug}`}
-            className="flex flex-col gap-2 items-start border rounded-md py-5 px-3 min-h-[400px]"
+            className="flex flex-col gap-2 items-start border rounded-md py-5 px-3 min-h-[400px] min-w-[360px]"
         >
             <h3 className="text-md font-semibold -mt-1 pr-7">{title}</h3>
             <div className="w-full">

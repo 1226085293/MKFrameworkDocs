@@ -1,0 +1,48 @@
+---
+title: '框架设计简述'
+description: '关于 MK 框架的设计简述'
+date: 2025-9-3 15:57:00
+authors:
+    - avatar: 'https://forum.cocos.org/user_avatar/forum.cocos.org/1226085293/120/86149_2.png'
+      handle: Muzzik
+      username: 马赛克
+      handleUrl: 'https://forum.cocos.org/u/1226085293/summary'
+cover: 'https://img.freepik.com/premium-vector/many-monsters-various-colors-doodle-come-bless-birthday-happy_577083-84.jpg?w=826'
+---
+
+## 框架的包装
+
+框架的源码选择通过 **扩展资源管理器** 的方式放在插件目录内，然后在 `MKInit.ts` 导出一个 mk 对象，
+通过导入映射及搭配 d.ts 给用户使用。
+
+### 问题 1：为什么选择扩展资源管理器实现框架代码存放？
+
+1. 便于修改和查看代码
+
+1. 划分用户与框架代码
+
+### 问题 2：为什么选择把模块集中到 mk 导出而不是单独导入模块？
+
+1. 单独导入模块对于新手来说并不友好，你需要知道有哪些模块才能导入
+
+1. 无法对接口进行后处理，例如屏蔽某个 public 函数
+
+## 框架的启动
+
+框架内置了一个插件脚本 `MKInstall.js`，其内拦截了 `loadBundle`，让其最先加载 Config 和 Framework Bundle，
+实现了框架先于用户脚本的加载
+
+框架内置了 Config 和 Framework Bundle，对应其名称的文件夹
+
+## 框架如何构建 d.ts？
+
+框架通过微软的 [api-extractor](https://api-extractor.node.org.cn/) 产品来自动打包 d.ts。同时通过 `api-extractor` 提供的修饰符控制公开接口
+
+为什么必须控制公开接口？例如 MKLifeCycle 代码中的 `_open` 必须被 uiManage 访问，所以必须是公开或者通过属性索引(`["xxx"]`)的方式访问，
+而通过索引的方式访问不存在的属性时编辑器不会提示错误，所以公开接口更好
+
+还有一些框架内部使用的属性、接口，如果不想暴露给用户，则可以使用 `@internal` 修饰符
+
+## 命令风格
+
+目前框架命名为驼峰，导出的对象是小驼峰，namespace 和 class 是大驼峰，且通过 eslint 规则限制
