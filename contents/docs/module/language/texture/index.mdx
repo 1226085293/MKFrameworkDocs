@@ -1,5 +1,57 @@
 ---
 title: 图片
-description:
+description: 多语言图片
 order: 2
 ---
+
+## 介绍
+
+多语言图片是一个组件，可以挂载到 `Sprite` 组件的节点上，用于展示多语言图片
+
+`mk.language.Texture` 是多语言文本组件，可以挂载到 `Sprite` 组件的节点上，用于展示多语言图片
+
+![多语言文本组件](/docs/6e7efa9f-f7bd-4bd3-b184-e863fe6d3e3f.png)
+
+## 属性面板
+
+<Note type="note" title="示例代码">
+```ts
+mk.languageManage.addTexture('多语言类型名', {
+    示例: {
+        zhCn: "db://assets/resources/xxx.png",
+        enUs: "db://assets/resources/xxx_en.png",
+    },
+});
+```
+</Note>
+
+### 类型
+
+`addLabel` 的首个参数，例如示例代码中的 "多语言类型名"
+
+### 语言标识
+
+`addLabel` 数据对象中的键，例如示例代码中的 "示例"
+
+---
+
+## 在代码中使用
+
+### 使用组件更新文本
+
+```ts
+let comp = node.getComponent(mk.language.Texture)!;
+
+comp.typeStr = '多语言类型名';
+comp.markStr = '示例';
+```
+
+修改 `typeStr`, `markStr` 都会更新内容
+
+### 不依赖组件更新图片
+
+```ts
+let comp = node.getComponent(Sprite)!;
+
+comp.spriteFrame = await mk.languageManage.getTexture('多语言类型名', '示例', this);
+```

@@ -1,5 +1,64 @@
 ---
 title: 文本
-description:
+description: 多语言文本
 order: 1
 ---
+
+## 介绍
+
+`mk.language.Label` 是多语言文本组件，可以挂载到 `Label` 或者 `RichText` 组件的节点上，用于展示多语言文本
+
+![多语言文本组件](/docs/9fe44eaf-acf1-426d-a2db-134524a812dc.png)
+
+## 属性面板
+
+<Note type="note" title="示例代码">
+```ts
+mk.languageManage.addLabel('多语言类型名', {
+    示例: {
+        enUs: 'template-{0}',
+        zhCn: '示例-{0}',
+    },
+});
+```
+</Note>
+
+### 类型
+
+`addLabel` 的首个参数，例如示例代码中的 "多语言类型名"
+
+### 语言标识
+
+`addLabel` 数据对象中的键，例如示例代码中的 "示例"
+
+### 水平对齐适配
+
+如果勾选此选项，将根据当前语种配置的方向设置 `Label` 或 `RichText` 组件的 `horizontalAlign`（水平对齐）属性
+
+---
+
+## 在代码中使用
+
+### 使用组件更新文本
+
+```ts
+let comp = node.getComponent(mk.language.Label)!;
+
+comp.typeStr = '多语言类型名';
+comp.markStr = '示例';
+comp.argsStrList = ['123'];
+```
+
+修改 `typeStr`, `markStr`, `argsStrList` 都会更新内容
+
+注意 `argsStrList` 需要赋值时才会更新内容，调用数组的 push, pop 等方法不会更新内容
+
+### 不依赖组件更新文本
+
+```ts
+let comp = node.getComponent(Label)!;
+
+comp.string = mk.languageManage.getLabel('多语言类型名', '示例', {
+    argsStrList: ['123'],
+});
+```

@@ -154,7 +154,7 @@ n11 --> n10
 在 `lateClose` 阶段，框架会自动完成以下清理操作：
 
 1. 重置 `this.data`（若为 `new class` 创建的对象）
-2. 移除通过 `@property` 引用的音频单元
+2. 在音频组内移除通过 `@property` 引用的音频单元
 3. 执行 `this.unscheduleAllCallbacks()` 取消组件内定时器
 4. 清理框架内 `EventTarget` 与 `_MKNetworkBase.MessageEvent` 的事件监听（若 target 为自身）
 5. 清理 `monitor` 中绑定到自身的监听
