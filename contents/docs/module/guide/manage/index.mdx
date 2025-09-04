@@ -1,0 +1,284 @@
+---
+title: 引导管理器
+description: 多步骤引导流程的核心控制器，支持跳转、状态保持、异步加载等复杂场景
+order: 1
+---
+
+## 介绍
+
+`mk.GuideManage` 是一个功能完整的引导流程管理器，专为多步骤、多状态、可中断的引导场景设计。适用于游戏新手引导、应用功能教学、复杂表单填写等需要分步交互的场景。
+
+### 主要特性
+
+-   **多实例支持**：可同时运行多个独立引导流程
+-   **灵活步骤管理**：支持任意步骤的插入、删除、跳转
+-   **状态保持**：支持暂停/恢复、步骤状态还原
+-   **组件化设计**：引导步骤脚本与逻辑分离，支持组件式挂载
+-   **异步加载**：支持步骤资源预加载，优化用户体验
+-   **事件驱动**：完善的生命周期事件系统
+-   **场景支持**：自动处理场景切换与资源加载
+
+---
+
+## 创建管理器
+
+通过构造函数创建引导管理器实例：
+
+```ts
+const guideManager = new mk.GuideManage({
+    currentStepNum: 1, // 初始步骤编号
+    endStepNum: 10, // 结束步骤编号
+    nameStr: '新手引导', // 引导名称（用于日志）
+    operateTab: XXXGuideOperate.tab, // 操作单元表
+    stepUpdateCallbackFunc: (stepNum) => {
+        /* 步骤更新回调 */
+    },
+});
+```
+
+### 初始化配置说明
+
+| 参数名                   | 类型                          | 必填 | 说明                     |
+| ------------------------ | ----------------------------- | ---- | ------------------------ |
+| `currentStepNum`         | `number`                      | 否   | 初始步骤编号             |
+| `endStepNum`             | `number`                      | 否   | 结束步骤编号             |
+| `nameStr`                | `string`                      | 否   | 引导名称（用于日志输出） |
+| `operateTab`             | `Record<string, OperateCell>` | 否   | 操作单元表               |
+| `stepUpdateCallbackFunc` | `(stepNum: number) => any`    | 否   | 步骤更新回调函数         |
+
+> **注意**：
+>
+> -   若未提供 `currentStepNum`，默认从 0 开始。
+> -   `stepUpdateCallbackFunc` 返回 `null` 或 `undefined` 会中断引导。
+
+---
+
+## 属性说明
+
+### 公共属性
+
+| 属性名       | 类型                           | 说明                                                |
+| ------------ | ------------------------------ | --------------------------------------------------- |
+| `event`      | `MKEventTarget<EventProtocol>` | 事件中心，用于监听引导生命周期事件                  |
+| `stepMap`    | `Map<number, MKGuideStepBase>` | 已注册步骤的映射表，key 为步骤编号                  |
+| `isPause`    | `boolean`                      | 获取/设置暂停状态（setter 触发事件）                |
+| `isFinish`   | `boolean`                      | 获取完成状态（只读，等于 `endStepNum` 时为 `true`） |
+| `endStepNum` | `number`                       | 获取结束步骤编号（只读）                            |
+
+---
+
+## 方法详解
+
+### 注册步骤
+
+```ts
+regis(step_: MKGuideStepBase | MKGuideStepBase[]): void
+```
+
+注册一个或多个步骤实例。
+
+**参数：**
+
+-   `step_`：单个或数组形式的步骤实例
+
+**说明：**
+
+-   注册后，步骤实例的 `guideManage` 属性会被自动设置为当前管理器
+-   步骤会被存储到 `stepMap` 中，以 `stepNum` 为 key
+
+---
+
+### 运行引导
+
+```ts
+run(): Promise<void>
+```
+
+运行当前步骤，自动取消暂停状态并更新视图。
+
+**执行流程：**
+
+1. 通过任务管线（`MKTaskPipeline`）保证执行顺序
+2. 检查是否已到达结束步骤
+3. 处理场景切换（根据 `sceneStr`）
+4. 加载操作单元（`operateStrList`）
+5. 执行步骤 `preLoad`、`load`、`unload` 生命周期
+6. 触发完整生命周期事件
+
+> **注意**：仅当 `isPause === false` 时才会执行完整流程。
+
+---
+
+### 设置步骤
+
+```ts
+setStep(stepNum_: number, initData_?: any): Promise<void>
+```
+
+跳转到指定步骤。
+
+**参数：**
+
+-   `stepNum_`：目标步骤编号
+-   `initData_`：可选的初始化数据（传递给步骤的 `initData`）
+
+**行为：**
+
+-   **暂停状态下**：仅更新步骤数据，不执行生命周期
+-   **正常状态下**：执行完整步骤切换流程
+-   切换前触发 `beforeSwitch` 事件
+-   到达 `endStepNum` 时自动调用 `finish()`
+
+> **提示**：可通过 `this._next()` 在步骤内部调用此方法。
+
+---
+
+### 获取当前步骤
+
+```ts
+getStep(): number
+```
+
+获取当前步骤编号。
+
+**返回值：**
+
+-   当前步骤编号（即 `this._stepNum`）
+
+---
+
+### 完成引导
+
+```ts
+finish(): void
+```
+
+手动完成引导。
+
+**行为：**
+
+-   设置 `isPause = true`
+-   触发 `finish` 事件
+-   不自动重置步骤数据
+
+> **适用场景**：强制结束引导，如用户跳过、超时等。
+
+---
+
+### 暂停/恢复
+
+通过 `isPause` 属性控制引导状态：
+
+```ts
+guideManager.isPause = true; // 暂停
+guideManager.isPause = false; // 恢复
+```
+
+**说明：**
+
+-   状态变化时会自动触发 `pause` 或 `resume` 事件
+-   暂停状态下仍可切换步骤，但不会执行步骤生命周期
+-   恢复后继续执行未完成的步骤
+
+---
+
+## 事件系统
+
+通过 `event` 属性监听引导生命周期事件：
+
+```ts
+guideManager.event.on('loadingStep', () => {
+    // 步骤加载开始
+});
+```
+
+### 可用事件列表
+
+| 事件名                | 参数                    | 触发时机                                            |
+| --------------------- | ----------------------- | --------------------------------------------------- |
+| `pause`               | 无                      | 引导暂停时                                          |
+| `resume`              | 无                      | 引导恢复时                                          |
+| `beforeSwitch`        | `nextStepNum: number`   | 步骤切换前（调用 `setStep` 时）                     |
+| `loadingStep`         | 无                      | 步骤加载前（场景/操作）                             |
+| `afterUnloadStep`     | `step: MKGuideStepBase` | 上个步骤卸载后                                      |
+| `loadingStepComplete` | 无                      | 当前步骤加载完成后                                  |
+| `break`               | 无                      | 引导中断时（数据错误或步骤未注册）                  |
+| `finish`              | 无                      | 引导完成时（到达 `endStepNum` 或手动调用 `finish`） |
+
+> **提示**：使用 `guideManager.event.key.xxx` 可避免拼写错误。
+
+---
+
+## 使用示例
+
+### 完整流程示例
+
+```ts
+// 1. 创建管理器
+const guide = new mk.GuideManage({
+    nameStr: '首次登录引导',
+    endStepNum: 3,
+    operateTab: {
+        tip: {
+            load: () => showTip(),
+            unload: () => hideTip(),
+        },
+    },
+});
+
+// 2. 注册步骤
+const steps = [new FirstStep(1), new SecondStep(2), new ThirdStep(3)];
+guide.regis(steps);
+
+// 3. 监听事件
+guide.event.on(guide.event.key.finish, () => {
+    console.log('✅ 引导完成');
+});
+
+guide.event.on(guide.event.key.break, () => {
+    console.warn('⚠️ 引导中断');
+});
+
+// 4. 开始引导
+await guide.setStep(1);
+
+// 5. 手动暂停/恢复
+guide.isPause = true;
+guide.isPause = false;
+```
+
+---
+
+## 常见问题（FAQ）
+
+### Q1：如何中断引导？
+
+-   在 `stepUpdateCallbackFunc` 中返回 `null` 或 `undefined`
+-   手动调用 `finish()` 或设置 `isPause = true`
+
+### Q2：如何预加载资源？
+
+-   在步骤的 `preLoad()` 方法中加载资源
+-   管理器会根据 `nextStepNumList` 自动调用
+
+### Q3：如何实现分支引导？
+
+-   设置 `nextStepNumList = [2, 3]`，表示多路径
+-   在步骤中根据条件手动调用 `setStep(2)` 或 `setStep(3)`
+
+### Q4：如何跨场景引导？
+
+-   在步骤中设置 `sceneStr = "resources.lobby"`
+-   管理器会自动切换场景并加载资源
+
+---
+
+## 参考资料
+
+-   [引导步骤详解](../step)
+-   [操作表概念详解](../guide#概念必读)
+-   [事件系统设计模式](../patterns/event-driven)
+
+```
+
+```

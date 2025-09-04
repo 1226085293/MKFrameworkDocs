@@ -1,0 +1,258 @@
+---
+title: 引导步骤
+description: 深入理解新手引导步骤的实现与管理
+order: 0
+---
+
+## 介绍
+
+每一个引导步骤承载了新手引导中的具体逻辑。这些步骤需要注册到管理器后，由管理器统一驱动其生命周期函数。
+
+---
+
+## 创建引导步骤
+
+### 推荐结构
+
+我们建议采用 **继承机制** 来组织引导步骤，以便更好地管理和复用代码。
+
+#### 创建引导步骤基类
+
+首先，创建一个通用的引导步骤基类，继承自 `mk.GuideStepBase<typeof XXXGuideOperate.tab>`，其中 `XXXGuideOperate.tab` 是你在 [操作表](../guide#概念必读) 中定义的操作单元。
+
+```ts:XXXGuideStepBase.ts
+// 示例：引导步骤基类
+export abstract class XXXGuideStepBase extends mk.GuideStepBase<typeof XXXGuideOperate.tab> {}
+```
+
+#### 派生子类
+
+然后，让具体的引导步骤继承该基类，并实现相应的逻辑。
+
+```ts:XXXGuideStepA.ts
+@cclass
+class XXXGuideStepA extends XXXGuideStepBase {
+    // 实现具体步骤逻辑
+    ...
+}
+```
+
+> **提示**：`XXX` 可替换为你的引导系统名称，例如 `Lobby`、`Game` 等，以便更好地组织模块。
+
+---
+
+## 注册步骤
+
+虽然你已经创建了引导步骤脚本，但还需要将其注册到管理器中才能生效。
+
+由于 `mk.GuideStepBase` 继承自 `Component`，你可以选择以下两种方式之一来实例化：
+
+-   **挂载到节点上**
+-   **直接使用 `new` 实例化**
+
+无论哪种方式，最终都需要调用引导管理器的 `regis` 方法完成注册：
+
+```ts
+const stepInstance = new XXXGuideStepA();
+guideManage.regis(stepInstance);
+```
+
+---
+
+## 属性说明
+
+### stepNum
+
+-   **类型**: `number`
+-   **作用**: 步骤的唯一标识符。
+-   **用途**: 引导管理器通过此属性查找并跳转至对应步骤。
+
+```ts
+guideManage.setStep(1); // 跳转到 stepNum 为 1 的步骤
+```
+
+---
+
+### guideManage
+
+-   **类型**: `MKGuideManage`
+-   **作用**: 当前步骤所属的引导管理器。
+-   **用途**: 在步骤内部访问管理器的方法或属性。
+
+```ts
+this.guideManage.setStep(2); // 手动跳转到其他步骤
+```
+
+---
+
+### operateStrList
+
+-   **类型**: `(keyof typeof XXXGuideOperate.tab)[]`
+-   **作用**: 定义当前步骤需要加载的操作单元列表。
+-   **说明**: 管理器会按顺序加载这些操作单元。
+
+```ts
+operateStrList = [XXXGuideOperate.key.清理界面, XXXGuideOperate.key.引导窗口];
+```
+
+> 更多内容参见 [操作表](../guide#概念必读)
+
+---
+
+### operateTab
+
+-   **类型**: `{ [k in keyof CT]: ReturnType<Awaited<CT[k]["load"]>> | undefined }`
+-   **作用**: 存储各操作单元 `load` 方法的返回值。
+-   **用途**: 获取已加载操作单元的结果。
+
+```ts
+const windowRef = this.operateTab[XXXGuideOperate.key.引导窗口];
+```
+
+---
+
+### initData
+
+-   **类型**: `any`
+-   **作用**: 外部传递的初始化数据。
+-   **来源**: `guideManage.setStep(initData)` 或 `this._next(initData)`
+
+```ts
+guideManage.setStep(1, { userLevel: 5 });
+```
+
+---
+
+### stepUpdateData
+
+-   **类型**: `any`
+-   **作用**: 步骤更新回调的返回值。
+-   **来源**: 引导管理器的 `stepUpdateCallbackFunc` 构造参数。
+-   **用途**: 可用于获取服务器奖励、状态更新等。
+
+```ts
+// 在 stepUpdateCallbackFunc 中返回数据
+stepUpdateCallbackFunc: (stepNum) => {
+    return fetchReward(stepNum);
+};
+```
+
+---
+
+### describeStr（可选）
+
+-   **类型**: `string`
+-   **作用**: 步骤的描述信息。
+-   **用途**: 用于日志输出，便于调试和追踪。
+
+```ts
+describeStr = '第一步：展示欢迎界面';
+```
+
+---
+
+### nextStepNumList（可选）
+
+-   **类型**: `number[]`
+-   **作用**: 定义后续可跳转的步骤列表。
+-   **行为**:
+    -   若数组长度为 1，则支持 `this._next()` 自动跳转，并触发预加载。
+    -   若数组长度 > 1，则仅触发预加载（多分支引导）。
+
+```ts
+nextStepNumList = [2]; // 单路径
+nextStepNumList = [2, 3]; // 多路径（仅预加载）
+```
+
+---
+
+### sceneStr（可选）
+
+-   **类型**: `string`，格式为 `"bundle名.scene名"`
+-   **示例**: `"resources.lobby"`
+
+> 当执行到该步骤时，如果当前场景与 `sceneStr` 不一致，会自动先切换场景。
+
+```ts
+sceneStr = 'resources.lobby';
+```
+
+---
+
+## 生命周期函数
+
+### preLoad
+
+-   **触发时机**: 上一个步骤 `load` 后，根据 `nextStepNumList` 触发下一个步骤的预加载。
+-   **用途**: 提前加载资源、初始化数据等。
+
+```ts
+preLoad?(): void | Promise<void> {
+    await preloadAssets();
+}
+```
+
+---
+
+### load
+
+-   **触发时机**: 进入当前步骤时调用。
+-   **参数**:
+    -   `isJump_: boolean`：是否通过跳转进入（非连续流程）
+
+```ts
+async load(isJump_: boolean) {
+    if (isJump_) {
+        this.showTransitionEffect();
+    }
+    this.initUI();
+}
+```
+
+---
+
+### unload
+
+-   **触发时机**: 离开当前步骤时调用。
+-   **用途**: 清理资源、销毁 UI、取消事件监听等。
+
+```ts
+async unload() {
+    this.destroyUI();
+}
+```
+
+---
+
+## 方法详解
+
+### \_next
+
+-   **用途**: 跳转到下一个步骤。
+-   **参数**:
+    -   `initData_?: any`：传递给下一个步骤的初始化数据。
+
+> **注意**：只有当 `nextStepNumList` 长度为 1 时，才能调用此方法。
+
+```ts
+this._next({ completed: true });
+```
+
+---
+
+## 小结
+
+| 功能         | 描述                                   |
+| ------------ | -------------------------------------- |
+| **创建**     | 继承 `GuideStepBase`，实现具体步骤逻辑 |
+| **注册**     | 使用 `guideManage.regis()` 注册步骤    |
+| **属性**     | 控制流程、数据传递、场景切换等         |
+| **生命周期** | `preLoad` → `load` → `unload`          |
+| **跳转**     | 使用 `_next()` 实现单路径跳转          |
+
+---
+
+## 参考资料
+
+-   [操作表概念详解](../guide#概念必读)
+-   [引导管理器文档](./manage)

@@ -1,0 +1,48 @@
+---
+title: 多边形遮罩
+description:
+order: 2
+---
+
+## 介绍
+
+多边形遮罩（MKPolygonMask）是为了引导用户点击区域的组件
+
+![多边形遮罩效果](/docs/73787272-ad35-425c-847b-f89cdcd86350.png)
+
+## 使用
+
+创建三个节点，结构如下
+
+-   MKPolygonMask 组件节点
+    -   Mask 遮罩节点
+        -   遮罩图片节点
+
+### 遮罩图片节点
+
+![遮罩图片节点](/docs/358238f2-3f9a-4cf4-b46f-80c2b3c82388.png)
+
+### Mask 节点
+
+![Mask节点](/docs/df03082e-5e69-45c0-89dd-60c9f6919f0c.png)
+
+### MKPolygonMask 节点
+
+![MKPolygonMask节点](/docs/ca780231-7296-4628-954a-b9549f387390.png)
+
+-   遮罩组件
+    设置为子节点下的 "Mask 遮罩节点"
+
+-   屏蔽触摸
+    勾选后屏蔽多边形外的区域点击
+
+-   跟踪节点
+    多边形区域会跟随跟踪节点坐标
+
+### 编辑多边形区域
+
+![编辑多边形区域](/docs/f7a51f6c-151c-447c-a99a-1a4f3f2b3a58.png)
+
+1. 勾选 PolygonCollider2D 组件的 Editing 属性
+
+2. 拖动场景编辑器内的多边形点，或者编辑 PolygonCollider2D 组件的 Points 属性
