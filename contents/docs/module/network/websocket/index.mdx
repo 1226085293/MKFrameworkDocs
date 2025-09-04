@@ -1,5 +1,233 @@
 ---
 title: Websocket
-description:
+description: 基于 `mk.network.Base` 的 WebSocket 网络模块 —— 支持可插拔编解码、心跳检测、断线重连、消息事件化与“消息等待（request）”语义。
 order: 0
 ---
+
+# 概览
+
+`mk.network.Websocket`（以及微信运行时下的 `mk.network.WebsocketWX`）是基于 `mk.network.Base` 的 WebSocket 客户端封装，面向用户提供一套以事件驱动、支持二进制/自定义协议、可等待回复的消息通信层。
+
+主要特点：
+
+-   可插拔编解码器（基于 `MKCodecBase`），支持任意数据格式传输。
+-   消息事件化：通过 `message` 对象以消息类型为 key 进行 `on`/`once`/`off`/`send`/`request` 等操作。
+-   请求-响应等待：`message.request(data)` 返回 Promise，自动根据“消息序列号”匹配响应并 resolve。
+-   心跳（心跳超时检测 + 可选客户端定时发心跳）与断线重连（间隔 & 次数控制）。
+-   支持发送潮（SendTide）——把多条消息按节奏发送以避免“消息洪峰”。
+-   兼容微信平台（`Websocket` / `WebsocketWX`）。
+
+# 用户层接口总览
+
+-   `mk.network.Base`：抽象基类的用户可见封装（实际使用时通过 `mk.network.Websocket` / `mk.network.WebsocketWX`）。
+-   `mk.network.Base_`：命名空间，包含初始化配置类型 `InitConfig`、枚举等（用于构造或阅读默认值）。
+-   `mk.network.Websocket`：浏览器 / 编辑器 环境下的 WebSocket 实现。
+-   `mk.network.Websocket_`：Websocket 特有的配置类（如 `binaryType`, `protocolStrList`）。
+-   `mk.network.WebsocketWX`：微信小程序环境下的 SocketTask 实现（使用 `wx.connectSocket`）。
+
+> 所有网络实例都暴露 `event` 与 `message` 两个主要对象用于事件与消息交互；并可通过 `config` 与 `codec` 做进一步定制。
+
+# 快速开始
+
+### 1. 简单连接与发送
+
+```ts
+const ws = new mk.network.Websocket({
+    // 可选：codec: new MyCodec(),
+    parseMessageIdFunc: (data) => data.constructor.getTypeUrl(''), // 根据项目协议决定
+    parseMessageSequenceFunc: (data) => data.__sequence, // 用于 request() 匹配返回
+});
+
+// 连接
+await ws.connect('ws://127.0.0.1:8848');
+
+// 普通发送（不等待回复）
+ws.message.send(MyProtoMsg.create({ foo: 1 }));
+
+// 监听推送
+ws.message.on(MyPushProto, (msg) => {
+    console.log('收到推送：', msg);
+});
+```
+
+### 2. 发送并等待响应（Request）
+
+```ts
+// request 会把消息放到待等待表（基于 parseMessageSequenceFunc 提取的 sequence）
+// 并返回 Promise，当收到相同 sequence 的响应时 resolve
+const p = ws.message.request(MyRequestProto.create({ data: 123 }));
+p?.then((reply) => {
+    console.log('收到回复', reply);
+});
+```
+
+### 3. 事件监听（连接/断开/心跳等）
+
+```ts
+ws.event.on(ws.event.key.open, () => console.log('连接成功'));
+ws.event.on(ws.event.key.close, (evt) => console.log('已关闭', evt));
+ws.event.on(ws.event.key.reconnectSuccess, () => console.log('重连成功'));
+ws.event.on(ws.event.key.heartbeatTimeout, () => console.log('心跳超时'));
+ws.event.on(ws.event.key.recv, (raw) => console.log('收到任意消息', raw));
+```
+
+# 配置详解（`mk.network.Base_.InitConfig` 与 `mk.network.Websocket_.InitConfig`）
+
+> 下面列出的配置字段是用户常用项与其语义（已省略内部实现细节）。
+
+### 通用配置（`mk.network.Base_.InitConfig`）
+
+| 字段                       |                  类型 |        默认 | 描述                                                                                           |
+| -------------------------- | --------------------: | ----------: | ---------------------------------------------------------------------------------------------- |
+| `codec`                    |         `MKCodecBase` | `undefined` | 可选的编解码器，若提供，发送前 `encode`、接收后 `decode` 将被调用。                            |
+| `sendIntervalMsNum`        |              `number` |         `0` | 底层发送队列轮询间隔 (ms)。0 表示立即发送（但仍走队列）；>0 表示轮询发送；配合 SendTide 使用。 |
+| `reconnectIntervalMsNum`   |              `number` |      `1000` | 断线后自动重连的时间间隔（ms）。                                                               |
+| `maxReconnectNum`          |              `number` |         `5` | 最大重连尝试次数。                                                                             |
+| `waitTimeoutMsNum`         |              `number` |      `5000` | `message.request()` 的默认超时时间（ms）。                                                     |
+| `heartbeatConfig`          |             `object?` | `undefined` | 心跳相关配置（见下文）。                                                                       |
+| `parseMessageIdFunc`       | \`(data\:any)=>string |    number\` | 把接收到的消息解析为“消息 ID/类型”，用于 `message.emit` & `on/once/off` 的匹配。               |
+| `parseMessageSequenceFunc` | \`(data\:any)=>string |      number | 从消息中解析出“序列号”用于 request-回复匹配。若不需要 request，可不实现或返回 `undefined`。    |
+
+### 心跳配置（`heartbeatConfig`）
+
+可选，不存在则不执行心跳逻辑
+
+| 字段          |                                      类型 | 描述                                                                                                                                                                                                                                    |
+| ------------- | ----------------------------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `intervalMsN` |                                 `number?` | 客户端发送心跳的间隔（ms）。如果不需要客户端定时发心跳，则 `initFunc` 返回 `null`。                                                                                                                                                     |
+| `timeoutMsN`  |                                  `number` | 收到心跳后多长时间未复位则视为心跳超时（ms），超时后触发 `heartbeatTimeout` 事件。                                                                                                                                                      |
+| `initFunc`    | `(doneFunc:()=>void)=> (()=>any) \| null` | 初始化函数：当框架检测到服务端心跳（server→client）时，请调用 `doneFunc()` 以重置超时计时器；如果需要客户端定时发送心跳，则 `initFunc` 返回一个“发送心跳数据的函数”，框架会按 `intervalMsN` 调用它并 send；若返回 `null` 则不自动发送。 |
+
+**心跳语义示例**：
+
+-   server → client：服务端有心跳推送，用户在 `initFunc` 的 `doneFunc` 被传入后需在收到服务端心跳时调用 `doneFunc()`，框架会重置心跳超时计时器。
+-   client → server：若 `initFunc` 返回发送函数，框架会在连接打开后定时调用并 `send` 返回的数据（用于主动 ping 到服务端）。
+
+### Websocket 特有配置（`mk.network.Websocket_.InitConfig`）
+
+| 字段              |       类型 | 默认            |                 |
+| ----------------- | ---------: | --------------- | --------------- |
+| `binaryType`      |   \`"blob" | "arraybuffer"\` | `"arraybuffer"` |
+| `protocolStrList` | `string[]` | `[]`            |                 |
+
+### 微信小程序差异（`mk.network.WebsocketWX`）
+
+`WebsocketWX` 使用微信的 `wx.connectSocket` 与 `wx.SocketTask`，配置项与 `Websocket` 基本一致，唯一差异是底层事件名称（onOpen/onMessage/onError/onClose）由框架封装，无需用户关心。`protocolStrList` 对应 `protocols` 字段。
+
+# 消息事件 API（`message` 对象）
+
+`message` 是针对“协议消息类型”的事件分发器，常用方法：
+
+| 方法                                    | 描述                                                                                                       |                                                                    |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `message.on(type, callback, target?)`   | 监听某类消息（`type` 可以是协议 class / 类型标志 / 数字 / 字符串，具体取决于 `parseMessageIdFunc` 的实现） |                                                                    |
+| `message.once(...)`                     | 只触发一次的监听                                                                                           |                                                                    |
+| `message.off(type, callback?, target?)` | 移除监听                                                                                                   |                                                                    |
+| `message.send(data)`                    | 发送消息（不等待回复）                                                                                     |                                                                    |
+| `message.request(data, timeoutMsNum?)`  | 发送并等待回复，返回 \`Promise\<reply                                                                      | null>`。若 `parseMessageSequenceFunc`未能解析序列号则返回`null\`。 |
+| `message.has(type, callback?, target?)` | 检查是否有对应监听                                                                                         |                                                                    |
+| `message.clear()`                       | 清除所有消息监听（常用于场景销毁或全局重启）                                                               |                                                                    |
+
+**注意事项**：
+
+-   `type` 的具体含义依赖 `parseMessageIdFunc` 的实现。常见做法：对于 protobuf，使用 `data.constructor.getTypeUrl("")` 作为消息 id 或使用消息包内的 `id` 字段。
+-   `request()` 必须依赖 `parseMessageSequenceFunc` 返回可用于匹配响应的 sequence。通常在 encode 前会往请求对象注入 `__sequenceNum` 字段，服务端在回复包中带回相同 sequence。
+
+# 控制事件（`event` 对象）
+
+`mk.network.Base` 还会对整个 socket 生命周期发出若干事件，使用方式如下：
+
+| 事件 key           | 说明                                 |
+| ------------------ | ------------------------------------ |
+| `open`             | socket 打开（连接成功）              |
+| `close`            | socket 关闭                          |
+| `recv`             | 收到任意消息（原始解码后的对象）     |
+| `reconnectSuccess` | 自动重连成功                         |
+| `reconnectFail`    | 自动重连最终失败（达到最大重连次数） |
+| `heartbeatTimeout` | 心跳超时触发                         |
+
+示例：
+
+```ts
+ws.event.on(ws.event.key.open, () => console.log('open'));
+ws.event.on(ws.event.key.close, () => console.log('close'));
+```
+
+# 发送节流 / 发送潮（SendTide）
+
+当需要对大量消息做节奏化发送（例如多条心跳、批量上报、消息洪峰）时，可以使用 `SendTide` 帮助控制：
+
+```ts
+// intervalMsN: -1 手动触发；0 立即发送；>0 表示自动间隔发送
+const tide = new mk.network.Base_.SendTide(ws, 100); // 每 100ms 发送一次消息（如果队列不空）
+tide.send(MyProto.create({ a: 1 }));
+// 若 -1 模式，需要手动触发
+tide.trigger();
+```
+
+# 常见用法示例（参考 `ResourcesNetwork`）
+
+```ts
+// 1. 实例化 codec（以 protobuf 为例）
+const codec = new MyProtoCodec();
+
+// 2. 创建 websocket 实例并传入解析方法
+const ws = new mk.network.Websocket({
+    codec,
+    parseMessageIdFunc: (data) => data.constructor.getTypeUrl(''),
+    parseMessageSequenceFunc: (data) => {
+        if (data['__sequenceNum'] === undefined) {
+            data['__sequenceNum'] = codec.sequenceNum++;
+        }
+        return data['__sequenceNum'];
+    },
+});
+
+// 3. 初始化 codec （如果 codec 需要注册 proto）
+ws.codec!.init(protoBundle, {
+    package: protoBundle.Package,
+    messageIdTab: protoBundle.MessageID,
+});
+
+// 4. 连接并使用
+await ws.connect('ws://127.0.0.1:8848');
+ws.message
+    .request(proto.RequestC.create({ data: 123 }))
+    ?.then((reply) => console.log('reply', reply));
+ws.message.on(proto.PushB, (msg) => console.log('push', msg));
+```
+
+# 错误处理与重连策略建议
+
+-   如果网络临时中断，框架会按照 `reconnectIntervalMsNum` 与 `maxReconnectNum` 自动重连，重连成功/失败会触发相应事件（`reconnectSuccess` / `reconnectFail`），可在上层记录或告知用户。
+-   `message.request()` 在超时后会 `resolve(null)`（或根据实现 `reject`），建议调用方在 `then`/`catch` 中做好超时降级逻辑。
+-   若希望对重连采取指数退避策略，可在上层捕获 `close`/`reconnectFail` 事件并自行实现更细粒度的重连控制（例如：`connect` + `setTimeout`）。
+
+# 最佳实践
+
+1. **统一序列号管理**：在项目层为所有需要 request/response 的消息维护统一的 `__sequenceNum` 策略，避免重复。
+2. **明确消息 ID 策略**：`parseMessageIdFunc` 应返回稳定且唯一的标识（类名、typeUrl、数字 id 等）。
+3. **心跳与超时**：务必结合业务选择合适的心跳与超时参数（`intervalMsN`、`timeoutMsN`），避免误判短暂断连。
+4. **消息体校验**：若使用 protobuf 等强类型协议，请在 codec 层开启收发校验（若 codec 支持）。
+5. **发送节流**：在高并发发送场景下使用 `SendTide` 避免 write 过多导致底层阻塞。
+6. **资源释放**：离开场景或页面时，调用 `close()` 并 `event.targetOff(this)` / `message.clear()` 以避免内存泄漏和重复监听。
+
+# FAQ
+
+**Q：如何让 `message.request()` 等待指定超时？**
+A：可以在 `request(data, timeoutMsNum)` 中传入超时时间（单位 ms），否则使用实例 `config.waitTimeoutMsNum`。
+
+**Q：如何在微信小程序使用？**
+A：使用 `mk.network.WebsocketWX`，配置与 `Websocket` 相同，底层自动使用 `wx.connectSocket`。接口不变，可以无缝替换。
+
+**Q：我不想使用 codec，该如何发送原始 string/ArrayBuffer？**
+A：不传 `codec`，则底层不会执行 `encode/decode`，发送的数据会直接透传到底层 socket（确保底层可接受该类型，如 `string` 或 `ArrayBuffer`）。
+
+**Q：如何取消所有等待中的 request？**
+A：当触发全局重启或销毁时，框架会清理等待表并把等待任务完成（返回 `null`）。你也可以在上层自行维护请求超时/取消逻辑。
+
+# 结语
+
+`mk.network.Websocket` 将 WebSocket 的常见管理（连接、心跳、重连、消息事件化、请求等待）以稳定、可扩展的方式暴露给用户：你只需关注**协议（codec）**与**消息语义（id / sequence）**，其余生命周期与容错逻辑由框架负责。配合 `SendTide` 与合理的心跳/重连参数，可以在绝大多数游戏与实时应用场景中获得稳定的网络体验。
+
+需要我把 `ResourcesNetwork` 的完整示例精简成一个可复制的“快速上手”代码片段吗？

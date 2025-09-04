@@ -1,111 +1,136 @@
 ---
 title: 管理器
-description: 多语言数据和设置
+description: 多语言数据管理、配置和切换
 order: 0
 ---
 
-## 介绍
+多语言管理器提供以下功能：
 
-多语言管理器提供
+-   **数据管理**：添加和获取多语言文本/图片数据
+-   **语言切换**：支持动态切换语言类型
+-   **事件监听**：监听多语言事件，实现实时更新
 
--   添加、获取多语言文本/图片数据
--   语言类型切换
--   多语言事件监听
+---
 
-## 概念
+## 核心概念
 
-在添加多语言数据时，例如文本，通常只有一张表，而且体积会随时间增加也很难清理。
-所以 MK 框架增加了一个多语言类型用于支持任意粒度的多语言数据
+### 多语言类型
 
-多语言类型键类型为 `_MKLanguageManage.TypeType`（string 或 number），数据类型为 `Language_.TypeDataStruct`
+传统多语言表会随着时间推移变得庞大且难以清理。为了解决这个问题，MK 框架引入多语言类型，以支持任意粒度的数据管理。
+
+-   **键类型**：`_MKLanguageManage.TypeType`（`string` 或 `number`）
+-   **数据类型**：`Language_.TypeDataStruct`
+
+通过多语言类型，你可以将数据划分为多个模块，从而避免资源堆积。
+
+---
 
 ## 配置
 
-多语言系统的配置位于 `GlobalConfig.Language` 下
+多语言系统的配置位于 `GlobalConfig.Language` 下。
 
-### 多语言种类
+### 1. 多语言种类
 
-在 `privateTypeTab` 中修改，例如
+在 `privateTypeTab` 中定义支持的语言类型，例如：
 
 ```ts
 /** 中文(中华人民共和国) */
 zhCn: {
-    dire: Layout.HorizontalDirection.LEFT_TO_RIGHT,
+    dire: Layout.HorizontalDirection.LEFT_TO_RIGHT, // 文本方向：从左到右
 },
 ```
 
-定义了一个名字 zhCn 文本从左到右的语言类型
+上述代码定义了一个名为 `zhCn` 的语言类型，其文本方向为从左到右。
 
-### 默认语种
+### 2. 默认语种
 
-defaultTypeStr
+通过 `defaultTypeStr` 配置默认语言类型：
 
-### 多语言参数前后缀
+```ts
+defaultTypeStr: types.zhCn;
+```
 
-argsHeadStr 和 argsTailStr
+### 3. 多语言参数前后缀
 
-例如默认前后缀为 `{` `}`，则多语言参数配置应该为 `{0}`，前后缀中间为数字代表参数下标
+通过 `argsHeadStr` 和 `argsTailStr` 配置参数占位符。
+
+-   **默认配置**：`argsHeadStr = '{'`，`argsTailStr = '}'`
+-   **参数使用**：在多语言文本中使用 `{0}` 表示第一个参数，`{1}` 表示第二个参数，依此类推。
+
+例如，配置 `template-{0}`，当 `argsStrList = ['123']` 时，结果为 `template-123`。
+
+---
 
 ## 属性
 
-### typeStr
+### `typeStr`
 
-当前的多语言语种，也就是 `GlobalConfig.Language.privateTypeTab` 对象的键。
-当你需要切换语种时就修改这个属性
+当前的多语言语种，对应于 `GlobalConfig.Language.privateTypeTab` 对象的键。切换语种时，修改此属性：
 
 ```ts
-// 切换到 enUs
+// 切换到英文（美国）
 mk.languageManage.typeStr = GlobalConfig.Language.types.enUs;
 ```
 
-### data
+### `data`
 
-当前语种的配置数据，也就是 `GlobalConfig.Language.privateTypeTab` 对象中当前 `typeStr` 键对应的值。
+当前语种的配置数据，对应于 `GlobalConfig.Language.privateTypeTab` 对象中当前 `typeStr` 键的值。
 
-### labelDataTab
+### `labelDataTab`
 
-文本数据表，类型为 `Record<_MKLanguageManage.TypeType, Language_.TypeDataStruct>`
+文本数据表，类型为 `Record<_MKLanguageManage.TypeType, Language_.TypeDataStruct>`。
+
+**示例**：
 
 ```ts
 let globalLabelData = mk.languageManage.labelDataTab['多语言类型名'];
 
-// 获取的数据类似
-// {
-//     测试: {
-//         zhCn: "测试",
-//         enUs: "Test",
-//         ...
-//     },
-//     ...
-// }
+// 数据格式
+{
+    "测试": {
+        "zhCn": "测试",
+        "enUs": "Test"
+    }
+}
 ```
 
-### textureDataTab
+### `textureDataTab`
 
-纹理数据表，数据类型和结构和 `labelDataTab` 一致，区别是 `labelDataTab` 存储的是多语言文本，
-`textureDataTab` 中存储的是图片的 db 路径（为了兼容编辑器和运行时加载）
+纹理数据表，结构与 `labelDataTab` 一致，但存储的是图片的 db 路径（以兼容编辑器和运行时加载）。
+
+**示例**：
 
 ```ts
 let globalLabelData = mk.languageManage.textureDataTab['多语言类型名'];
 
-// 获取的数据类似
-// {
-//     测试: {
-//         zhCn: "db://assets/resources/xxx.png",
-//         enUs: "db://assets/resources/xxx_en.png",
-//         ...
-//     },
-//     ...
-// }
+// 数据格式
+{
+    "测试": {
+        "zhCn": "db://assets/resources/xxx.png",
+        "enUs": "db://assets/resources/xxx_en.png"
+    }
+}
 ```
 
-### event
+### `event`
 
-管理器的事件，使用方式参考[此处](/docs/getting-started/quick-start-guide/event)
+管理器事件，支持以下操作：
+
+-   **监听事件**：`on(eventName, callback)`
+-   **移除事件**：`off(eventName, callback)`
+-   **触发事件**：`emit(eventName)`
+
+使用方式请参考[事件系统文档](/docs/getting-started/quick-start-guide/event)。
+
+---
 
 ## 方法
 
-### addLabel
+### `addLabel`
+
+动态添加多语言文本数据。
+
+**语法**：
 
 ```ts
 mk.languageManage.addLabel('多语言类型名', {
@@ -116,13 +141,26 @@ mk.languageManage.addLabel('多语言类型名', {
 });
 ```
 
-添加文本数据集，你可以用它来动态添加多语言文本数据
+### `addTexture`
 
-### addTexture
+与 `addLabel` 类似，区别在于传递的数据是图片的 db 路径。
 
-和 `addLabel` 一致，区别是你传递的数据是图片的 db 路径
+**语法**：
 
-### getLabel
+```ts
+mk.languageManage.addTexture('多语言类型名', {
+    示例: {
+        zhCn: 'db://assets/resources/xxx.png',
+        enUs: 'db://assets/resources/xxx_en.png',
+    },
+});
+```
+
+### `getLabel`
+
+获取指定的多语言文本。
+
+**语法**：
 
 ```ts
 mk.languageManage.getLabel('多语言类型名', '示例', {
@@ -131,62 +169,107 @@ mk.languageManage.getLabel('多语言类型名', '示例', {
 });
 ```
 
-获取指定的多语言文本。例如示例代码中获取的结果是 `示例-123`。
+**参数**：
 
-#### 参数：
+| 参数                 | 类型       | 描述                                  |
+| -------------------- | ---------- | ------------------------------------- |
+| `type`               | `string`   | `addLabel` 时传递的多语言类型名       |
+| `markStr`            | `string`   | `addLabel` 数据的多语言标识（对象键） |
+| `config`             | `object`   | 可选配置                              |
+| `config.language`    | `string`   | 语种（默认为当前 `typeStr`）          |
+| `config.argsStrList` | `string[]` | 多语言参数                            |
 
-    1. 多语言类型名：addLabel 时传递的多语言类型名
-    2. 多语言标识：addLabel 数据的多语言标识（对象键）
-    3. （可选）配置
-        -   language：语种
-        -   argsStrList：多语言参数
+**返回值**：对应的多语言文本（如 `示例-123`）。
 
-### getTexture
+### `getTexture`
+
+获取指定的多语言图片。
+
+**语法**：
 
 ```ts
 mk.languageManage.getTexture('多语言类型名', '示例', null, GlobalConfig.Language.types.zhCn);
 ```
 
-获取指定的多语言图片
+**参数**：
 
-#### 参数：
+| 参数       | 类型     | 描述                                    |
+| ---------- | -------- | --------------------------------------- |
+| `type`     | `string` | `addTexture` 时传递的多语言类型名       |
+| `markStr`  | `string` | `addTexture` 数据的多语言标识（对象键） |
+| `target`   | `object` | 跟随释放对象                            |
+| `language` | `string` | 语种（可选，默认为当前 `typeStr`）      |
 
-    1. 多语言类型名：addTexture 时传递的多语言类型名
-    2. 多语言标识：addTexture 数据的多语言标识（对象键）
-    3. （可选）语种
+**返回值**：对应的 `SpriteFrame` 对象。
 
-## 扩展
+---
 
-### 多语言数据
+## 扩展功能
 
-在框架功能示例仓库中，你可能看到 `mk.Language_.LabelData` 和 `mk.Language_.TextureData` 的使用
+### 多语言数据类
+
+在框架功能示例仓库中，可能会看到 `mk.Language_.LabelData` 和 `mk.Language_.TextureData` 的使用：
 
 ```ts
 export default new mk.Language_.LabelData(cc.js.getClassName(XXX), {
-	示例: {
-		enUs: "template-{0}",
-		zhCn: "示例-{0}",
-	},
-    ...
+    示例: {
+        enUs: 'template-{0}',
+        zhCn: '示例-{0}',
+    },
 });
 ```
 
-在 `mk.Language_.LabelData` 构造函数中，框架会执行 `addLabel`，为什么不直接使用 `addLabel` 呢？
+在构造函数中，框架会自动执行 `addLabel`，但具有以下优势：
 
-1. 类型安全
+#### 1. 类型安全
 
-如果我配置 `zhCn` 和 `enUs` 两个语种，那么缺少配置时编辑器会提示
+如果配置 `zhCn` 和 `enUs` 两个语种，缺少配置时编辑器会提示：
 
 ![类型安全提示](/docs/管理器-1.png)
 
-2. 提供了 key 供外部使用
+#### 2. 提供 key 供外部使用
+
+通过 `key` 属性，可以快速获取多语言标识：
+
+```ts
+const key = labelData.key.示例;
+```
 
 ![外部 key](/docs/管理器-2.png)
 
-### 如何配置多语言数据
+### 配置多语言数据
 
-框架的设想是单个配置表中配置文本和图片数据，然后通过插件更新每个 `mk.Language_.LabelData` 和 `mk.Language_.TextureData`
-的构造数据。
+框架设想是在只需要在单个配置表中配置所有文本和图片数据，然后通过插件更新每个 `mk.Language_.LabelData` 和 `mk.Language_.TextureData` 的构造数据。
 
-但是目前没有做这个插件，所以你可以使用你喜欢的配置表工具导出 JSON 或 Typescript 文件，
-然后再通过 addLabel 或 addTexture 添加数据
+但目前没有实现这个插件，因此可以采用以下方式：
+
+1. **使用配置表工具**：导出 JSON 或 Typescript 文件。
+2. **动态加载**：通过 `addLabel` 或 `addTexture` 添加数据。
+
+---
+
+## 常见问题
+
+### Q：如何支持新的语言类型？
+
+A：在 `GlobalConfig.Language.privateTypeTab` 中添加新的语言类型，并确保 `defaultTypeStr` 指向一个有效的语言类型。
+
+### Q：如何实现多语言参数的动态替换？
+
+A：通过 `argsStrList` 参数传递参数数组，例如 `argsStrList = ['123', '456']`，则 `{0}` 替换为 `123`，`{1}` 替换为 `456`。
+
+### Q：如何监听语言切换事件？
+
+A：通过 `event` 属性监听 `switchLanguage` 事件：
+
+```ts
+mk.languageManage.event.on(mk.languageManage.event.key.switchLanguage, () => {
+    console.log('语言已切换');
+});
+```
+
+---
+
+## 总结
+
+多语言管理器通过模块化设计和灵活的配置，提供了高效的多语言管理方案。通过 `addLabel`、`addTexture`、`getLabel` 和 `getTexture` 方法，你可以轻松实现多语言支持。同时，框架还提供了类型安全和外部 key 等扩展功能，以满足更复杂的需求。
