@@ -111,20 +111,27 @@ export default function TocObserver({ data }: Props) {
 
     return (
         <div className="flex flex-col gap-2.5 text-sm dark:text-stone-300/85 text-stone-800 ml-0.5">
-            {data.map(({ href, level, text }, index) => (
-                <Link
-                    key={href + text + level + index}
-                    href={`#${href.slice(1)}`}
-                    className={clsx({
-                        'pl-0': level === 2,
-                        'pl-4': level === 3,
-                        'pl-8': level === 4,
-                        'dark:font-medium font-semibold text-primary': activeId === href.slice(1),
-                    })}
-                >
-                    {text}
-                </Link>
-            ))}
+            {data.map(({ href, level, text }, index) => {
+                // 根据标题级别确定缩进
+                const indentClass =
+                    level === 1 ? 'pl-0' : level === 2 ? 'pl-4' : level === 3 ? 'pl-8' : 'pl-12';
+
+                return (
+                    <Link
+                        key={href + text + level + index}
+                        href={`#${href.slice(1)}`}
+                        className={clsx(
+                            indentClass, // 应用缩进类
+                            {
+                                'dark:font-medium font-semibold text-primary':
+                                    activeId === href.slice(1),
+                            }
+                        )}
+                    >
+                        {text}
+                    </Link>
+                );
+            })}
         </div>
     );
 }
