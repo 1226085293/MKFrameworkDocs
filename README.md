@@ -1,6 +1,6 @@
 ## 介绍
 
-本项目为 MKFramework 游戏框架的官方文档，基于 [AriaDocs 模板](https://vercel.com/templates/documentation/documentation-template) 模板构建，
+本项目为 MKFramework 游戏框架的官方文档，基于 [AriaDocs](https://vercel.com/templates/documentation/documentation-template) 模板构建，
 在此基础上修改如下
 
 1. 修改为静态网站
