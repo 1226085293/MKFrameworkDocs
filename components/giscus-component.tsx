@@ -16,8 +16,6 @@ export default function GiscusComponent() {
 
     if (!mounted) return null;
 
-    console.log(siteConfig.giscus);
-
     return (
         <Giscus
             repo={siteConfig.giscus.repo}
