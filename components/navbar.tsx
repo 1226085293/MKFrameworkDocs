@@ -9,6 +9,7 @@ import { SheetLeftbar } from './leftbar';
 import { SheetClose } from '@/components/ui/sheet';
 import AlgoliaSearch from './algolia-search';
 import { getRoutes } from '@/lib/server/getRoutes';
+import siteConfig from '@/site-config';
 
 const algolia_props = {
     appId: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
@@ -39,7 +40,7 @@ export function Navbar() {
                             <Link
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                href="https://github.com/1226085293/MKFramework"
+                                href={siteConfig.projectRepo}
                                 className={buttonVariants({
                                     variant: 'ghost',
                                     size: 'icon',
@@ -105,7 +106,7 @@ export function NavMenu({ isSheet = false }: { isSheet?: boolean }) {
         // { title: "Guides", href: "#" },
         {
             title: '讨论',
-            href: 'https://github.com/1226085293/MKFramework/discussions',
+            href: `${siteConfig.projectRepo}/discussions`,
         },
     ];
 

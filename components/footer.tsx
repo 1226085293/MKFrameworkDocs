@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { CommandIcon } from 'lucide-react';
+import siteConfig from '@/site-config';
 
 export function Footer() {
     return (
@@ -11,7 +12,7 @@ export function Footer() {
                         Build by{' '}
                         <Link
                             className="px-1 underline underline-offset-2"
-                            href="https://github.com/1226085293"
+                            href={siteConfig.authorLink}
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -20,7 +21,7 @@ export function Footer() {
                         . The source code is available on{' '}
                         <Link
                             className="px-1 underline underline-offset-2"
-                            href="https://github.com/1226085293/MKFrameworkDocs"
+                            href={siteConfig.repo}
                             target="_blank"
                             rel="noopener noreferrer"
                         >

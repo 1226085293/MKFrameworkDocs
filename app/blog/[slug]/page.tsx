@@ -9,6 +9,7 @@ import MdxRenderer from '@/components/mdx-renderer';
 import { Typography } from '@/components/typography';
 import { formatDate } from '@/lib/utils';
 import Image from 'next/image';
+import GiscusComponent from '@/components/giscus-component';
 
 type PageProps = {
     params: Promise<{ slug: string }>;
@@ -72,6 +73,9 @@ export default async function BlogPage(props: PageProps) {
                 <Typography>
                     <MdxRenderer code={blog.body.code} />
                 </Typography>
+                <div className="mt-10">
+                    <GiscusComponent />
+                </div>
             </div>
         </div>
     );

@@ -7,6 +7,7 @@ import MdxRenderer from '@/components/mdx-renderer';
 import Pagination from '@/components/pagination';
 import Toc from '@/components/toc';
 import { Typography } from '@/components/typography';
+import GiscusComponent from '@/components/giscus-component'; // 引入 Giscus 组件
 
 type PageProps = {
     params: Promise<{ slug: string[] }>;
@@ -63,6 +64,9 @@ export default async function DocsPage(props: PageProps) {
                         <MdxRenderer code={doc.body.code} />
                         <Pagination pathname={pathName} />
                     </Typography>
+                    <div className="mt-10">
+                        <GiscusComponent />
+                    </div>
                 </div>
             </div>
 
