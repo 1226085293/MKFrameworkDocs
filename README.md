@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 介绍
 
-## Getting Started
+本项目为 MKFramework 游戏框架的官方文档，基于 [AriaDocs 模板](https://vercel.com/templates/documentation/documentation-template) 模板构建，
+在此基础上修改如下
 
-First, run the development server:
+1. 修改为静态网站
+1. 修改内容使用 contentlayer 处理
+1. 修改了文档右侧导航栏
+1. 增加了内容标题# url 索引
+1. 内容增加了 Plantuml 支持
+1. 增加了 Giscus 评论系统
+1. 增加了 PagesCMS 支持
+1. 增加全局配置
+1. 优化了页面展示
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 快速开始
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+控制台执行 `pnpm i`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 运行预览
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+控制台执行 `pnpm run dev`
