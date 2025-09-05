@@ -159,20 +159,20 @@ await mk.uiManage.close(Test, { isDestroy: true, isDestroyChildren: true });
 
 ## 配置类（API 文档）
 
-### `OpenConfig<CT>`
+### OpenConfig\<CT>
 
 -   `init?: CT.prototype.initData` —— 初始化数据，会在模块 `init` 时传入。
 -   `type?: string` —— 模块类型（默认 `"default"`）。
 -   `parent?: Node | null` —— 指定父节点（若不传则使用注册时的 parent）。
 
-### `CloseConfig<CT>`
+### CloseConfig\<CT>
 
 -   `type?: string` —— 指定要关闭的模块类型。
 -   `isAll?: boolean` —— 是否关闭全部指定类型模块（默认 `false`）。
 -   `isDestroy?: boolean` —— 是否销毁节点（若为 `true`，则 `isDestroyChildren` 若未指定则默认 `true`）。
 -   `isDestroyChildren?: boolean` —— 是否销毁动态子节点（默认同 `isDestroy`）。
 
-### `RegisConfig<CT>`
+### RegisConfig\<CT>
 
 对象池与注册相关配置（常用字段）：
 
@@ -185,7 +185,7 @@ await mk.uiManage.close(Test, { isDestroy: true, isDestroyChildren: true });
 | `poolMaxHoldNum`  | 对象池最大保留数量（-1 表示不启用）            | `-1`                           |
 | `poolInitFillNum` | 对象池初始化填充数量                           | `1`                            |
 
-### `RegisData<CT>` extends `RegisConfig`
+### RegisData\<CT> extends RegisConfig
 
 -   `source`：具体来源（`Prefab | string | Node | Record`）
 -   `target`：跟随释放对象（若不为 null 会在其释放时触发模块 `unregis`）

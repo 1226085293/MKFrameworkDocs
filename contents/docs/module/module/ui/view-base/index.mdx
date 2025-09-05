@@ -15,7 +15,7 @@ order: 3
 
 ## 生命周期扩展
 
-### `open`
+### open
 
 在模块打开时触发，主要执行 **打开动画**。
 
@@ -37,7 +37,7 @@ protected async open(): Promise<void> {
 
 ---
 
-### `close(config?)`
+### close(config?)
 
 -   若是外部调用，则交由 `uiManage.close` 执行后中断 close。支持传入 `CloseConfig` 配置。
     ```ts
@@ -50,7 +50,7 @@ protected async open(): Promise<void> {
 
 ---
 
-### `lateClose`
+### lateClose
 
 在 `close` 之后调用，主要执行 **关闭动画**。
 
@@ -64,7 +64,7 @@ protected async open(): Promise<void> {
 
 ## 模块类型
 
-### `typeStr`
+### typeStr
 
 -   类型：`string`
 -   默认值：`"default"`
@@ -104,7 +104,7 @@ protected async open(): Promise<void> {
 
 ## 属性配置
 
-### `isShowAlone（单独展示）`
+### isShowAlone（单独展示）
 
 -   类型：`boolean`
 -   分组：视图配置
@@ -112,7 +112,7 @@ protected async open(): Promise<void> {
 
 ---
 
-### `animationConfig（动画配置）`
+### animationConfig（动画配置）
 
 -   分组：视图配置
 -   说明：配置 **打开/关闭动画**，并决定是否等待动画执行完成。
@@ -129,18 +129,18 @@ protected async open(): Promise<void> {
 
 这些属性仅在 **编辑器环境** 下生效，便于快速为视图节点添加常用组件。
 
-#### `isAutoMask（添加遮罩）`
+#### isAutoMask（添加遮罩）
 
 -   类型：`boolean`
 -   说明：自动在视图根节点下添加 **遮罩节点**，关闭时自动销毁。
 -   遮罩节点来源于 `GlobalConfig.View.maskDataTab.prefabPathStr`。
 
-#### `isAutoWidget（0 边距 widget）`
+#### isAutoWidget（0 边距 widget）
 
 -   类型：`boolean`
 -   说明：在节点上添加 **Widget** 组件，并设置 **0 边距**（顶/底/左/右）。
 
-#### `isAutoBlockInput（BlockInputEvents）`
+#### isAutoBlockInput（BlockInputEvents）
 
 -   类型：`boolean`
 -   说明：在节点上添加 **BlockInputEvents**，阻止事件穿透。

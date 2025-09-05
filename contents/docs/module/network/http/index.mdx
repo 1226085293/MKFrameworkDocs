@@ -42,7 +42,7 @@ Http --> 用户: resolve(result)
 
 ### 核心接口
 
-#### `mk.network.http`
+#### mk.network.http
 
 全局单例，提供 `GET` 和 `POST` 请求方法。
 
@@ -51,7 +51,7 @@ Http --> 用户: resolve(result)
 | `get(url: string, config?: Partial<Http_.Config>)`  | 发送 GET 请求  |
 | `post(url: string, config?: Partial<Http_.Config>)` | 发送 POST 请求 |
 
-#### `mk.network.Http_`
+#### mk.network.Http\_
 
 命名空间，提供配置类和类型定义。
 
@@ -64,7 +64,7 @@ Http --> 用户: resolve(result)
 
 ## API 详解
 
-### `get` / `post`
+### get / post
 
 #### 基础用法
 
@@ -88,7 +88,7 @@ const response = await mk.network.http.post('https://api.example.com/login', {
 -   成功时返回 `Promise<any>`（解析后的响应数据）
 -   失败时返回 `Promise<null>`（超时、网络错误、状态码异常）
 
-### `Http_.Config` 配置类
+### Http\_.Config 配置类
 
 | 属性               | 类型                                                                        | 默认值 | 描述                                         |
 | ------------------ | --------------------------------------------------------------------------- | ------ | -------------------------------------------- |

@@ -63,7 +63,7 @@ defaultTypeStr: types.zhCn;
 
 ## 属性
 
-### `typeStr`
+### typeStr
 
 当前的多语言语种，对应于 `GlobalConfig.Language.privateTypeTab` 对象的键。切换语种时，修改此属性：
 
@@ -72,11 +72,11 @@ defaultTypeStr: types.zhCn;
 mk.languageManage.typeStr = GlobalConfig.Language.types.enUs;
 ```
 
-### `data`
+### data
 
 当前语种的配置数据，对应于 `GlobalConfig.Language.privateTypeTab` 对象中当前 `typeStr` 键的值。
 
-### `labelDataTab`
+### labelDataTab
 
 文本数据表，类型为 `Record<_MKLanguageManage.TypeType, Language_.TypeDataStruct>`。
 
@@ -94,7 +94,7 @@ let globalLabelData = mk.languageManage.labelDataTab['多语言类型名'];
 }
 ```
 
-### `textureDataTab`
+### textureDataTab
 
 纹理数据表，结构与 `labelDataTab` 一致，但存储的是图片的 db 路径（以兼容编辑器和运行时加载）。
 
@@ -112,7 +112,7 @@ let globalLabelData = mk.languageManage.textureDataTab['多语言类型名'];
 }
 ```
 
-### `event`
+### event
 
 管理器事件，支持以下操作：
 
@@ -126,7 +126,7 @@ let globalLabelData = mk.languageManage.textureDataTab['多语言类型名'];
 
 ## 方法
 
-### `addLabel`
+### addLabel
 
 动态添加多语言文本数据。
 
@@ -141,7 +141,7 @@ mk.languageManage.addLabel('多语言类型名', {
 });
 ```
 
-### `addTexture`
+### addTexture
 
 与 `addLabel` 类似，区别在于传递的数据是图片的 db 路径。
 
@@ -156,7 +156,7 @@ mk.languageManage.addTexture('多语言类型名', {
 });
 ```
 
-### `getLabel`
+### getLabel
 
 获取指定的多语言文本。
 
@@ -181,7 +181,7 @@ mk.languageManage.getLabel('多语言类型名', '示例', {
 
 **返回值**：对应的多语言文本（如 `示例-123`）。
 
-### `getTexture`
+### getTexture
 
 获取指定的多语言图片。
 
