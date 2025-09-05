@@ -50,7 +50,7 @@ export default function BlogIndexPage() {
             <div className="mb-7 flex flex-col gap-2">
                 <h1 className="sm:text-3xl text-2xl font-extrabold">最近博客</h1>
                 <p className="text-muted-foreground sm:text-[16.5px] text-[14.5px]">
-                    所有博客和新闻内容均直接来自开发者
+                    关于本产品的博客及公告
                 </p>
             </div>
             <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 sm:gap-8 gap-4 mb-5">
