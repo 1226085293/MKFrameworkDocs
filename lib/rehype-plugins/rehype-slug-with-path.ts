@@ -17,16 +17,26 @@ export function rehypeSlugWithPath() {
                 .trim()
                 .replace(/`(.+?)`/g, '$1')
                 .replace(/$$(.*?)$$$(?:.*?)$/g, '$1')
+                .replace(/^\s+|\s+$/g, '')
                 .replace(/[*\\~]/g, '');
 
             if (!text) return;
-
-            const slug = slugger.slug(text);
 
             // 更新栈：移除同级或更深
             while (stack.length > 0 && stack[stack.length - 1].depth >= depth) {
                 stack.pop();
             }
+
+            const slug = (() => {
+                const prefix = stack.map((item) => item.slug).join('/');
+                // 生成当前标题的 slug
+                let slug = slugger.slug(prefix ? `${prefix}--${text}` : `--${text}`);
+
+                slug = slug.slice(slug.indexOf('--') + 2);
+
+                return slug;
+            })();
+
             stack.push({ depth, slug });
 
             // 构建完整路径

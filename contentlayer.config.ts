@@ -57,13 +57,20 @@ export const Doc = defineDocumentType(() => ({
 
                     const level = (m[1] || '').length; // ## => 2, ### => 3, #### => 4
 
-                    // 生成当前标题的 slug
-                    const slug = slugger.slug(text);
-
                     // 更新栈：移除比当前 level 更深或同级的标题
                     while (stack.length > 0 && stack[stack.length - 1].level >= level) {
                         stack.pop();
                     }
+
+                    const slug = (() => {
+                        const prefix = stack.map((item) => item.slug).join('/');
+                        // 生成当前标题的 slug
+                        let slug = slugger.slug(prefix ? `${prefix}--${text}` : `--${text}`);
+
+                        slug = slug.slice(slug.indexOf('--') + 2);
+
+                        return slug;
+                    })();
 
                     // 压入当前标题
                     stack.push({ level, slug });
