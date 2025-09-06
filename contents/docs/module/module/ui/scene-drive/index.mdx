@@ -4,23 +4,23 @@ description: 场景驱动，负责在场景加载后驱动生命周期函数
 order: 2
 ---
 
-`SceneDrive` 继承自 [`LifeCycle`](./life-cycle)，主要用于 **场景层级** 的生命周期管理。  
-当场景加载完成后，它会自动添加到场景中的节点上，并驱动模块的 **打开 / 关闭** 生命周期。
+`mk.SceneDrive` 继承自 [`mk.LifeCycle`](./life-cycle)， 当场景加载完成后，
+它会驱动场景上模块的生命周期函数
 
 ---
 
 ## 功能概述
 
--   **场景加载完成时**：`SceneDrive` 组件会递归驱动 LifeCycle 的 **打开** 逻辑
+-   **场景加载完成时**：`mk.SceneDrive` 组件会递归驱动 `mk.LifeCycle` 的 **打开** 逻辑
 
--   **场景切换前**：用户调用 `bundle.loadScene` 时，
-    `SceneDrive` 组件会递归驱动 LifeCycle 的 **关闭** 逻辑，确保模块正确清理
+-   **场景切换前**：用户调用 `mk.bundle.loadScene` 时，
+    `mk.SceneDrive` 组件会递归驱动 `mk.LifeCycle` 的 **关闭** 逻辑，确保模块正确清理
 
 > 打开和关闭逻辑可以参考[执行顺序](./life-cycle#生命周期函数)
 
 ## 自动挂载机制
 
-在非编辑器模式下，`SceneDrive` 会通过监听 `Director.EVENT_AFTER_SCENE_LAUNCH`
+在非编辑器模式下，`mk.SceneDrive` 会通过监听 `Director.EVENT_AFTER_SCENE_LAUNCH`
 事件自动挂载到场景下的所有子节点
 
 ---

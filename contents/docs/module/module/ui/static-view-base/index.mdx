@@ -4,6 +4,25 @@ description: 静态视图基类，继承自 LifeCycle，屏蔽了多余的视图
 order: 4
 ---
 
-`StaticViewBase` 是静态视图基类，无法被 `uiManage` 打开，继承自 [`LifeCycle`](./life-cycle)
+`mk.StaticViewBase` 是静态视图基类，无法被 `mk.uiManage` 管理，继承自 [`mk.LifeCycle`](./life-cycle)
 
-如果你不想要 ViewBase 在属性面板上的配置展示，又不需要通过 `uiManage.open` 打开当前模块，则可以使用 StaticViewBase
+## 何时被使用
+
+如果符合以下条件，你可以使用 `mk.StaticViewBase`
+
+-   不需要使用 `mk.uiManage` 管理当前模块
+
+-   不想要 ViewBase 在属性面板上的展示
+
+-   想要生命周期函数被正确调用
+
+## 注意事项
+
+`mk.StaticViewBase` 屏蔽了 `mk.Layer` 功能，如果你需要它，可以在你的类型中定义 `_isUseLayer = true;`
+如下
+
+```ts
+class XXX extends mk.StaticViewBase {
+    protected _isUseLayer = true;
+}
+```

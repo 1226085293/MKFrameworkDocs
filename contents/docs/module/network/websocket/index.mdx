@@ -4,11 +4,11 @@ description: 基于 `mk.network.Base` 的 WebSocket 网络模块 —— 支持�
 order: 0
 ---
 
-## 概览
+## 介绍
 
 `mk.network.Websocket`（以及微信运行时下的 `mk.network.WebsocketWX`）是基于 `mk.network.Base` 的 WebSocket 客户端封装，面向用户提供一套以事件驱动、支持二进制/自定义协议、可等待回复的消息通信层。
 
-主要特点：
+### 特点
 
 -   可插拔编解码器（基于 `MKCodecBase`），支持任意数据格式传输。
 -   消息事件化：通过 `message` 对象以消息类型为 key 进行 `on`/`once`/`off`/`send`/`request` 等操作。
@@ -33,7 +33,7 @@ order: 0
 
 ```ts
 const ws = new mk.network.Websocket({
-    // 可选：codec: new MyCodec(),
+    codec: new MyCodec(),
     parseMessageIdFunc: (data) => data.constructor.getTypeUrl(''), // 根据项目协议决定
     parseMessageSequenceFunc: (data) => data.__sequence, // 用于 request() 匹配返回
 });

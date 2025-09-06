@@ -4,13 +4,13 @@ description: LifeCycle 决定了生命周期函数的调用逻辑
 order: 1
 ---
 
-`LifeCycle` 继承自 [`Layer`](./layer)，用于实现生命周期管理，并作为视图父类提供通用逻辑，例如 **模块关闭后的数据清理、事件解绑、定时器销毁、资源释放** 等。
+`mk.LifeCycle` 继承自 [`mk.Layer`](./layer)，用于实现生命周期管理，并作为视图父类提供通用逻辑，例如 **模块关闭后的数据清理、事件解绑、定时器销毁、资源释放** 等。
 
 ---
 
 ## 生命周期函数
 
-在继承 `Component` 的生命周期函数（如 `onLoad`、`onEnable` 等）之外，`LifeCycle` 还扩展了自己的生命周期函数。
+在继承 `Component` 的生命周期函数（如 `onLoad`、`onEnable` 等）之外，`mk.LifeCycle` 还扩展了自己的生命周期函数。
 
 ### 执行顺序
 
@@ -69,7 +69,7 @@ n11 --> n10
 
 触发条件：
 
-1. 使用 `uiManage.open` 并传入 `init` 数据（非 `undefined`）时
+1. 使用 `mk.uiManage.open` 并传入 `init` 数据（非 `undefined`）时
 
     ```ts
     let module = (await mk.uiManage.open(NewComponent, {
@@ -116,17 +116,23 @@ n11 --> n10
 
 手动驱动生命周期函数执行。
 
-> 使用场景：框架只会在 `uiManage.open` 或场景切换时驱动生命周期。若通过 `addComponent` 手动挂载了 `LifeCycle`，需要调用 `drive` 来触发。
+> 使用场景：框架只会在 `mk.uiManage.open` 或场景切换时驱动生命周期。若通过 `addComponent` 手动挂载了 `LifeCycle`，需要调用 `drive` 来触发。
 
 ---
 
 ### followRelease(obj)
 
--   **参数**：跟随释放的对象，类型为 `MKRelease_.TypeReleaseParamType & MKAudio_.PrivateUnit`
+-   **参数**：跟随释放的对象，类型为 `Release_.TypeReleaseParamType & Audio_.PrivateUnit`
 
-在模块 `lateClose` 时自动释放资源。
+传入参数将在模块 `lateClose` 时自动释放资源。具体类型如下
 
-> 注意：如果加载资源时已声明为“跟随释放对象”，则无需再次调用。
+1.  节点：cc.Node
+1.  资源：cc.Asset
+1.  对象：必须存在 `release()` 函数的对象
+1.  函数：Function
+1.  音频单元：mk.Audio\_.Unit
+
+> 注意：如果参数为资源，且加载此资源时已传递为“跟随释放对象”，则无需调用 `followRelease`
 
 ---
 
@@ -157,5 +163,5 @@ n11 --> n10
 2. 在音频组内移除通过 `@property` 引用的音频单元
 3. 执行 `this.unscheduleAllCallbacks()` 取消组件内定时器
 4. 清理框架内 `EventTarget` 与 `_MKNetworkBase.MessageEvent` 的事件监听（若 target 为自身）
-5. 清理 `monitor` 中绑定到自身的监听
+5. 清理 `mk.monitor` 中绑定到自身的监听
 6. 减少自身引用资源的引用计数

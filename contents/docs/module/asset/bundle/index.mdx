@@ -34,7 +34,7 @@ order: 1
 
 ---
 
-## 主要 API
+## 方法
 
 ### set
 
@@ -237,9 +237,3 @@ A：`BundleManageBase.close()` 内禁止关闭 `main`（会抛异常 `"中断"`�
 -   使用 `BundleManageBase` 管理资源和网络，所有通过 `followRelease` 注册的对象会在 `close()` 时自动释放，降低内存泄漏风险。
 -   对于复杂热更场景，先在测试环境多次验证脚本卸载与资源释放顺序，避免遗留无效 ccclass 导致 `js.unregisterClass` 出错。
 -   `loadScene` 的事件机制是可等待的（`event.request`），良好使用可避免场景切换中途被破坏的状态（比如弹窗未关闭、数据未 flush）。
-
----
-
-## 图示（帮助理解）
-
-### Bundle 管理器生命周期（PlantUML）

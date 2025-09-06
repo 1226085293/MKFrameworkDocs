@@ -4,8 +4,8 @@ description: Layer 负责组件节点的显示层级控制
 order: 0
 ---
 
-Layer 继承于 Cocos 的 Component，Layer 控制的显示层级是同一父节点下节点之间的展示顺序。也就是节点在父节点中的下标 `siblingIndex`，
-但是 Layer 提供了 **层类型** 和 **层级** 方便用户进行更精细的控制
+`mk.Layer` 继承于 Cocos 的 `Component`，`mk.Layer` 控制的显示层级是同一父节点下节点之间的展示顺序。也就是节点在父节点中的下标 `siblingIndex`，
+但是 `mk.Layer` 提供了 **层类型** 和 **层级** 方便用户进行更精细的控制
 
 ## 层类型
 
@@ -23,6 +23,10 @@ Layer 继承于 Cocos 的 Component，Layer 控制的显示层级是同一父节
 如果你想修改层类型定义，只需要改这个枚举即可。
 
 ### 在代码中使用
+
+在 `mk.Layer` 的子类可以如下使用，
+
+注意：动态修改 layerTypeNum 不会实时刷新显示层级，层级更新只会在 `onEnable` 和修改 `childLayerNum` 时执行
 
 ```ts
 @ccclass('NewComponent')

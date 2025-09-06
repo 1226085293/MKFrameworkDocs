@@ -1,10 +1,10 @@
 ---
 title: UI 管理器
-description: 模块管理器（uiManage），负责模块的注册、打开、关闭、对象池管理与生命周期调度
+description: 模块管理器负责模块的注册、打开、关闭、对象池管理与生命周期调度
 order: 5
 ---
 
-uiManage 是在在 mk 下的实例对象，是整个 UI 模块系统的核心管理器。它负责：
+`mk.uiManage` 是整个 UI 模块系统的核心管理器。它负责：
 
 -   模块的 **注册 / 取消注册 / 自动注册**
 -   模块的 **打开 / 关闭 / 获取**（支持按类型、按实例、按节点操作）
@@ -14,28 +14,35 @@ uiManage 是在在 mk 下的实例对象，是整个 UI 模块系统的核心管
 
 ---
 
-## 核心概念
+## 属性
 
--   **注册数据（RegisData）**：描述模块来源（Prefab / 路径 / Node / 不同类型的 map）、对象池配置、是否允许重复打开等。
--   **对象池（MKObjectPool\<Node>）**：每个模块类型维护独立的节点对象池，支持初始化扩充、回收与销毁回调。
--   **模块实例表（\_uiMap / \_uiShowList）**：维护已打开模块的映射与展示顺序，用于 close / get 等操作。
--   **重复加载保护**：通过 `_uiLoadMap` 的 `MKStatusTask` 跟踪加载状态，避免不必要的并发或重复加载。
--   **跟随释放（followRelease）**：注册时可以传入 `target_`，当该对象释放时自动 `unregis` 模块（常用于资源生命周期绑定）。
+### event
+
+UI 事件对象，提供如下事件
+
+| 事件名 | 参数                                          | 描述               |
+| ------ | --------------------------------------------- | ------------------ |
+| open   | (key: mk.UIManage.TypeOpenKey, module\_: any) | 模块成功打开后触发 |
+| close  | (key: mk.UIManage.TypeOpenKey, module\_: any) | 模块成功关闭后触发 |
+
+用例：
+
+```ts
+mk.uiManage.event.on(mk.uiManage.event.key.open, (key_: mk.UIManage_.TypeOpenKey, module_: any) => {
+    ...
+}, this)
+```
+
+### getRegisDataFunc
+
+获取模块注册数据方法，如果你不想要每个地方都使用 `mk.uiManage.regis`，你可以赋值给这个属性一个函数，
+根据参数(mk.ViewBase 构造类型)返回对应的注册数据
+
+它将在 `mk.uiManage.open` 没有获取到注册数据时被调用
 
 ---
 
-## 事件（`event: MKEventTarget`）
-
-`mk.uiManage` 提供事件系统，常用事件：
-
--   `event.open` — 模块成功打开后触发： `(key, moduleInstance)`
--   `event.close` — 模块成功关闭后触发： `(key, moduleInstance)`
-
-可通过 `mk.uiManage.event.on(...)` 监听，或使用 `mk.uiManage.event` 的 API。
-
----
-
-## 主要 API
+## 方法
 
 ### regis
 
@@ -43,26 +50,39 @@ uiManage 是在在 mk 下的实例对象，是整个 UI 模块系统的核心管
 
 注册模块并初始化对象池。
 
--   `key`：模块构造函数（`Constructor<MKViewBase>`）。
--   `source`：注册资源来源（`Prefab | string | Node | Record<type, Prefab|string|Node>`）。
--   `target`：跟随释放对象（`followRelease`），为 `null` 则不跟随。
--   `config`：可选 `RegisConfig` 来覆盖对象池与加载策略。
+#### 参数
 
-行为要点：
+-   `key`：模块类型（`Constructor<mk.ViewBase>`）
+-   `source`：注册资源来源（`Prefab | string | Node | Record<type, Prefab|string|Node>`）
+-   `target`：跟随释放对象，为 `null` 则不跟随
+-   `config`：可选，注册配置
+-   `config.isRepeat`：此模块是否可以创建多个，默认 false
+-   `config.parent`：此模块的默认父节点，默认 canvas 节点
+-   `config.loadConfig`：加载资源时传给 `mk.asset.get` 的配置
+-   `config.poolMinHoldNum`：对象池最小保留数量（不足时扩充数），默认 `isRepeat ? 8 : 1`
+-   `config.poolMaxHoldNum`：对象池最大保留数量（-1 表示不启用），默认 -1
+-   `config.poolInitFillNum`：对象池初始化填充数量，默认 1
 
--   会在内部为每个 `type` 建立 `MKObjectPool<Node>` 并提前按 `poolInitFillNum` 填充（若配置要求）。
--   若全部来源都无效（资源失效计数等），注册会失败并回滚。
--   如果传入 `target`，当 `target.followRelease` 的参数函数触发时会自动 `unregis(key)`。
+#### 要点
 
-示例：
+-   source 可以传递 Record 对象用于代表不同 UI 类型的资源来源
+-   会在内部为每个不同 `type` 的资源建立资源对象池
+-   如果传入 `target`，则由 target 控制何时触发 `unregis(key)`
+
+#### 示例
 
 ```ts
-await mk.uiManage.regis(Test, 'Module/Test/Test111.prefab', this, {
-    isRepeat: false,
-    loadConfig: {
-        bundleStr: 'resources',
+// 通过资源路径注册 Test 模块
+await mk.uiManage.regis(Test, 'Module/Test/Test111.prefab', this);
+// 通过资源路径注册多类型 Test 模块
+await mk.uiManage.regis(
+    Test,
+    {
+        default: 'Module/Test/Test111.prefab',
+        default: 'Module/Test/Test222.prefab',
     },
-});
+    this
+);
 ```
 
 ---
@@ -78,7 +98,11 @@ await mk.uiManage.regis(Test, 'Module/Test/Test111.prefab', this, {
 -   销毁并释放对象池中节点及其可能动态加载的 Prefab 引用。
 -   从内部映射中移除注册信息。
 
-> 如果注册时传入了 `target`（跟随释放对象），一般无需手动调用 `unregis`，除非你想提前强制释放。
+> 如果注册时传入了 `target`（跟随释放对象），一般无需手动调用 `unregis`，除非你想提前释放。
+
+#### 参数
+
+-   `key`：模块类型（`Constructor<mk.ViewBase>`）
 
 ---
 
@@ -86,23 +110,29 @@ await mk.uiManage.regis(Test, 'Module/Test/Test111.prefab', this, {
 
 `get()` / `get(key)` / `get(key, type)`
 
-多用法重载：
+#### 参数
 
--   `get()`：返回当前展示（`_uiShowList`）中所有有效模块。
--   `get(key)`：返回指定 `key` 的最新打开模块实例（若存在），或 `null`。
--   `get(key, type?)`：可按模块 `typeStr` 过滤并返回对应实例或列表（如果传入 `key` 为数组则返回列表）。
+-   空参数：获取当前所有打开的模块
+-   `key`
 
-示例：
+    -   `Constructor<mk.ViewBase>`，返回最后打开的模块实例
+    -   `[Constructor<mk.ViewBase>]`，返回所有打开的模块实例列表
+
+-   `type`：筛选结果，模块 `typeStr` === `type`
+
+#### 示例
 
 ```ts
 // 获取当前所有打开的 ViewBase 对象
 const all = mk.uiManage.get();
 // 获取最后打开的 Test 模块
 const test = mk.uiManage.get(Test);
-// 获取当前打开的 Test 模块列表
+// 获取所有打开的 Test 模块列表
 const testList = mk.uiManage.get([Test]);
 // 获取最后打开的 Test 模块且模块类型为 default
 const panelOfTypeA = mk.uiManage.get(Test, 'default');
+// 获取所有打开的 Test 模块列表且模块类型为 default
+const panelOfTypeAList = mk.uiManage.get([Test], 'default');
 ```
 
 ---
@@ -111,17 +141,21 @@ const panelOfTypeA = mk.uiManage.get(Test, 'default');
 
 `open(key, config?) : Promise<module | null>`
 
-打开模块（核心流程）：
+打开模块，需要模块已经调用 [regis](#方法/regis) 或 [getRegisDataFunc](#属性/getregisdatafunc) 参数存在
 
--   等待可能的 `regis` 任务（`_uiRegisTaskMap`）完成。若未注册且 `getRegisDataFunc` 存在，会尝试自动注册。
--   使用注册时建立的对象池获取节点并确保挂载视图组件（`getComponent(key) || addComponent(key)`）。
--   支持**检测重复加载**：若 `regisData.isRepeat === false` 且已有打开或正在打开的实例，则阻止再次打开。
--   处理 **单独展示**（`isShowAlone`）：若新模块为单独展示，会隐藏当前展示列表中处于后半段的模块，并记录隐藏集合用于后续恢复。
--   将模块添加到 `_uiMap` 和 `_uiShowList`，设置 `viewComp.config`，并把节点加入 `parent`（若指定）。
--   启动模块生命周期：调用 `viewComp._open({ init, isFirst: true })`，若父节点有效则等待 open 完成。
--   成功后触发 `event.open`。
+#### 参数
 
-示例：
+-   `key`：模块类型（`Constructor<mk.ViewBase>`）
+-   `config`：可选，打开配置
+-   `config.init`：初始化数据，和 `key` 类型的成员属性 `initData` 类型一致
+-   `config.type`：模块类型，默认 "default"
+-   `config.parent`：模块父节点
+
+#### 要点
+
+-   你可以在调用 regis 后立即 open（不必等待 regis 完成）
+
+#### 示例
 
 ```ts
 const test = await mk.uiManage.open(Test, { init: { id: 1 }, type: 'default' });
@@ -133,90 +167,31 @@ const test = await mk.uiManage.open(Test, { init: { id: 1 }, type: 'default' });
 
 `close(args, config?) : Promise<boolean>`
 
-关闭模块（灵活支持节点、类 Key、实例）：
+关闭模块
 
--   `args` 可以是 `Node` / `Constructor<MKViewBase>` / `MKViewBase` 实例。
--   `config` 为 `CloseConfig`，支持：`type`（按模块 type 过滤）、`isAll`（关闭所有相同 type）、`isDestroy`（销毁节点而非回收）、`isDestroyChildren`（是否销毁动态子节点）。
--   关闭流程中会：
+#### 参数
 
-    -   恢复被 `isShowAlone` 隐藏的模块（维护 `_uiHiddenLengthN` 与 `_uiHiddenSet`）。
-    -   从 `_uiShowList` 与 `_uiMap` 中移除被关闭项。
-    -   对每个待关闭模块执行 `v._close({ isFirst: true, isDestroyChildren })`（等待生命周期完成）。
-    -   若节点仍然有效：移除父节点、触发 `event.close`；根据 `isDestroy/isStatic` 与对象池存在性决定是 **销毁** 还是 **回收（放回对象池）**。
+-   `args`：可以是 `Node` / `Constructor<mk.ViewBase>` / `mk.ViewBase` 实例
+-   `config`：可选，关闭配置
+-   `config.type`：模块类型
+-   `config.isAll`：关闭全部模块
+-   `config.isDestroy`：销毁节点
+-   `config.isDestroyChildren`：销毁动态子节点（动态子节点是通过 `mk.uiManage.open` 加载到模块节点下的其他模块）
 
-示例：
+#### 要点
+
+-   若 isDestroy 为 false 则会回收模块节点而不是 destroy
+
+#### 示例
 
 ```ts
-// 关闭 Test 模块（最早的模块）
+// 关闭 Test 模块（最后打开的模块）
 await mk.uiManage.close(Test);
 // 关闭所有的 Test 模块
 await mk.uiManage.close(Test, { isAll: true });
 // 关闭并销毁 Test 模块，并且销毁所有加载到 Test 节点下的模块
 await mk.uiManage.close(Test, { isDestroy: true, isDestroyChildren: true });
 ```
-
----
-
-## 配置类（API 文档）
-
-### OpenConfig\<CT>
-
--   `init?: CT.prototype.initData` —— 初始化数据，会在模块 `init` 时传入。
--   `type?: string` —— 模块类型（默认 `"default"`）。
--   `parent?: Node | null` —— 指定父节点（若不传则使用注册时的 parent）。
-
-### CloseConfig\<CT>
-
--   `type?: string` —— 指定要关闭的模块类型。
--   `isAll?: boolean` —— 是否关闭全部指定类型模块（默认 `false`）。
--   `isDestroy?: boolean` —— 是否销毁节点（若为 `true`，则 `isDestroyChildren` 若未指定则默认 `true`）。
--   `isDestroyChildren?: boolean` —— 是否销毁动态子节点（默认同 `isDestroy`）。
-
-### RegisConfig\<CT>
-
-对象池与注册相关配置（常用字段）：
-
-| 字段              | 说明                                           | 默认值                         |
-| ----------------- | ---------------------------------------------- | ------------------------------ |
-| `isRepeat`        | 是否允许重复打开（true：允许多个实例同时存在） | `false`                        |
-| `parent`          | 默认父节点（函数或节点）                       | 场景中的 `Canvas` 节点（回退） |
-| `loadConfig`      | 加载资源时传给 `MKAsset.get` 的配置            | `undefined`                    |
-| `poolMinHoldNum`  | 对象池最小保留数量（不足时扩充数）             | 若未指定：`isRepeat ? 8 : 1`   |
-| `poolMaxHoldNum`  | 对象池最大保留数量（-1 表示不启用）            | `-1`                           |
-| `poolInitFillNum` | 对象池初始化填充数量                           | `1`                            |
-
-### RegisData\<CT> extends RegisConfig
-
--   `source`：具体来源（`Prefab | string | Node | Record`）
--   `target`：跟随释放对象（若不为 null 会在其释放时触发模块 `unregis`）
-
----
-
-## 对象池与资源管理
-
--   每个注册的 `key` 会建立一个 `Map<type, MKObjectPool<Node>>`，每种 `type` 对应一个节点池。
--   对象池支持：
-
-    -   `createFunc`：按需加载并 `instantiate` 资源。
-    -   `clearFunc`：在销毁池时调用，销毁列表中节点。
-    -   `destroyFunc`：用于清理动态加载的 Prefab 引用（如 `decRef()`）。
-
--   注册时如果 `source` 为字符串路径且 `poolInitFillNum > 0`，会预加载 Prefab；若资源加载失败，会记录失效并可能导致注册失败。
-
----
-
-## 单独展示（`isShowAlone`）逻辑
-
--   打开某个标记为 `isShowAlone` 的视图时，会隐藏当前 `_uiShowList` 中从 `_uiHiddenLengthN` 到结尾的模块，并将这些被隐藏的模块记录到 `_uiHiddenSet`，以便关闭时恢复。
--   关闭模块时会更新 `_uiHiddenLengthN` 并按需恢复以前隐藏的模块（仅恢复那些原本是 active 的模块）。
-
----
-
-## 与生命周期 / 全局事件的协同
-
--   在 `open` 流程中会调用视图的生命周期 `_open({ init, isFirst: true })`，并在合适时等待该任务完成（若父节点有效）。
--   全局 `restart` 事件（在构造函数中绑定）会触发 `_eventRestart`：等待场景关闭、销毁所有对象池并重置 `mk.uiManage` 内部状态。
--   `regis` 时传入的 `target`（若存在）会通过 `followRelease` 在 target 被释放时自动 `unregis` 注册数据。
 
 ---
 
@@ -250,7 +225,7 @@ mk.uiManage.event.on(mk.uiManage.event.key.close, (key, instance) => {
 
 ## 注意与最佳实践
 
--   **优先通过 `regis` 提前注册资源**，避免 `open` 时才首次加载导致的卡顿；若使用动态注册，请实现 `getRegisDataFunc` 以支持自动注册。
+-   **提前通过 `regis` 注册资源**，避免 `open` 时才首次加载导致的卡顿；若使用动态注册，请实现 `getRegisDataFunc` 以支持自动注册。
 -   `isRepeat=false`（默认）时，打开策略会避免重复打开：当已有实例或正在打开时会返回 `null`。若需要多个同类实例（例如列表中的多个 item），请将 `isRepeat` 设为 `true`。
 -   `RegisConfig.poolInitFillNum` 设置过大可能在注册时导致大量预加载，注意资源占用。
 -   如果模块资源跟随某对象生命周期（例如 bundle / 外部资源），优先将该对象作为 `regis` 的 `target` 传入，框架会在 target 释放时自动取消注册并回收资源。

@@ -18,7 +18,7 @@ order: 2
 
 -   展示态（UI 临时状态）与业务态分离，避免状态冲突。
 -   所有业务写入通过单一路径（Control → Model → Control → View\.publicUpdate），便于校验、埋点与回滚。
--   `monitor` 与 `ToolMonitorDataMethod` 自动完成数据到 UI 的同步，显著减少样板代码。
+-   `mk.monitor` 与 `ToolMonitorDataMethod` 自动完成数据到 UI 的同步，显著减少样板代码。
 -   更利于单元测试：Model 与 Control 可独立测试，View 只负责渲染并暴露安全的更新接口。
 
 ---
@@ -28,7 +28,7 @@ order: 2
 -   **View**
 
     -   持有 `data`（view-only）：动画、输入草稿、渲染缓存、分页/滚动位置等。
-    -   使用 `monitor.on` / `ToolMonitorDataMethod` 将 `data` 与节点绑定（View 自己监听自己的 `data`）。
+    -   使用 `mk.monitor.on` / `ToolMonitorDataMethod` 将 `data` 与节点绑定（View 自己监听自己的 `data`）。
     -   暴露明确的公共接口（例如 `applyModelSnapshot(snapshot)`、`setToggleState(v)`、`refreshList(items)`），**禁止外部直接修改 `data`**。
     -   将用户操作通过 `this.event` 发出，交由 Control 处理。
 
@@ -36,7 +36,7 @@ order: 2
 
     -   接收 View 的事件并执行业务逻辑（调用 Model API）。Control 是唯一写 Model 的入口。
     -   将 Model 的权威数据转换成“展示快照/视图模型”，**通过调用 View 的公开函数**把展示数据交给 View（例如 `this._view.applyModelSnapshot(snapshot)`），由 View 自行把 snapshot 映射到 `data`。Control 不直接改 `this._view.data`。
-    -   管理模块生命周期、统一清理 `monitor`。
+    -   管理模块生命周期、统一清理 `mk.monitor`。
 
 -   **Model**
 
@@ -49,10 +49,10 @@ order: 2
 
 下面给出可直接复制粘贴的模板，确保 Control 仅通过事件与 View 的公共方法交互，不直接修改 `view.data`。
 
-### 1) Model（业务层）
+### 1. Model（业务层）
 
 ```ts
-class MyModel extends MVCModelBase {
+class MyModel extends mk.MVCModelBase {
     items: string[] = [];
     gold = 1000;
 
@@ -69,10 +69,10 @@ class MyModel extends MVCModelBase {
 }
 ```
 
-### 2) View（视图层 — 持有 view-only `data` 并监听；对外提供更新接口）
+### 2. View（视图层 — 持有 view-only `data` 并监听；对外提供更新接口）
 
 ```ts
-class MyView extends MVCViewBase<MyModel> {
+class MyView extends mk.MVCViewBase<MyModel> {
     // view-only 数据（private by convention）
     data = new (class {
         label = '0';
@@ -85,7 +85,7 @@ class MyView extends MVCViewBase<MyModel> {
         this.node.getChildByName('btnClose')!.once('click', () => this.event.emit('close'), this);
 
         // 绑定 data -> UI（View 自己负责）
-        monitor.on(
+        mk.monitor.on(
             this.data,
             'label',
             (v) => {
@@ -94,7 +94,7 @@ class MyView extends MVCViewBase<MyModel> {
             this
         );
 
-        monitor.on(
+        mk.monitor.on(
             this.data,
             'isToggled',
             (v) => {
@@ -143,10 +143,10 @@ class MyView extends MVCViewBase<MyModel> {
 
 要点：对外仅暴露受控方法（`applyModelSnapshot`、`setToggleState` 等），内部才直接操作 `this.data`，从而保证更新路径可控。
 
-### 3) Control（ViewModel / 命令中心 — 仅调用 View 的事件与公开函数）
+### 3. Control（ViewModel / 命令中心 — 仅调用 View 的事件与公开函数）
 
 ```ts
-class MyControl extends MVCControlBase<MyModel, MyView> {
+class MyControl extends mk.MVCControlBase<MyModel, MyView> {
     protected async open() {
         this._model = await MyModel.new();
         this._view = (await MyView.new())!;
@@ -231,14 +231,14 @@ this._view.event.on('toggleChanged', async (v) => {
 
 ## 生命周期与资源清理（必须遵守）
 
--   `MVCControlBase.close()` 的行为：等待 open 完成 → `model.close()` → `uiManage.close(view)` → `monitor.clear(this)`（清理 Control 注册的监视器）。
--   `MVCModelBase.close()` 会 `monitor.clear(this)` 并根据 `_isResetData` 重置数据。
--   注册 `monitor.on` 时将 `target` 设为 `this`（Control 或 View），以便框架在 close 时自动清理。
+-   `mk.MVCControlBase.close()` 的行为：等待 open 完成 → `model.close()` → `mk.uiManage.close(view)` → `mk.monitor.clear(this)`（清理 Control 注册的监视器）。
+-   `mk.MVCModelBase.close()` 会 `mk.monitor.clear(this)` 并根据 `_isResetData` 重置数据。
+-   注册 `mk.monitor.on` 时将 `target` 设为 `this`（Control 或 View），以便框架在 close 时自动清理。
 
 示例（在 View 中）：
 
 ```ts
-monitor.on(this.data, 'label', handler, this); // target=this，框架会自动 clear
+mk.monitor.on(this.data, 'label', handler, this); // target=this，框架会自动 clear
 ```
 
 ---
@@ -248,10 +248,10 @@ monitor.on(this.data, 'label', handler, this); // target=this，框架会自动 
 -   **禁止 Control 直接修改 `view.data`**：使用 View 的公开函数更新展示态。
 -   **所有业务写操作通过 Control → Model**（或通过 Model 的 API），负责人集中。
 -   **集中同步**：将 Model → View 的映射写在 `syncModelToView()`（Control）并在内部委托给 View 的公共方法，保持逻辑一致性。
--   **数组变更要替换引用或使用 monitor 支持的变更方法**，确保绑定触发。
+-   **数组变更要替换引用或使用 mk.monitor 支持的变更方法**，确保绑定触发。
 -   **将临时 UI 状态放在 `View.data`**（动画、选择、缓存）。
 -   **避免回环更新**：View 发事件 → Control 写 Model → Control 请求 View 更新，这样不会触发无限循环；如有必要用锁或旧值比较防止重复更新。
--   **使用 `this` 作为 monitor 的 target**，框架会在 close 时自动清理监视器，降低内存泄漏风险。
+-   **使用 `this` 作为 mk.monitor 的 target**，框架会在 close 时自动清理监视器，降低内存泄漏风险。
 
 ---
 
@@ -284,7 +284,7 @@ partition "Model" {
 
 partition "View" {
   :View 初始化;
-  :绑定 this.data -> UI (monitor);
+  :绑定 this.data -> UI (mk.monitor);
   :暴露 applyModelSnapshot / setToggleState 等公共方法;
 }
 
@@ -293,7 +293,7 @@ partition "View" {
 if ( 关 闭 ) then (是)
   :Control.close();
   :Model.close() -> 清理监视器;
-  :uiManage.close(view) -> View.close() -> 清理视图监视器;
+  :mk.uiManage.close(view) -> View.close() -> 清理视图监视器;
   stop
 else (否)
   :继续运行;
@@ -319,7 +319,7 @@ actor 用户 as User
 participant "View\n(this.data)" as View
 participant "Control\n(ViewModel)" as Control
 participant "Model\n(业务数据)" as Model
-participant "monitor\n(绑定)" as Monitor
+participant "mk.monitor\n(绑定)" as Monitor
 
 == 启动 ==
 Control -> Model : 初始化（new / open）
@@ -337,7 +337,7 @@ Model --> Control : 返回 / 更新完成
 == 更新视图（受控） ==
 Control -> View : applyModelSnapshot(snapshot)   <-- 注意：Control 不直接改 view.data
 View -> View.data : 根据 snapshot 更新内部 data
-View.data -> Monitor : monitor 触发
+View.data -> Monitor : mk.monitor 触发
 Monitor -> View : 自动更新 UI
 
 == 关闭 ==
@@ -355,4 +355,4 @@ Control -> Monitor : clear(this)
 
 -   将展示态放到 `View.data`（由 View 自行维护），业务态放到 `Model`，控制与同步逻辑放到 `Control`（ViewModel）。
 -   必须遵守**Control 只能通过 View 的事件与公开函数与 View 交互**、**Control 不直接写 `view.data`** 的约束，这样可以保证更新路径可控、职责清晰且更易维护。
--   `monitor` 与 `ToolMonitorDataMethod` 将数据驱动 UI 的优势最大化，建议把 Model → View 的转换逻辑集中在 Control（构建 snapshot）并交由 View 执行最终的 `data` 更新。
+-   `mk.monitor` 与 `ToolMonitorDataMethod` 将数据驱动 UI 的优势最大化，建议把 Model → View 的转换逻辑集中在 Control（构建 snapshot）并交由 View 执行最终的 `data` 更新。

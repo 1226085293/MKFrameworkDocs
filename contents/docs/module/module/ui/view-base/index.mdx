@@ -4,12 +4,12 @@ description: 视图基类，继承自 LifeCycle，提供 UI 动画、遮罩、�
 order: 3
 ---
 
-`ViewBase` 是动态视图基类，可以被 `uiManage` 打开，继承自 [`LifeCycle`](./life-cycle)，在生命周期管理的基础上，扩展了以下能力：
+`mk.ViewBase` 是动态视图基类，可以被 `mk.uiManage` 打开，继承自 [`mk.LifeCycle`](./life-cycle)，在生命周期管理的基础上，扩展了以下能力：
 
 -   **视图展示配置**（单独展示、弹窗动画配置）
 -   **编辑器快捷操作**（遮罩、Widget、BlockInputEvents）
--   **外部 close**（可作为 uiManage.close 使用）
--   **模块类型**
+-   **外部 close**（可作为 mk.uiManage.close 替代）
+-   **模块类型**（用于支持同一脚本不同 UI）
 
 ---
 
@@ -39,11 +39,11 @@ protected async open(): Promise<void> {
 
 ### close(config?)
 
--   若是外部调用，则交由 `uiManage.close` 执行后中断 close。支持传入 `CloseConfig` 配置。
+-   若是外部调用，则交由 `mk.uiManage.close` 执行后中断 close。支持传入 `CloseConfig` 配置。
     ```ts
-    // 例如 module 是 ViewBase 类型对象，在外部调用它的 close
+    // 例如 module 是 mk.ViewBase 类型对象，在外部调用它的 close
     module.close();
-    // 此时框架内会使用 uiManage.close 关闭 module，
+    // 此时框架内会使用 mk.uiManage.close 关闭 module，
     // 而不是直接执行 module 的 close 函数，可用于按钮回调和便捷关闭模块
     ```
 -   非外部调用则视为生命周期函数
@@ -68,8 +68,8 @@ protected async open(): Promise<void> {
 
 -   类型：`string`
 -   默认值：`"default"`
--   说明：模块类型标识，用于区分不同的 UI 模块来源。模块类型可在 `uiManage.regis` 时注册，
-    然后通过 `uiManage.open` 打开指定的模块类型，不同的模块类型代表了不同的 UI
+-   说明：模块类型标识，用于区分不同的 UI 模块来源。模块类型可在 `mk.uiManage.regis` 时注册，
+    然后通过 `mk.uiManage.open` 打开指定的模块类型，不同的模块类型代表了不同的 UI
 -   示例：
 
     ```ts
