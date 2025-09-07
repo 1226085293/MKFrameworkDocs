@@ -1,5 +1,79 @@
 ---
 title: 屏幕适配
-description:
+description: 屏幕和节点适配
 order: 0
 ---
+
+## 介绍
+
+框架内提供了两个适配组件，分别用于屏幕和节点
+
+## 屏幕适配
+
+`mk.AdaptationCanvas` 是屏幕适配组件，并且框架封装了两种适配类型
+
+```ts
+/** 适配模式 */
+export enum AdaptationMode {
+    /** 无 */
+    None,
+    /** 自适应（更宽定高，更高定宽） */
+    Adaptive,
+    /** 固定尺寸（屏幕尺寸不同大小相同） */
+    FixedSize,
+}
+```
+
+你只需要修改配置类型，框架就会自动进行屏蔽适配
+
+```ts:GlobalConfig.ts
+namespace GlobalConfig {
+    ...
+	export namespace View {
+        ...
+		/** 适配类型 */
+		export const adaptationType: AdaptationMode = AdaptationMode.Adaptive;
+    }
+}
+```
+
+## 节点适配
+
+节点适配是依靠在节点上添加 `MKAdaptationNode` 组件进行的
+
+![节点适配组件](/docs/b295ee71-bf87-4cd2-bcd4-ac31d9283489.png)
+
+### 适配模式
+
+-   Scale: 组件会调整当前节点的缩放来进行适配
+
+-   Size: 组件会调整当前节点的宽高来进行适配
+
+当设置为 Size 时，组件会在挂载时或节点更换图片时保存节点的原始大小，推荐使用 Scale
+
+### 适配来源
+
+-   Canvas：Canvas 大小
+
+-   Parent：父节点大小
+-   Customize：自定义大小
+
+适配来源也就是节点适配的目标尺寸来源
+
+### 适配类型
+
+图中红色为适配来源，图片为适配节点
+
+-   默认: 原始尺寸
+    ![原始尺寸](/docs/0288ad1e-67da-4408-a8f5-ccda463588b2.png)
+
+-   缩放: 和目标尺寸一致
+    ![缩放](/docs/8be43e2f-d900-41af-bf87-66a576c3e2fe.png)
+-   自适应\_展示完
+    ![自适应_展示完](/docs/fc40650c-bae9-47e7-9a91-26af830ceeb9.png)
+-   自适应\_填充满
+    ![自适应_填充满](/docs/ff80167b-c0ab-4cf9-805a-5c2c0a357770.png)
+-   填充宽
+    ![填充宽](/docs/ff80167b-c0ab-4cf9-805a-5c2c0a357770.png)
+-   填充高
+    ![填充高](/docs/f72f72be-b113-41b5-acca-53f547a4c9e3.png)
