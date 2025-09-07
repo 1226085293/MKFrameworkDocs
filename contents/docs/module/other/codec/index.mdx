@@ -1,0 +1,29 @@
+---
+title: 编解码器
+description: 适用于任意数据的加/解密，或者网络消息的编/解码
+order: 2
+---
+
+通过继承 `mk.CodecBase` 实现数据的编解码
+
+## 示例
+
+```ts
+class MyCodec extends mk.CodecBase {
+    // 编码
+    encode(data: any): any {
+        return JSON.stringify(data);
+    }
+
+    // 解码
+    decode(data: any): any {
+        return JSON.parse(data);
+    }
+}
+```
+
+## 使用场景
+
+-   数据加/解密
+-   网络数据编/解码
+-   自定义序列化/反序列化

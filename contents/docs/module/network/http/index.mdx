@@ -1,68 +1,17 @@
 ---
-title: http
+title: Http
 description: 支持 GET/POST、自定义编解码、任意返回类型解析的网络请求框架
 order: 1
 ---
 
-## 架构设计
+## 介绍
 
-### 核心思想
-
--   **双模式支持**：兼容 Cocos Creator 编辑器和原生运行时环境（通过 `sys.isNative` 区分）。
--   **编解码扩展**：通过 `MKCodecBase` 实现请求/响应数据的编解码，支持二进制、JSON、Base64 等。
--   **任意返回类型**：支持 `XMLHttpRequestResponseType` 所有类型（如 `text`、`arraybuffer`、`blob`、`json`、`document`）。
--   **事件驱动**：通过 `Promise` 封装异步请求，支持超时、回调等事件处理。
-
-### 数据流图示
-
-```plantuml
-@startuml
-actor 用户
-participant "mk.network.http" as Http
-participant "XMLHttpRequest" as XHR
-participant "服务器" as Server
-participant "编解码器" as Codec
-
-用户 -> Http: get/post(url, config)
-Http -> XHR: open()
-Http -> XHR: setRequestHeader()
-Http -> Codec: encode(body) (若配置)
-Http -> XHR: send(encodedBody)
-XHR -> Server: 发送请求
-Server --> XHR: 返回响应
-XHR -> Http: 触发 onreadystatechange
-Http -> Codec: decode(response) (若配置)
-Http --> 用户: resolve(result)
-@enduml
-```
+`mk.network.http` 是支持 Web 和原生环境的 Http 封装对象，扩展了编解码，自动解析返回数据，
+且以 Promise 方式实现
 
 ---
 
-## 用户层接口
-
-### 核心接口
-
-#### mk.network.http
-
-全局单例，提供 `GET` 和 `POST` 请求方法。
-
-| 方法                                                | 描述           |
-| --------------------------------------------------- | -------------- |
-| `get(url: string, config?: Partial<Http_.Config>)`  | 发送 GET 请求  |
-| `post(url: string, config?: Partial<Http_.Config>)` | 发送 POST 请求 |
-
-#### mk.network.Http\_
-
-命名空间，提供配置类和类型定义。
-
-| 类/类型       | 描述                       |
-| ------------- | -------------------------- |
-| `Config`      | 请求配置类                 |
-| `MKCodecBase` | 编解码器基类（需用户继承） |
-
----
-
-## API 详解
+## 方法
 
 ### get / post
 
@@ -94,7 +43,7 @@ const response = await mk.network.http.post('https://api.example.com/login', {
 | ------------------ | --------------------------------------------------------------------------- | ------ | -------------------------------------------- |
 | `timeoutNum`       | `number`                                                                    | `5000` | 超时时间（毫秒）                             |
 | `returnType`       | `XMLHttpRequestResponseType`                                                | -      | 返回数据类型（如 `'json'`、`'arraybuffer'`） |
-| `codec`            | `MKCodecBase`                                                               | -      | 编解码器（需继承）                           |
+| `codec`            | `mk.CodecBase`                                                              | -      | [编解码器](../other/codec)（可选）           |
 | `body`             | `Document \| Blob \| BufferSource \| FormData \| URLSearchParams \| string` | -      | 请求体                                       |
 | `header`           | `Record<string, string>`                                                    | -      | 请求头                                       |
 | `openCallbackFunc` | `(http: XMLHttpRequest) => void`                                            | -      | 请求初始化回调                               |
@@ -123,31 +72,7 @@ const config = new mk.network.Http_.Config({
 | `document`    | 返回 `Document` 或 `XMLDocument`   | XML、HTML 文档   |
 | `json`        | 自动解析为 JavaScript 对象         | JSON API         |
 
-### 编解码器（`codec`）
-
-通过 `codec` 实现请求/响应数据的编解码，需继承 `MKCodecBase`。
-
-#### 示例实现
-
-```ts
-class MyCodec extends MKCodecBase {
-    encode(data: any): any {
-        return JSON.stringify(data); // 请求前编码
-    }
-
-    decode(data: any): any {
-        return JSON.parse(data); // 响应后解码
-    }
-}
-```
-
-**典型场景**：
-
--   加密/解密数据
--   压缩/解压缩数据
--   自定义序列化/反序列化
-
-### 请求头（`header`）
+### 请求头（header）
 
 支持自定义请求头，例如：
 
@@ -161,7 +86,7 @@ header: {
 
 > **注意**：在原生环境（`sys.isNative`）下，框架自动添加 `Accept-Encoding: gzip,deflate`。
 
-### 请求初始化回调（`openCallbackFunc`）
+### 请求初始化回调（openCallbackFunc）
 
 在 `XMLHttpRequest.open` 后触发，可用于注册事件或设置额外属性。
 
