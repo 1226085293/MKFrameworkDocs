@@ -1,0 +1,55 @@
+---
+title: 音频单元
+order: 1
+---
+
+## 介绍
+
+音频单元是单个音频的信息集合和控制单元
+
+## 创建
+
+### 编辑器
+
+```ts
+@ccclass('ResourcesAudio')
+export class ResourcesAudio extends mk.ViewBase {
+    @property({ displayName: '音效', type: mk.Audio_.Unit })
+    effect = new mk.Audio_.Unit();
+}
+```
+
+### 动态加载
+
+调用 [mk.audio.add](./manage/#方法/add) 方法即可
+
+## 属性
+
+-   `readonly groupNumList`: 当前所在分组
+-   `readonly state`: 播放状态
+-   `readonly waitPlayNum`: 等待播放次数
+-   `readonly totalTimeSNum`: 总时长（秒）
+-   `readonly event`: 音频事件对象，可用于监听音频状态变化
+-   `readonly type`: 音频类型
+-   `readonly realVolumeNum`: 真实音量
+-   `readonly audioSource`: 音频组件，微信环境下为 null
+-   `clip`: 音频资源
+-   `volumeNum`: 音量
+-   `isLoop`: 是否循环
+-   `currentTimeSNum`: 当前时间（秒）
+-   `isWaitPlay`: 等待播放开关
+
+### 等待播放（isWaitPlay，waitPlayNum）
+
+当 `isWaitPlay` 为 true 且当前音频在播放状态时再次调用 `mk.audio.play` 播放当前音频，
+当前音频不会重新开始播放，而是会累计 `waitPlayNum` 次数，等音频播放完成时再次播放 `waitPlayNum` 次数
+
+### 音量（realVolumeNum，volumeNum）
+
+音频单元的音量受到音频组的影响，所以除了自身的音量`(volumeNum)`，还有一个根据自身的音频组计算得到的真实音量`(realVolumeNum)`
+
+真实音量的计算方式为：`自身音量 * 音频组1音量 * 音频组2音量 * 音频组n音量...`
+
+## 方法
+
+### clone
