@@ -1,5 +1,29 @@
 ---
 title: 裁剪框架模块（缩小代码体积）
 description:
-order: 1
+order: 0
 ---
+
+## 裁剪模块
+
+{/* prettier-ignore */}
+<Stepper>
+	<StepperItem title="步骤 1: 打开 MKExport.ts">
+        打开位于 `项目根目录\extensions\MKFramework\assets\MKFramework\Framework\MKExport.ts` 位置的文件
+	</StepperItem>
+	<StepperItem title="步骤 2: 注释模块">
+        在文件内注释你想要删减的模块，例如
+        ```ts
+        // 音频
+        // export { mkAudio as audio, MKAudio_ as Audio_ } from "./Audio/MKAudioExport";
+        ```
+    </StepperItem>
+    <StepperItem title="步骤 3: 调用工具">
+        点击 "顶部菜单/扩展/MKFramework/剔除或恢复框架模块" 菜单，等待执行完成
+        ![插件](/docs/4f58a81b-6382-4870-9cc9-b888be661dd1.png)
+    </StepperItem>
+</Stepper>
+
+## 恢复模块
+
+和裁剪流程相同，只是第 2 步改为取消注释
