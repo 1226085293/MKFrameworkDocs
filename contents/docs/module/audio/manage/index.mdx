@@ -21,7 +21,7 @@ mk.audio.add('test.mp3', this, {
         bundleStr: 'resources',
     },
     isDir: false,
-    groupNumList: [],
+    groupIdNumList: [],
 });
 ```
 
@@ -34,7 +34,7 @@ mk.audio.add('test.mp3', this, {
 -   `target_`: 跟随释放对象
 -   `config_`: 配置数据
 -   `config_.type`: 音频类型，枚举定义在 `GlobalConfig.Audio.Type`
--   `config_.groupNumList`: 音频分组列表
+-   `config_.groupIdNumList`: 音频分组 ID 列表
 -   `config_.loadConfig`: 资源加载配置
 -   `config_.isDir`: 是否是文件夹
 
