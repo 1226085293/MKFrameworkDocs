@@ -39,17 +39,56 @@ export class ResourcesAudio extends mk.ViewBase {
 -   `currentTimeSNum`: 当前时间（秒）
 -   `isWaitPlay`: 等待播放开关
 
-### 等待播放（isWaitPlay，waitPlayNum）
-
-当 `isWaitPlay` 为 true 且当前音频在播放状态时再次调用 `mk.audio.play` 播放当前音频，
-当前音频不会重新开始播放，而是会累计 `waitPlayNum` 次数，等音频播放完成时再次播放 `waitPlayNum` 次数
-
-### 音量（realVolumeNum，volumeNum）
-
-音频单元的音量受到音频组的影响，所以除了自身的音量`(volumeNum)`，还有一个根据自身的音频组计算得到的真实音量`(realVolumeNum)`
-
-真实音量的计算方式为：`自身音量 * 音频组1音量 * 音频组2音量 * 音频组n音量...`
-
 ## 方法
 
 ### clone
+
+克隆自身，返回一个新的音频单元对象，用于控制重叠播放
+
+## 概念
+
+### 等待播放
+
+如果当前音频在播放状态时，再次调用 `mk.audio.play` 播放当前音频，会出现以下两种情况:
+
+-   `isWaitPlay` 为 false 时: 当前音频重头开始播放
+-   `isWaitPlay` 为 true 时: 当前音频不会重新开始播放，而是会累计 `waitPlayNum` 次数，等音频播放完成时再次播放 `waitPlayNum` 次数
+
+### 音量
+
+音频单元的音量受到音频组的影响，所以除了自身的音量`(volumeNum)`，还有一个根据自身的音频组`(groupNumList)`计算得到的真实音量`(realVolumeNum)`
+
+真实音量的计算方式为：`自身音量 * 音频组1音量 * 音频组2音量 * 音频组n音量...`
+
+### 重叠播放
+
+通过 `clone` 得到多个相同资源的音频单元，然后获取停止状态的音频单元调用播放，即可做到重叠播放，
+音频单元数量即最大重叠播放次数
+
+示例：
+
+```ts
+class Test extends mk.ViewBase {
+    @property({ displayName: '重叠音效', type: mk.Audio_.Unit })
+    overlapEffect = new mk.Audio_.Unit();
+
+    /** 重叠音频数组 */
+    private _overlapEffectList!: mk.Audio_.Unit[];
+
+    // 通过 clone 得到多个音频单元
+    protected open(): void | Promise<void> {
+        this._overlapEffectList.push(
+            this.overlapEffect,
+            this.overlapEffect.clone(),
+            this.overlapEffect.clone()
+        );
+        // 或者如下
+        // this._overlapEffectList.push(this.overlapEffect, ...Array.from({ length: 2 }, (v, k) => this.overlapEffect.clone()));
+    }
+
+    // 获取停止状态的音频单元播放
+    clickAudio(): void {
+        mk.audio.play(this._overlapEffectList.find((v) => v.state === mk.Audio_.State.Stop)!);
+    }
+}
+```
