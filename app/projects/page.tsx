@@ -10,14 +10,6 @@ export const metadata: Metadata = {
     title: 'MKFrameworkDocs - 项目展示',
 };
 
-interface Project {
-    id: number;
-    title: string;
-    description: string;
-    image?: string;
-    link?: string;
-}
-
 export default async function ProjectsPage() {
     const projects = await fetchProjectsFromGitHub();
 
