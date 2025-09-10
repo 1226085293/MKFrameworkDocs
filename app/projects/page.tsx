@@ -18,19 +18,21 @@ export default async function ProjectsPage() {
             <div className="mb-7 flex flex-col gap-2">
                 <h1 className="sm:text-3xl text-2xl font-extrabold">项目展示</h1>
                 <p className="text-muted-foreground sm:text-[16.5px] text-[14.5px]">
-                    社区贡献的项目展示区
+                    社区贡献的项目展示区，填写简单信息便可展示，不需要公开源码
                 </p>
             </div>
 
             {/* 固定宽度的flex布局 */}
             <div className="flex flex-wrap gap-6 mb-5">
                 {/* 提交项目按钮卡片 */}
-                <SubmitProjectCard />
+                <div key="submit-card">
+                    <SubmitProjectCard />
+                </div>
 
                 {/* 项目列表 */}
-                {projects.map((project) => (
+                {projects.map((project, kNum) => (
                     <ProjectCard
-                        key={project.id}
+                        key={`project-${kNum}`} // 确保唯一性
                         title={project.title}
                         description={project.description}
                         image={project.image}
