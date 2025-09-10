@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowUpRight, Plus } from 'lucide-react';
 import { fetchProjectsFromGitHub } from '@/lib/github-api';
 import siteConfig from '@/site-config';
+import { hash } from 'crypto';
 
 export const metadata: Metadata = {
     title: 'MKFrameworkDocs - 项目展示',
@@ -30,9 +31,12 @@ export default async function ProjectsPage() {
                 </div>
 
                 {/* 项目列表 */}
-                {projects.map((project, kNum) => (
+                {projects.map((project) => (
                     <ProjectCard
-                        key={`project-${kNum}`} // 确保唯一性
+                        key={`${project.title}-${project.link}-${hash(
+                            'sha1',
+                            project.description
+                        )}`}
                         title={project.title}
                         description={project.description}
                         image={project.image}
