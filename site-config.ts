@@ -7,6 +7,8 @@ class SiteConfig {
     siteRepos: Record<string, string> = {
         github: 'https://github.com/1226085293/MKFrameworkDocs',
     };
+    /** 项目 */
+    projectsDiscussionUrl = 'https://github.com/1226085293/MKFrameworkDocs/discussions/3';
     /** 站点仓库 */
     repo = this.siteRepos.github;
     /** 评论系统配置 */
