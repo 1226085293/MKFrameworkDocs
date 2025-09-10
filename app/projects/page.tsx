@@ -1,18 +1,133 @@
 // app/projects/page.tsx
-import { Metadata } from 'next';
+'use client';
+
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, Plus } from 'lucide-react';
-import { fetchProjectsFromGitHub } from '@/lib/github-api';
 import siteConfig from '@/site-config';
-import { hash } from 'crypto';
 
-export const metadata: Metadata = {
-    title: 'MKFrameworkDocs - 项目展示',
+// 工具函数
+function extractImageUrl(imageTag: string): string {
+    const match = imageTag.match(/src="([^"]+)"/);
+    return match ? match[1] : '';
+}
+
+function parseProjectsFromBody(body: string) {
+    const projectRegex =
+        /title: (.*?)\s+description: (.*?)\s+link: (.*?)\s+image: (.*?)(?=\s+(?:title:|$))/gs;
+    const projects = [];
+    let match;
+    while ((match = projectRegex.exec(body)) !== null) {
+        const [, title, description, link, image] = match;
+        projects.push({
+            title: title.trim(),
+            description: description.trim(),
+            link: link.trim() === 'null' ? undefined : link.trim(),
+            image: image.trim() === 'null' ? undefined : image.trim(),
+        });
+    }
+    return projects;
+}
+
+// 获取缓存时间：开发时 0，生产时 60 秒
+const getCacheTime = () => {
+    // 判断是否为生产环境
+    return process.env.NODE_ENV === 'production' ? 60 : 0;
 };
 
-export default async function ProjectsPage() {
-    const projects = await fetchProjectsFromGitHub();
+// GitHub 请求函数（带缓存控制）
+const fetchProjects = async (token: string) => {
+    const urlStrList = siteConfig.projectsDiscussionUrl.split('/');
+    const [owner, repo, , number] = [
+        urlStrList.slice(-4)[0],
+        urlStrList.slice(-3)[0],
+        urlStrList.slice(-2)[0],
+        urlStrList.slice(-1)[0],
+    ];
+
+    const response = await fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+            Authorization: `bearer ${token}`,
+            'Content-Type': 'application/json',
+            'User-Agent': 'MKFrameworkDocs-Client',
+        },
+        body: JSON.stringify({
+            query: `
+        query {
+          repository(owner: "${owner}", name: "${repo}") {
+            discussion(number: ${number}) {
+              body
+              comments(first: 100) {
+                nodes {
+                  body
+                }
+              }
+            }
+          }
+        }
+      `,
+        }),
+        next: {
+            revalidate: getCacheTime(), // ← 关键：开发 0，生产 60 秒
+        },
+        // 生产环境：允许使用缓存；开发环境：强制绕过缓存
+        cache: process.env.NODE_ENV === 'development' ? 'no-store' : 'force-cache',
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.errors) {
+        console.error('GitHub API Error:', data.errors);
+        throw new Error(data.errors[0]?.message || 'GitHub API Error');
+    }
+
+    const discussion = data.data?.repository?.discussion;
+    if (!discussion) throw new Error('Discussion not found');
+
+    return [
+        ...parseProjectsFromBody(discussion.body),
+        ...discussion.comments.nodes.flatMap((c: any) => parseProjectsFromBody(c.body)),
+    ];
+};
+
+export default function ProjectsPage() {
+    const [projects, setProjects] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+
+    const loadProjects = async () => {
+        if (!token) {
+            setError('配置错误：缺少 GitHub Token');
+            setLoading(false);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await fetchProjects(token);
+            setProjects(data);
+        } catch (err: any) {
+            console.error('Load failed:', err);
+            setError(err.message || '加载失败，请稍后重试');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 用户手动刷新页面时触发（仅首次加载）
+    useEffect(() => {
+        loadProjects();
+        // eslint-disable-next-line
+    }, []);
 
     return (
         <div className="flex flex-col gap-1 sm:min-h-[91vh] min-h-[88vh] pt-2 w-full">
@@ -23,73 +138,42 @@ export default async function ProjectsPage() {
                 </p>
             </div>
 
-            {/* 固定宽度的flex布局 */}
             <div className="flex flex-wrap gap-6 mb-5">
-                {/* 提交项目按钮卡片 */}
-                <div key="submit-card">
-                    <SubmitProjectCard />
-                </div>
+                <SubmitProjectCard />
 
-                {/* 项目列表 */}
-                {projects.map((project) => (
-                    <ProjectCard
-                        key={`${project.title}-${project.link}-${hash(
-                            'sha1',
-                            project.description
-                        )}`}
-                        title={project.title}
-                        description={project.description}
-                        image={project.image}
-                        link={project.link}
-                    />
-                ))}
+                {loading ? (
+                    Array(2)
+                        .fill(0)
+                        .map((_, i) => (
+                            <div
+                                key={i}
+                                className="w-[360px] h-[400px] bg-muted rounded-lg animate-pulse"
+                            />
+                        ))
+                ) : error ? (
+                    <div className="w-full p-6 text-center">
+                        <div className="text-destructive mb-2">{error}</div>
+                        <button
+                            onClick={loadProjects}
+                            className="text-sm text-primary hover:underline"
+                        >
+                            重新加载
+                        </button>
+                    </div>
+                ) : (
+                    projects.map((project, idx) => (
+                        <ProjectCard key={`${project.title}-${idx}`} {...project} />
+                    ))
+                )}
             </div>
         </div>
     );
 }
 
-// 提交项目按钮卡片组件
-// 修改 SubmitProjectCard 组件
-function SubmitProjectCard() {
-    return (
-        <Link
-            href={siteConfig.projectsDiscussionUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex flex-col items-center justify-center border border-dashed border-muted-foreground/30 rounded-lg hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 w-[360px] h-[400px]"
-        >
-            <div className="flex flex-col items-center gap-6 text-center">
-                {' '}
-                {/* 增加gap */}
-                <div className="flex items-center justify-center w-full">
-                    <Plus
-                        className="w-[180px] h-[180px] text-primary/20 group-hover:text-primary/40 transition-colors"
-                        strokeWidth={1} // 细描边避免过粗
-                    />
-                </div>
-                {/* 提交项目文字 */}
-                <span className="text-xl font-medium text-muted-foreground group-hover:text-primary transition-colors">
-                    提交项目
-                </span>
-            </div>
-            <span className="mt-2 text-base font-medium text-muted-foreground/60 group-hover:text-primary/70 transition-colors">
-                需开启代理访问
-            </span>
-        </Link>
-    );
-}
-
-interface ProjectCardProps {
-    title: string;
-    description: string;
-    image?: string;
-    link?: string;
-}
-
-function ProjectCard({ title, description, image, link }: ProjectCardProps) {
+// 项目卡片组件
+function ProjectCard({ title, description, image, link }: any) {
     return (
         <div className="group flex flex-col border rounded-lg overflow-hidden bg-card hover:shadow-md transition-all duration-200 w-[360px] h-[400px]">
-            {/* 图片区域 - 强制16:9比例 */}
             <div className="relative w-full aspect-video overflow-hidden">
                 {image ? (
                     <Image
@@ -105,7 +189,6 @@ function ProjectCard({ title, description, image, link }: ProjectCardProps) {
                 )}
             </div>
 
-            {/* 内容区域 */}
             <div className="flex flex-col flex-1 p-4">
                 <div className="flex flex-col gap-3 mb-auto">
                     <h3 className="text-lg font-semibold line-clamp-1 leading-tight">{title}</h3>
@@ -114,7 +197,6 @@ function ProjectCard({ title, description, image, link }: ProjectCardProps) {
                     </p>
                 </div>
 
-                {/* 访问按钮 */}
                 {link && (
                     <div className="flex justify-end mt-3">
                         <Link
@@ -133,8 +215,29 @@ function ProjectCard({ title, description, image, link }: ProjectCardProps) {
     );
 }
 
-// 从MDX格式的image中提取图片URL
-function extractImageUrl(imageTag: string): string {
-    const match = imageTag.match(/src="([^"]+)"/);
-    return match ? match[1] : '';
+// 提交项目卡片
+function SubmitProjectCard() {
+    return (
+        <Link
+            href={siteConfig.projectsDiscussionUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex flex-col items-center justify-center border border-dashed border-muted-foreground/30 rounded-lg hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 w-[360px] h-[400px]"
+        >
+            <div className="flex flex-col items-center gap-6 text-center">
+                <div className="flex items-center justify-center w-full">
+                    <Plus
+                        className="w-[180px] h-[180px] text-primary/20 group-hover:text-primary/40 transition-colors"
+                        strokeWidth={1}
+                    />
+                </div>
+                <span className="text-xl font-medium text-muted-foreground group-hover:text-primary transition-colors">
+                    提交项目
+                </span>
+            </div>
+            <span className="mt-2 text-base font-medium text-muted-foreground/60 group-hover:text-primary/70 transition-colors">
+                需开启代理访问
+            </span>
+        </Link>
+    );
 }
