@@ -123,10 +123,9 @@ export default function ProjectsPage() {
         }
     };
 
-    // 用户手动刷新页面时触发（仅首次加载）
+    // 首次加载
     useEffect(() => {
         loadProjects();
-        // eslint-disable-next-line
     }, []);
 
     return (
@@ -134,7 +133,7 @@ export default function ProjectsPage() {
             <div className="mb-7 flex flex-col gap-2">
                 <h1 className="sm:text-3xl text-2xl font-extrabold">项目展示</h1>
                 <p className="text-muted-foreground sm:text-[16.5px] text-[14.5px]">
-                    社区贡献的项目展示区，填写简单信息便可展示，不需要公开源码
+                    社区贡献的项目展示区，填写简单信息便可展示，无需公开源码
                 </p>
             </div>
 
@@ -153,12 +152,6 @@ export default function ProjectsPage() {
                 ) : error ? (
                     <div className="w-full p-6 text-center">
                         <div className="text-destructive mb-2">{error}</div>
-                        <button
-                            onClick={loadProjects}
-                            className="text-sm text-primary hover:underline"
-                        >
-                            重新加载
-                        </button>
                     </div>
                 ) : (
                     projects.map((project, idx) => (
@@ -232,7 +225,7 @@ function SubmitProjectCard() {
                     />
                 </div>
                 <span className="text-xl font-medium text-muted-foreground group-hover:text-primary transition-colors">
-                    提交项目
+                    添加项目
                 </span>
             </div>
             <span className="mt-2 text-base font-medium text-muted-foreground/60 group-hover:text-primary/70 transition-colors">
