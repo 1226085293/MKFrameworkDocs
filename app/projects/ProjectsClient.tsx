@@ -4,7 +4,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import siteConfig from '@/site-config';
 import useSWR from 'swr';
 
