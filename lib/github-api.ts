@@ -1,6 +1,6 @@
+// lib/github-api.ts
 import siteConfig from '@/site-config';
 
-// lib/github-api.ts
 interface GitHubDiscussion {
     id: string;
     number: number;
@@ -24,6 +24,11 @@ export async function fetchProjectsFromGitHub(): Promise<Project[]> {
         }
 
         const urlStrList = siteConfig.projectsDiscussionUrl.split('/');
+
+        // 根据环境设置不同的缓存时间
+        const isDevelopment = process.env.NODE_ENV === 'development';
+        const revalidateTime = isDevelopment ? 10 : 60; // 开发环境10秒，生产环境60秒
+
         const response = await fetch('https://api.github.com/graphql', {
             method: 'POST',
             headers: {
@@ -49,7 +54,7 @@ export async function fetchProjectsFromGitHub(): Promise<Project[]> {
                         }
                     `,
             }),
-            next: { revalidate: 3600 }, // 每小时重新验证一次
+            next: { revalidate: revalidateTime }, // 根据环境设置不同的缓存时间
         });
 
         const data = await response.json();
