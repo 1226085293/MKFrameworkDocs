@@ -27,7 +27,7 @@ export async function fetchProjectsFromGitHub(): Promise<Project[]> {
         const response = await fetch('https://api.github.com/graphql', {
             method: 'POST',
             headers: {
-                Authorization: `bearer ${process.env.GITHUB_PROJECTS_TOKEN}`,
+                Authorization: `bearer ${process.env.PROJECTS_GITHUB_TOKEN}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
