@@ -102,7 +102,7 @@ export function NavMenu({ isSheet = false }: { isSheet?: boolean }) {
             href: routes.length > 0 ? `/docs${routes[0].href}` : '/docs',
         },
         { title: '博客', href: '/blog' },
-        // { title: "Examples", href: "#" },
+        { title: '项目', href: '/projects' },
         // { title: "Guides", href: "#" },
         {
             title: '讨论',

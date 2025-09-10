@@ -3,3 +3,23 @@ title: 修改框架代码
 description:
 order: 0
 ---
+
+## 源码位置
+
+框架源码可以在编辑器的资源管理器下方的 `mk-framework` 下点击打开
+![框架源码位置](/docs/396b4df5-5a24-4a8e-8dfd-022c83d3590d.png)
+
+## 打包 d.ts
+
+当你修改了框架内的接口、属性、注释等，你会发现 mk 下的接口还是没有变化，这是因为框架使用 `extensions\MKFramework\@types\MKFramework\mk.d.ts` 进行类型声明，
+你需要在修改代码后重新打包 d.ts
+
+### 方式一：使用框架插件
+
+点击 "顶部菜单/扩展/MKFramework/构建 d.ts" 即可
+
+![框架插件](/docs/QQ_1757407141721.png)
+
+### 方式二：使用 npm 命令
+
+在项目根目录下执行 `npx ts-node ./extensions/MKFramework/source/CMD.ts build-dts` 等待完成即可

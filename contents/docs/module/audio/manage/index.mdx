@@ -1,0 +1,84 @@
+---
+title: 管理器
+order: 0
+---
+
+## 介绍
+
+`mk.audio` 是框架的音频管理器，支持音频多分组管理，动态加载，最大播放数量控制优化，内置自动切换的通用/微信双版本代码
+
+## 方法
+
+### add
+
+add 是动态加载音频单元的接口，可以加载文件夹/单个资源
+
+```ts
+// 加载 db://resources/test.mp3
+mk.audio.add('test.mp3', this, {
+    type: GlobalConfig.Audio.Type.Music,
+    loadConfig: {
+        bundleStr: 'resources',
+    },
+    isDir: false,
+    groupIdNumList: [],
+});
+```
+
+#### 参数
+
+`add(url_, target_, config_)`
+
+-   `url_`: 资源路径，和 `mk.asset.get` 类型一致
+
+-   `target_`: 跟随释放对象
+-   `config_`: 配置数据
+-   `config_.type`: 音频类型，枚举定义在 `GlobalConfig.Audio.Type`
+-   `config_.groupIdNumList`: 音频分组 ID 列表
+-   `config_.loadConfig`: 资源加载配置
+-   `config_.isDir`: 是否是文件夹
+
+### play
+
+播放或者恢复暂停的音频单元
+
+```ts
+mk.audio.play(this.music, {
+    isLoop: false,
+    volumeNum: 0.5,
+});
+```
+
+#### 参数
+
+`play(audio_, config_)`
+
+-   `audio_`: 音频单元
+
+-   `config_`: 可选，播放配置
+-   `config_.isLoop`: 设置音频单元是否循环（包括之后）
+-   `config_.volumeNum`: 设置音频单元的音量（包括之后）
+
+### pauseAll
+
+暂停当前所有音频，但不包括之后播放的音频
+
+### resumeAll
+
+恢复当前暂停的所有音频
+
+### stopAll
+
+停止当前的所有音频，但不包括之后播放的音频
+
+如果要阻止后续播放音频，可以使用 [getGroup](#方法/getGroup)
+
+例如
+
+```ts
+mk.audio.getGroup(GlobalConfig.Audio.Type.Music).stop();
+```
+
+### getGroup
+
+获取音频组对象，如果不存在则创建

@@ -1,0 +1,69 @@
+---
+title: 音频组
+order: 2
+---
+
+## 介绍
+
+音频组由多个音频单元组成，用于统一管理这些音频单元
+
+## 获取
+
+使用 `mk.audio.getGroup` 方法即可，不存在则会自动创建
+
+## 属性
+
+-   `readonly idNum`: 分组 ID，也就是 `getGroup` 的参数
+
+-   `readonly audioUnitList`：只读，音频单元列表
+-   `readonly isPlay`: 播放状态
+-   `readonly isStop`: 停止状态
+-   `volumeNum`: 分组音量
+
+## 方法
+
+### play
+
+若无参数播放处于暂停和停止状态的音频单元，存在参数则播放指定状态的音频单元
+
+调用后将设置 `isPlay` 为 true, `isStop` 为 false
+
+#### 参数
+
+-   `containsStateNum_`: 状态值，决定了播放什么状态下的音频，默认 `mk.Audio_.State.Pause | mk.Audio_.State.Stop`
+
+### pause
+
+暂停分组内的音频单元
+
+调用后将设置 `isPlay` 为 false
+
+### stop
+
+停止或恢复播放能力
+
+#### 参数
+
+-   `isStop_`: 停止状态，默认 true
+    -   true: 停止当前并阻止后续音频播放
+    -   false: 恢复播放能力
+
+### addAudio
+
+添加音频单元到当前音频组
+
+#### 参数
+
+-   `audio_`: 音频单元或者音频单元数组
+
+### delAudio
+
+从当前音频组删除音频单元
+
+#### 参数
+
+-   `audio_`: 音频单元或者音频单元数组
+
+### clear
+
+清理分组内所有音频
