@@ -44,6 +44,7 @@ export default function RootLayout({
                     name="google-site-verification"
                     content="kQDVFhUTNG12MduVr7DiXr2BFyYzW2urmCHB7o2uvmM"
                 />
+                <meta name="algolia-site-verification" content="5EA7CE09166D90A7" />
             </head>
             <body
                 className={`${sansFont.variable} ${monoFont.variable} font-regular antialiased tracking-wide`}
