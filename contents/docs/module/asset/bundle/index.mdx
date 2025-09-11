@@ -111,7 +111,7 @@ await mk.bundle.loadScene('MainScene', {
     - 成功后更新 `bundleStr`/`preSceneStr`/`sceneStr` 并触发 `afterBundleSwitch` / `afterSceneSwitch`；
     - 无论成功与否，最终把 `isSwitchScene` 置回 `false`。
 
-注意：如果 `config.isPreload === true`，只做预加载并返回是否成功，不走切场景逻辑。
+> 注意：如果 `config.isPreload === true`，只做预加载并返回是否成功，不走切场景逻辑。
 
 ---
 
@@ -131,7 +131,7 @@ await mk.bundle.loadScene('MainScene', {
 -   更新 `assetManager.downloader.bundleVers` 的版本号映射；
 -   最后调用 `load(bundleInfo)` 重新加载新 bundle。
 
-> 警告：reload 过程会**卸载旧脚本/资源**，若存在跨 bundle 单例或未清理的全局引用，会导致错误。热更前请确保所有 bundle 管理器/模块已正确清理。
+> 注意：reload 过程会**卸载旧脚本/资源**，若存在跨 bundle 单例或未清理的全局引用，会导致错误。热更前请确保所有 bundle 管理器/模块已正确清理。
 
 ---
 
@@ -218,16 +218,16 @@ class MyManage extends mk.bundle.BundleManageBase {
 ## 常见问题（FAQ）
 
 **Q：为什么在编辑器里看不到子 bundle 管理器的 `open`？**
+
 A：编辑器模式仅自动运行 main bundle 的生命周期，子 bundle 的管理器在编辑器下不会自动 `open`（除非手动运行）。
 
 **Q：什么时候触发 `beforeBundleSwitch` / `afterBundleSwitch`？**
+
 A：仅在真实切换 bundle（`bundle.name !== this._bundleStr`）时触发；在 `loadScene` 的切换流程中，先发 `beforeBundleSwitch`，成功切换后会发 `afterBundleSwitch`。监听者可通过 `event.request` 阻塞或异步等待。
 
 **Q：reload 会卸载哪些东西？**
-A：reload 会尝试清理脚本缓存（System / scriptCache）、注销 ccclass、释放 bundle 资源并从 `assetManager` 中移除旧 bundle。务必保证没有遗留的全局引用或未释放资源，否则可能抛异常或行为异常。`reload` 不在 PREVIEW 模式下支持。
 
-**Q：main bundle 能被 `close()` 吗？**
-A：`BundleManageBase.close()` 内禁止关闭 `main`（会抛异常 `"中断"`）。不要尝试关闭 main bundle。
+A：reload 会尝试清理脚本缓存（System / scriptCache）、注销 ccclass、释放 bundle 资源并从 `assetManager` 中移除旧 bundle。务必保证没有遗留的全局引用或未释放资源，否则可能抛异常或行为异常。`reload` 不在 PREVIEW 模式下支持。
 
 ---
 

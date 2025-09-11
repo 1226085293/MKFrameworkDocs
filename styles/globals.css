@@ -217,25 +217,6 @@ td > code {
     word-break: keep-all !important;
 }
 
-/* components.css */
-/* .prose h1 > .anchor-link > .heading-anchor,
-.prose h2 > .anchor-link > .heading-anchor,
-.prose h3 > .anchor-link > .heading-anchor,
-.prose h4 > .anchor-link > .heading-anchor {
-    @apply inline-block opacity-0 -translate-x-2 transition-all duration-500 ease-in-out ml-2 font-semibold;
-}
-
-.prose h1:hover > .anchor-link > .heading-anchor,
-.prose h2:hover > .anchor-link > .heading-anchor,
-.prose h3:hover > .anchor-link > .heading-anchor,
-.prose h4:hover > .anchor-link > .heading-anchor,
-.prose h1:focus-within > .anchor-link > .heading-anchor,
-.prose h2:focus-within > .anchor-link > .heading-anchor,
-.prose h3:focus-within > .anchor-link > .heading-anchor,
-.prose h4:focus-within > .anchor-link > .heading-anchor {
-    @apply opacity-100 translate-x-0;
-} */
-
 .heading-anchor {
     margin-left: 0.5rem;
     font-weight: normal;
@@ -247,4 +228,8 @@ td > code {
 
 .heading-anchor:hover {
     color: #333;
+}
+
+blockquote {
+    font-style: normal !important;
 }
