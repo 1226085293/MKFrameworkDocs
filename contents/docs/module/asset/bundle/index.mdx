@@ -4,11 +4,12 @@ description: Bundle 管理：加载 / 预加载 / 场景切换 / 热更 与 管�
 order: 1
 ---
 
-本文以工程实战角度说明框架内的 **Bundle 管理器 `mk.bundle`（`MKBundle`）** 的使用方法、重要约定与实现要点。内容覆盖：模块概览、主要 API、Bundle 生命周期、Bundle 管理器基类(`BundleManageBase`)、使用示例、常见陷阱与 PlantUML 图示，便于快速上手并避免误用。
+{/* prettier-ignore */}
+<Note type="note" title="前置知识">
+	- 引擎内置 Bundle: https://docs.cocos.com/creator/3.8/manual/zh/asset/bundle.html#%E5%86%85%E7%BD%AE-asset-bundle
+</Note>
 
----
-
-## 模块概览
+## 介绍
 
 `mk.bundle` 封装 bundle 的加载 / 场景加载 / 预加载 / 热更，并提供 bundle/scene 切换事件和「bundle 管理器」机制用于子游戏或模块化管理。
 
@@ -23,14 +24,37 @@ order: 1
 
 ---
 
-## 重要概念与属性
+## 属性
 
--   `bundleMap: Map<string, BundleData>`：已知的 bundle 信息表（`BundleInfo` + 可选 `manage`）。
+### event
 
--   `bundleStr`：当前运行场景所属 bundle（getter/setter 会触发 bundle 切换流程）。
--   `sceneStr`：当前场景名（setter 会触发场景切换事件）。
--   `isSwitchScene`：当前是否处于场景切换流程中（loadScene 期间为 true）。
--   事件：`beforeBundleSwitch` / `afterBundleSwitch` / `beforeSceneSwitch` / `afterSceneSwitch`（通过 `mk.bundle.event` 订阅）。
+bundle 事件，使用方式参考 [此处](../../getting-started/quick-start-guide/event)，提供如下事件
+
+-   `beforeBundleSwitch`: bundle 切换前事件
+
+-   `afterBundleSwitch`: bundle 切换后事件
+-   `beforeSceneSwitch`: 场景切换前事件
+-   `afterSceneSwitch`: 场景切换后事件
+
+### bundleMap
+
+bundle 信息表，用于存储 `set` 接口的数据
+
+### sceneStr
+
+只读，当前场景名
+
+### bundleStr
+
+只读，当前场景所属 bundle 名
+
+### preBundleStr
+
+只读，上个场景所属 bundle 名
+
+### isSwitchScene
+
+只读，当前是否处于场景切换流程中（loadScene 期间为 true）
 
 ---
 
@@ -38,9 +62,19 @@ order: 1
 
 ### set
 
+更新 bundle 信息，数据将存储在 `bundleMap` 中，后续 `load`/`loadScene` 会使用它
+
+#### 参数
+
 `set(bundleInfo)`
 
-注册或更新 bundle 信息（不会自动加载 bundle），示例：
+-   `bundleInfo`: bundle 信息
+
+-   `bundleInfo.bundleStr`: bundle 名
+-   `bundleInfo.originStr`: 远程路径，本地 Bundle 可为空
+-   `bundleInfo.versionStr`: bundle 版本（打包时的 md5）
+
+#### 示例
 
 ```ts
 mk.bundle.set({
@@ -50,120 +84,100 @@ mk.bundle.set({
 });
 ```
 
-`bundleMap` 会把该信息保存为 `BundleData`，后续 `load`/`loadScene` 会使用它。
-
 ---
 
 ### load
 
-`load(bundleName | LoadConfig): Promise<AssetManager.Bundle | null>`
+加载 bundle，若已存在则直接返回
 
-加载 bundle（若已存在则直接返回）。常见用法：
+#### 参数
 
-```ts
-// 简单加载
-await mk.bundle.load('subgame1');
+`load(bundleName)`
+`load(loadConfig)`
 
-// 带进度回调
-await mk.bundle.load({
-    bundleStr: 'subgame1',
-    progressCallbackFunc: (c, t) => {
-        /** 进度回调 */
-    },
-});
-```
+-   `bundleName`: bundle 名，其他数据从 `bundleMap` 获得
 
-行为要点：
-
--   等待引擎初始化完成（`game` 的 `EVENT_GAME_INITED`）。
-
--   若 bundle 已在 `assetManager` 中，则直接返回并触发一次 `progressCallbackFunc(1,1)`（用于兼容 UI 进度）。
--   若需下载，会走 `assetManager.loadBundle(originStr, {version, onFileProgress}, cb)`。对于非远程 bundle，会在加载成功后模拟一次完成回调（`progressCallbackFunc(1,1)`）。
+-   `loadConfig`: 加载配置
+-   `loadConfig.bundleStr`: bundle 名
+-   `loadConfig.versionStr`: bundle 版本
+-   `loadConfig.originStr`: bundle 远程路径
+-   `loadConfig.progressCallbackFunc`: 加载进度回调
 
 ---
 
 ### loadScene
 
-`loadScene(sceneName, SwitchSceneConfig): Promise<boolean>`
+加载/预加载场景
 
-切换场景（支持预加载）。用法示例：
+#### 参数
 
-```ts
-await mk.bundle.loadScene('MainScene', {
-    bundleStr: 'main', // 要切到哪个 bundle 的场景
-    progressCallbackFunc: (f, t) => {}, // 预加载进度（可选）
-    beforeLoadCallbackFunc: directorOnBeforeLoad, // 场景加载前回调
-});
-```
+`loadScene(sceneStr_, config_)`
 
-关键流程与行为：
+-   `sceneStr_`: 场景名
+-   `config_`: bundle 配置
+-   `config_.bundleStr`: bundle 名
+-   `config_.isPreload`: 是否是预加载，默认 false
+-   `config_.progressCallbackFunc`: 加载进度回调，可选
+-   `config_.beforeLoadCallbackFunc`: 加载前调用的函数，可选
+-   `config_.launchedCallbackFunc`: 启动后调用的函数，可选
+-   `config_.unloadedCallbackFunc`: 场景卸载后回调，可选
 
-1. 等待 MKBundle 初始化任务完成；
-2. 根据 `config.bundleStr` 找到或创建对应 `BundleInfo` 并调用 `load()`；
-3. 如果 `config.progressCallbackFunc` 存在，则先 `preloadScene`（支持进度回调）；
-4. 如果不是预加载并且 preload 成功：
-
-    - 标记 `isSwitchScene = true`；
-
-    - 若即将切换的 bundle 与当前 `bundleStr` 不同，会 `event.request(beforeBundleSwitch)`（可被拦截/等待）；
-    - 发 `beforeSceneSwitch` 事件并等待所有监听完成；
-    - 调用 `bundle.loadScene(sceneName, cb)`，完成后 `director.runScene(sceneAsset, beforeLoadCallback, onLaunched)`；
-    - 成功后更新 `bundleStr`/`preSceneStr`/`sceneStr` 并触发 `afterBundleSwitch` / `afterSceneSwitch`；
-    - 无论成功与否，最终把 `isSwitchScene` 置回 `false`。
-
-> 注意：如果 `config.isPreload === true`，只做预加载并返回是否成功，不走切场景逻辑。
+> 注意：如果 `config_.isPreload === true`，只做预加载并返回是否成功，不走切场景逻辑。
 
 ---
 
 ### reload
 
-`reload(ReloadBundleInfo): Promise<AssetManager.Bundle | null>`（热更）
+用于热更 bundle（替换脚本、资源）
 
-用于热更/重载某个 bundle（替换脚本、资源）。**限制**：在 PREVIEW 模式下不支持重载；不能在正在运行该 bundle 的场景内重载（必须在其他 bundle 场景下）。
+{/* prettier-ignore */}
+<Note type="warning" title="注意">
+    PREVIEW 模式不支持重载
 
-`reload` 的主要步骤（实现细节）：
+    不能在正在运行该 bundle 的场景内重载（防止资源被释放报错）
 
--   验证 `versionStr` 与非在当前 bundle 场景中；
+</Note>
 
--   收集并清理系统脚本缓存（System / scriptCache），删除该 bundle 的脚本模块；
--   注销、清理 ccclass（通过 `js.unregisterClass`）；
--   清理并 `releaseAll`（非 main bundle）并从 `assetManager` 移除原 bundle；
--   更新 `assetManager.downloader.bundleVers` 的版本号映射；
--   最后调用 `load(bundleInfo)` 重新加载新 bundle。
+#### 参数
 
-> 注意：reload 过程会**卸载旧脚本/资源**，若存在跨 bundle 单例或未清理的全局引用，会导致错误。热更前请确保所有 bundle 管理器/模块已正确清理。
+`reload(bundleInfo_)`
 
----
+-   `bundleInfo_`: bundle 信息
 
-## BundleManageBase（管理器基类）
+-   `bundleInfo_.bundleStr`: bundle 名
+-   `bundleInfo_.versionStr`: bundle 版本，可选
+-   `bundleInfo_.originStr`: bundle 远程路径，可选
+-   `bundleInfo_.ccclassRegexp`: 匹配 ccclass 名称正则表达式，可选
+-   `bundleInfo_.progressCallbackFunc`: 加载进度回调，可选
 
-`BundleManageBase` 提供 bundle 级管理能力：对象池、事件、网络、数据获取器以及 `followRelease`/`cancelRelease` 的实现。常用于把 bundle 内的通用资源、网络接口、共享数据放在一个地方，示例场景：子游戏管理器、功能侧模块集合管理。
+#### 必要条件
 
-关键点：
+**获取 ccclass 组件类型**：由于内部会清理 ccclass 组件脚本缓存，所以你必须确保框架能获取到 ccclass 类型才能使用 `reload`，
+框架内部使用以下方式获取 ccclass 类型
 
--   `abstract nameStr: string`：子类必须提供 bundle 名。构造时会自动把实例注册到 `mk.bundle.bundleMap`。
+    - **ccclass 装饰器参数匹配**
 
--   构造阶段会在下帧把自己加入 `mk.bundle`，并在非 EDITOR 环境运行父类生命周期 `init`/`open`/`close`（`mkToolFunc.runParentFunc`）。
--   `nodePoolTab`：按需创建 `NodePool`，方便复用节点。
--   `followRelease(object)` / `cancelRelease(object)`：通过内部 `_releaseManage` 管理对象释放，当管理器 `close()` 时会 `releaseAll()`。
--   生命周期约定：在编辑器模式仅 main bundle 的生命周期会自动跑（子 bundle 管理器在编辑器不会自动 open），`init()` 在从其他 bundle 切换到该 bundle 场景前调用，`open()` 在切换到该 bundle 场景时调用，`close()` 在从该 bundle 切出时调用。`close()` 会清理事件、网络事件、data、对象池，并释放所有跟随对象。
+        框架内置的正则匹配是 `$\{bundle名}(_|/)\`，以 `reload` resources bundle 举例
+        ```ts
+        @ccclass("resources/A")
+        class ResourcesA { ... }
 
-示例：
+        @ccclass("resources_A")
+        class ResourcesA { ... }
+        ```
+        上面两种方式都能让框架正常清理 `ResourcesA` 缓存，你也可以传递自己的正则表达式(`bundleInfo_.ccclassRegexp`)
 
-```ts
-class MyBundleManage extends mkBundle.BundleManageBase {
-    nameStr = 'subgame1';
-    async init() {
-        /* init resources */
-    }
-    async open() {
-        /* start services */
-    }
-    close() {
-        /* cleanup */
-    }
-}
-```
+
+    - **导出 ccclass 类型**
+
+        ```ts
+        @ccclass("resourcesA")
+        export class ResourcesA { ... }
+        ```
+
+        使用 `export` 关键字导出 class 也能让框架拿到正常清理 `ResourcesA` 缓存
+
+> 注意：reload 过程会**卸载旧脚本/资源**，若存在跨 bundle 单例或未清理的全局引用、定时器、事件等，会导致错误。热更前请确保 bundle 数据被已正确清理
 
 ---
 
@@ -176,7 +190,7 @@ mk.bundle.set({ bundleStr: 'subgame1', originStr: 'https://cdn/x/subgame1' });
 await mk.bundle.load('subgame1');
 ```
 
-**切换场景（含预加载）：**
+**切换场景：**
 
 ```ts
 const ok = await mk.bundle.loadScene('Level01', {
@@ -190,36 +204,20 @@ if (!ok) {
 }
 ```
 
-**热更 bundle（谨慎）：**
+**热更 bundle：**
 
 ```ts
 await mk.bundle.reload({
     bundleStr: 'subgame1',
-    versionStr: '2025-08-01-01',
+    versionStr: '0d5a2d',
     originStr: 'https://cdn/x/subgame1',
     ccclassRegexp: /subgame1(_|\/)/,
 });
 ```
 
-**在 bundle 管理器里注册可被自动释放的对象：**
-
-```ts
-class MyManage extends mk.bundle.BundleManageBase {
-  nameStr = 'subgame1';
-  open() {
-    const obj = mk.asset.get(...);
-    this.followRelease(obj); // 会在 close 时被 releaseAll
-  }
-}
-```
-
 ---
 
 ## 常见问题（FAQ）
-
-**Q：为什么在编辑器里看不到子 bundle 管理器的 `open`？**
-
-A：编辑器模式仅自动运行 main bundle 的生命周期，子 bundle 的管理器在编辑器下不会自动 `open`（除非手动运行）。
 
 **Q：什么时候触发 `beforeBundleSwitch` / `afterBundleSwitch`？**
 
