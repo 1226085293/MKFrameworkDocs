@@ -12,6 +12,12 @@ order: 1
 
 ## 属性面板
 
+### 类型
+
+`addLabel` 的首个参数，例如示例代码中的 "多语言类型名"
+
+属性名: `typeStr`
+
 <Note type="note" title="示例代码">
 ```ts
 mk.languageManage.addLabel('多语言类型名', {
@@ -23,13 +29,20 @@ mk.languageManage.addLabel('多语言类型名', {
 ```
 </Note>
 
-### 类型
-
-`addLabel` 的首个参数，例如示例代码中的 "多语言类型名"
-
 ### 语言标识
 
 `addLabel` 数据对象中的键，例如示例代码中的 "示例"
+
+属性名: `markStr`
+
+### 参数
+
+多语言数据中的参数列表
+以示例代码举例，如果参数填写 `123` 则结果为 `示例-123`
+
+属性名: `argsStrList`
+
+[配置参考此处](./manage#配置/多语言参数前后缀)
 
 ### 水平对齐适配
 
