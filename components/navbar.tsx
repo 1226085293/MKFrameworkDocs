@@ -106,7 +106,7 @@ export function NavMenu({ isSheet = false }: { isSheet?: boolean }) {
         // { title: "Guides", href: "#" },
         {
             title: '讨论',
-            href: `${siteConfig.projectRepo}/discussions`,
+            href: siteConfig.discussionUrl,
         },
     ];
 

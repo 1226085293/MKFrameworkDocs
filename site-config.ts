@@ -3,6 +3,8 @@ class SiteConfig {
     authorLink = 'https://github.com/1226085293';
     /** 项目仓库 */
     projectRepo = 'https://github.com/1226085293/MKFramework';
+    /** 讨论地址 */
+    discussionUrl = 'https://forum.cocos.org/t/topic/159492/70';
     /** 站点仓库集合 */
     siteRepos: Record<string, string> = {
         github: 'https://github.com/1226085293/MKFrameworkDocs',
