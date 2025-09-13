@@ -12,20 +12,20 @@ order: 0
 
 ## 创建引导步骤
 
-### 推荐结构
+`XXX` 可替换为你的引导系统名称，例如 `Lobby`、`Game` 等，以便更好地组织模块。
 
-我们建议采用 **继承机制** 来组织引导步骤，以便更好地管理和复用代码。
+### 1. 创建引导步骤基类
 
-#### 创建引导步骤基类
+> 如果你不使用 [操作表](../guide#概念必读)，此步骤可忽略
 
-首先，创建一个通用的引导步骤基类，继承自 `mk.GuideStepBase<typeof XXXGuideOperate.tab>`，其中 `XXXGuideOperate.tab` 是你在 [操作表](../guide#概念必读) 中定义的操作单元。
+首先，创建一个通用的引导步骤基类，继承自 `mk.GuideStepBase<typeof XXXGuideOperate.tab>`，其中 `XXXGuideOperate.tab` 是你在操作表中定义的操作单元。
 
 ```ts:XXXGuideStepBase.ts
 // 示例：引导步骤基类
 export abstract class XXXGuideStepBase extends mk.GuideStepBase<typeof XXXGuideOperate.tab> {}
 ```
 
-#### 派生子类
+### 2. 创建引导步骤类型
 
 然后，让具体的引导步骤继承该基类，并实现相应的逻辑。
 
@@ -37,24 +37,25 @@ class XXXGuideStepA extends XXXGuideStepBase {
 }
 ```
 
-> **提示**：`XXX` 可替换为你的引导系统名称，例如 `Lobby`、`Game` 等，以便更好地组织模块。
+### 3. 使用引导步骤
+
+由于 `mk.GuideStepBase` 继承自 `Component`，你可以选择以下两种方式之一来使用：
+
+-   **将其挂载到节点上**
+
+-   **直接使用 `new` 实例化**
 
 ---
 
 ## 注册步骤
 
-虽然你已经创建了引导步骤脚本，但还需要将其注册到管理器中才能生效。
-
-由于 `mk.GuideStepBase` 继承自 `Component`，你可以选择以下两种方式之一来实例化：
-
--   **挂载到节点上**
--   **直接使用 `new` 实例化**
-
-无论哪种方式，最终都需要调用引导管理器的 `regis` 方法完成注册：
+注册步骤就是将其保存到引导管理器，使用引导管理器的 [regis](./manage#方法详解/注册步骤) 方法来注册步骤
 
 ```ts
-const stepInstance = new XXXGuideStepA();
-guideManage.regis(stepInstance);
+// 使用 new 的对象注册
+guideManage.regis([new XXXGuideStepA(), ...]);
+// 使用节点组件对象注册
+guideManage.regis([node.getComponent(XXXGuideStepA), ...]);
 ```
 
 ---
