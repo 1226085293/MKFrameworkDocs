@@ -25,25 +25,67 @@ export class ResourcesAudio extends mk.ViewBase {
 
 ## 属性
 
--   `readonly groupIdNumList`: 当前所在分组 ID 列表
--   `readonly state`: 播放状态
--   `readonly waitPlayNum`: 等待播放次数
--   `readonly totalTimeSNum`: 总时长（秒）
--   `readonly event`: 音频事件对象，可用于监听音频状态变化
--   `readonly type`: 音频类型
--   `readonly realVolumeNum`: 真实音量
--   `readonly audioSource`: 音频组件，微信环境下为 null
--   `clip`: 音频资源
--   `volumeNum`: 音量
--   `isLoop`: 是否循环
--   `currentTimeSNum`: 当前时间（秒）
--   `isWaitPlay`: 等待播放开关
+### groupIdNumList
+
+当前所在分组 ID 列表，只读
+
+### state
+
+播放状态，只读
+
+### waitPlayNum
+
+等待播放次数，只读
+
+### totalTimeSNum
+
+总时长（秒），只读
+
+### type
+
+音频类型，只读
+
+### realVolumeNum
+
+真实音量，只读
+
+### audioSource
+
+音频组件，微信环境下为 null，只读
+
+### event
+
+音频事件对象，可用于监听音频状态变化
+
+### clip
+
+音频资源，AudioClip 类型
+
+### volumeNum
+
+音量
+
+### isLoop
+
+是否循环
+
+### currentTimeSNum
+
+当前时间（秒）
+
+### isWaitPlay
+
+等待播放开关
+
+---
 
 ## 方法
 
 ### clone
 
 克隆自身，返回一个新的音频单元对象，用于控制重叠播放
+
+---
 
 ## 概念
 

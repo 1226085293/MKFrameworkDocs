@@ -176,9 +176,9 @@ async function requestWithRetry(url: string, config: Http_.Config, retries = 3) 
 
 ## 常见问题（FAQ）
 
-### 如何发送 FormData 请求？
+**Q: 如何发送 FormData 请求？**
 
-通过 `body` 传递 `FormData` 对象：
+A: 通过 `body` 传递 `FormData` 对象：
 
 ```ts
 const formData = new FormData();
@@ -187,12 +187,3 @@ const response = await mk.network.http.post('https://api.example.com/upload', {
     body: formData,
 });
 ```
-
-### 如何处理大文件上传？
-
--   使用 `returnType: 'arraybuffer'` 接收二进制数据
--   在 `openCallbackFunc` 中注册 `onprogress` 事件监控上传进度
-
-### 如何支持 HTTPS？
-
-直接传递 HTTPS URL 即可，无需额外配置。

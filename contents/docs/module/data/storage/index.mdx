@@ -14,7 +14,7 @@ order: 0
     用于全局使用，但像游戏中的多账号多角色，以及多人开发解耦只有多个 storage 才更适合
 </Note>
 
-### 创建
+## 创建
 
 ```ts
 class StorageData {
@@ -36,34 +36,50 @@ let storage = new mk.Storage({
 | codec | [编解码器](../other/codec)（可选），用于对存储数据加密/解密 |
 | writeIntervalMsNum | 写入间隔时间（可选，单位毫秒），每次存储都会等待间隔时间，防止过于频繁的存储导致卡顿 |
 
-## 主要接口
+## 属性
 
 ### key
 
+数据键，你可以通过 `key` 属性获取到所有的存储键，可让编辑器自动提示且方便同步修改键名
+
+#### 示例
+
 `storage.key`
 
-数据键，你可以通过 `key` 属性获取到所有的存储键，可让编辑器自动提示且方便同步修改键名
+---
+
+## 方法
 
 ### get
 
+获取数据，如果数据不存在，则会返回构造参数中的 `data` 中对应的值，如果数据仍然不存在则返回 `null`
+
+#### 示例
+
 `storage.get(storage.key.testStr)`
 
-获取数据，如果数据不存在，则会返回构造参数中的 `data` 中对应的值，如果数据仍然不存在则返回 `null`
+---
 
 ### set
 
-`storage.set(storage.key.testStr, "")`
-
 存储数据，以 Json 的格式存储到本地，如果不存在 `nameStr` 则暂时存储在缓存中，设置 `nameStr` 后自动转移到本地
+
+---
 
 ### del
 
+删除数据，如果你想要删除本地数据时则调用这个接口，如果不存在 `nameStr` 则只会清理缓存数据
+
+#### 示例
+
 `storage.del(storage.key.testStr)`
 
-删除数据，如果你想要删除本地数据时则调用这个接口，如果不存在 `nameStr` 则只会清理缓存数据
+---
 
 ### clear
 
-`storage.clear()`
-
 清空当前存储器数据，`del` 是删除指定 key 的数据，`clear` 就是删除所有数据，同样如果不存在 `nameStr` 则只会清理缓存数据
+
+#### 示例
+
+`storage.clear()`

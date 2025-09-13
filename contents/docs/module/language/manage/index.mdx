@@ -50,7 +50,7 @@ order: 0
 
 多语言系统的配置位于 `GlobalConfig.Language` 下。
 
-### 1. 多语言种类
+### 多语言种类
 
 在 `privateTypeTab` 中定义支持的语言类型，例如：
 
@@ -63,7 +63,7 @@ zhCn: {
 
 上述代码定义了一个名为 `zhCn` 的语言类型，其文本方向为从左到右。
 
-### 2. 默认语种
+### 默认语种
 
 通过 `defaultTypeStr` 配置默认语言类型：
 
@@ -71,7 +71,7 @@ zhCn: {
 defaultTypeStr: types.zhCn;
 ```
 
-### 3. 多语言参数前后缀
+### 多语言参数前后缀
 
 通过 `argsHeadStr` 和 `argsTailStr` 配置参数占位符。
 
@@ -269,17 +269,17 @@ const key = labelData.key.示例;
 
 ---
 
-## 常见问题
+## 常见问题（FAQ）
 
-### Q：如何支持新的语言类型？
+**Q：如何支持新的语言类型？**
 
 A：在 `GlobalConfig.Language.privateTypeTab` 中添加新的语言类型，并确保 `defaultTypeStr` 指向一个有效的语言类型。
 
-### Q：如何实现多语言参数的动态替换？
+**Q：如何实现多语言参数的动态替换？**
 
 A：通过 `argsStrList` 参数传递参数数组，例如 `argsStrList = ['123', '456']`，则 `{0}` 替换为 `123`，`{1}` 替换为 `456`。
 
-### Q：如何监听语言切换事件？
+**Q：如何监听语言切换事件？**
 
 A：通过 `event` 属性监听 `switchLanguage` 事件：
 
@@ -288,9 +288,3 @@ mk.languageManage.event.on(mk.languageManage.event.key.switchLanguage, () => {
     console.log('语言已切换');
 });
 ```
-
----
-
-## 总结
-
-多语言管理器通过模块化设计和灵活的配置，提供了高效的多语言管理方案。通过 `addLabel`、`addTexture`、`getLabel` 和 `getTexture` 方法，你可以轻松实现多语言支持。同时，框架还提供了类型安全和外部 key 等扩展功能，以满足更复杂的需求。

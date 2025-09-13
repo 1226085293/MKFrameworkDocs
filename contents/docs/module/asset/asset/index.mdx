@@ -4,36 +4,29 @@ description: 资源的加载、释放、管理
 order: 0
 ---
 
-## 模块概览
+## 介绍
 
 `mk.asset` 负责：
 
 -   统一加载接口为：`get` 和 `getDir`。
 
--   兼容三种加载场景：本地资源、编辑器（EDITOR）、远程资源
+-   兼容三种加载场景：本地资源、远程资源、编辑器（EDITOR）
 -   管理引用计数与延迟回收，避免短时间内重复加载释放同一资源
 -   支持资源跟随释放，把资源与对象的生命周期绑定
 -   释放时清理资源的动态合图（如果启用）
 -   路径优化：自动处理图片后缀（`SpriteFrame` / `Texture2D`），自动去掉文件扩展名
 
-使用时优先把资源的生命周期 **交给框架管理**（通过 `followRelease`），必要时可手动 `mk.asset.release(...)`。
+## 方法
 
-## 加载本地资源
+### get
 
-在框架中可以通过 `mk.asset.get` 接口加载本地资源，但是如何用好它节省工作量呢？
+get 接口用于加载单个资源，支持本地、远程、编辑器环境
+
+#### 参数
 
 ```ts
-get<T extends Asset>(
-    pathStr_: string,
-    type_: Constructor<T>,
-    target_: MKAsset_.TypeFollowReleaseObject | null,
-    config_?: MKAsset_.GetConfig<T>
-): Promise<T | null>;
+get(pathStr_, type_, target_, config_?)
 ```
-
-这里一共有四个参数，依次说明
-
-### 参数
 
 -   `pathStr_`: 资源路径
 
@@ -41,11 +34,11 @@ get<T extends Asset>(
 
         路径可以传递多种格式，这里以 `asset/resources/test/image.png` 举例
 
-        1.  全路径：`db://resources/test/image.png`
+        1. 全路径：`db://resources/test/image.png`
 
             这里会默认后`db://`后的第一个`/`前的文本为 bundle 名，示例中为 `resources`
 
-        1.  bundle 内路径：`test/image.png`，但是需要在 `config_` 参数传递 bundle 名，稍后会知道
+        1. bundle 内路径：`test/image.png`，但是需要在 `config_` 参数传递 bundle 名，稍后会知道
 
     -   **路径优化**
 
@@ -56,9 +49,11 @@ get<T extends Asset>(
         -   图片格式补充后缀名：默认情况下，加载图片资源需要带有 `/spriteFrame` 或 `/texture` 后缀，
             如果你没加后缀的情况下，框架会通过第二个 `type_` 参数自动为你添加后缀
 
--   `type_`: 资源类型
+    -   **编辑器环境**
 
-    例如 Prefab, SpriteFrame, Texture2D 等...
+        在编辑器环境下加载资源，你必须传递 db 路径，例如 `'db://xxx/xxx.png'`
+
+-   `type_`: 资源类型，例如 Prefab, SpriteFrame, Texture2D 等...
 
 -   `target_`: 资源跟随释放对象
 
@@ -67,120 +62,73 @@ get<T extends Asset>(
     什么是 **资源跟随释放对象**？ 资源跟随释放对象的类型是 `MKRelease_.TypeFollowReleaseObject<Asset>`，有两个函数
     ![跟随释放对象类型](/docs/f9dfeba8-7279-4679-848b-baceabf87b20.png)
 
-    followRelease：在资源加载完成时调用，然后由跟随释放对象自己决定什么时候调用资源的 `decRef`，
-    目前框架中已扩展的类型有 `mk.LifeCycle` 和 `mk.Bundle_.BundleManageBase`，
+    followRelease: `mk.asset` 会在资源加载完成时调用跟随释放对象的 `followRelease`，然后由跟随释放对象自己决定什么时候调用资源的 `decRef`
+
+    目前框架中已扩展的类型有 `mk.LifeCycle` 和 `mk.Bundle_.BundleManageBase`
 
     -   `mk.LifeCycle`
 
-        作为 `mk.LifeCycle` 的子类，如果你传递 `mk.ViewBase`, `mk.StaticViewBase`, `mk.SceneDrive` 类型的对象，资源可以在生命周期的 lateClose 中释放
+        作为 `mk.LifeCycle` 的子类，如果你传递 `mk.ViewBase`, `mk.StaticViewBase`, `mk.SceneDrive` 类型的对象，资源会在生命周期的 lateClose 中被减少引用计数
 
     -   `mk.Bundle_.BundleManageBase`
 
-        这是 bundle 管理器，你可以在下一篇文章中了解它，如果你传递这个类型的对象，资源会在从当前 bundle 的 scene 切换到其他 bundle 的 scene 后，
-        资源会被释放
+        bundle 管理器，你可以在下一篇文章中了解它，如果你传递这个类型的对象，资源会在从当前 bundle 的 scene 切换到其他 bundle 的 scene 后，
+        资源会被减少引用计数
 
--   `config_`：加载配置
+-   `config_`: 加载配置，可选
+-   `config_.bundleStr`: bundle 名
 
-    | 属性            | 描述                                                                                                                                                                                                                                   |
-    | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-    | `bundleStr`     | bundle 名，编辑器：resources，运行时：当前场景所属 bundle                                                                                                                                                                              |
-    | `progressFunc`  | 进度回调                                                                                                                                                                                                                               |
-    | `completedFunc` | 完成回调                                                                                                                                                                                                                               |
-    | `remoteOption`  | 远程配置，存在则为远程资源，配置数据参考[官方文档](https://docs.cocos.com/creator/3.8/manual/zh/asset/dynamic-load-resources.html#%E5%8A%A0%E8%BD%BD%E8%BF%9C%E7%A8%8B%E8%B5%84%E6%BA%90%E5%92%8C%E8%AE%BE%E5%A4%87%E8%B5%84%E6%BA%90) |
-    | `retryNum`      | 失败重试次数，默认值为 GlobalConfig.Asset.Config.retryCountOnLoadFailureNum                                                                                                                                                            |
+    默认值：编辑器：resources，运行时：当前场景所属 bundle
 
-## 加载远程资源
+-   `config_.progressFunc`: 进度回调
+-   `config_.completedFunc`: 完成回调
+-   `config_.remoteOption`: 远程配置，存在则为远程资源，配置数据参考[官方文档](https://docs.cocos.com/creator/3.8/manual/zh/asset/dynamic-load-resources.html#%E5%8A%A0%E8%BD%BD%E8%BF%9C%E7%A8%8B%E8%B5%84%E6%BA%90%E5%92%8C%E8%AE%BE%E5%A4%87%E8%B5%84%E6%BA%90)
+-   `config_.retryNum`: 失败重试次数，默认值为 `GlobalConfig.Asset.Config.retryCountOnLoadFailureNum`
 
-远程资源依赖 `remoteOption` 配置，内部基于 `assetManager.loadRemote` 实现。
+### getDir
 
-```ts
-const tex = await mk.asset.get<Texture2D>('http://xxx.com/test.png', Texture2D, this, {
-    remoteOption: { ext: '.png' }, // 必填：指定扩展名
-    retryNum: 3, // 可选：失败重试次数
-});
-```
+getDir 接口用于加载文件夹资源，支持本地、远程环境
 
-要点：
+#### 参数
 
--   必须在 `remoteOption` 中指定文件扩展名（`.png` / `.jpg` 等），否则无法识别类型。
--   推荐传入跟随释放对象（如 View / Scene），避免忘记释放导致内存泄漏。
--   支持进度与完成回调，与本地资源保持一致。
-
----
-
-## 加载编辑器资源
-
-在 **EDITOR 环境** 下，可以直接加载 `resources` 目录内的资源，用于工具面板、预览器等场景。
+getDir 参数和 get 接口基本一致，`pathStr_` 传递文件夹路径即可
 
 ```ts
-const prefab = await mk.asset.get('db://xxx/xxx.png', Prefab, null, {
-    bundleStr: 'resources',
-});
+getDir(pathStr_, type_, target_, config_?)
 ```
 
-要点：
+### release
 
--   资源路径必须为 db 路径
--   常用于编辑器扩展（如 UI 编辑、配置预览）。
+强制释放资源或者资源列表
 
----
-
-## 加载文件夹资源
-
-通过 `getDir` 一次性加载目录下的所有资源。
+#### 参数
 
 ```ts
-getDir<T extends Asset>(
-    pathStr_: string,
-    type_: Constructor<T>,
-    target_: MKAsset_.TypeFollowReleaseObject | null,
-    config_?: MKAsset_.GetConfig<T>
-): Promise<T[]>;
+release(asset_);
 ```
 
-示例：
-
-```ts
-const sprites = await mk.asset.getDir('icons', SpriteFrame, this, {
-    bundleStr: 'resources',
-});
-
-for (const sp of sprites) {
-    // 使用 SpriteFrame
-}
-```
-
-说明：
-
--   目录路径与单文件路径规则一致（支持全路径和 bundle 路径）。
--   返回一个数组，顺序与资源在 `assetManager` 的遍历顺序保持一致。
--   适合加载整套图标、音效等批量资源。
+-   `asset_`: 资源或资源列表
 
 ---
 
 ## 常见问题（FAQ）
 
-1. **为什么有时资源没释放？**
+**Q：为什么有时资源没释放？**
 
-    - 检查是否正确传入了 `target_`（跟随释放对象）。
+A: 检查是否正确传入了 `target_`（跟随释放对象）。资源没被引用时会在缓存时间后才释放，配置在 `GlobalConfig.Asset.config.cacheLifetimeMsNum`
 
-    - 资源没被引用时会在缓存时间后才释放，配置在 `GlobalConfig.Asset.config.cacheLifetimeMsNum`
+**Q：远程资源需要手动释放吗？**
 
-2. **远程资源需要手动释放吗？**
+A: 如果你在加载时传递了 `target_`（跟随释放对象），资源会由 `target_` 控制何时释放。
+`target_` 传递 `null`，则代表手动管理，需手动调用 `decRef` 或 `mk.asset.release`。
 
-    - 如果你在加载时传递了 `target_`（跟随释放对象），资源会由 `target_` 控制何时释放。
+**Q：数组资源如何释放？**
 
-    - `target_` 传递 `null`，则代表手动管理，需手动调用 `decRef` 或 `mk.asset.release`。
+A: 和 `get` 得到的资源一致
 
-3. **数组资源如何释放？**
+**Q：我能直接用引擎提供的 `assetManager` 加载资源吗？**
 
-    - 和 `get` 得到的资源一致
-
-4. **我能直接用引擎提供的 `assetManager` 加载资源吗？**
-
-    - 可以，但会绕过引用计数与跟随释放机制，使用不当容易造成内存泄漏。
-
-    - 推荐始终用 `mk.asset` 提供的封装接口。
+A: 可以，但会绕过引用计数与跟随释放机制，使用不当容易造成内存泄漏。推荐始终用 `mk.asset` 提供的封装接口。
 
 ---
 

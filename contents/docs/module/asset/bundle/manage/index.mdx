@@ -1,0 +1,64 @@
+---
+title: 管理器
+order: 0
+---
+
+## 介绍
+
+`BundleManageBase` 是 Bundle 管理器基类，相当于 Bundle 级别的数据及对象共享中心，示例场景：子游戏、功能模块的共用对象共享中心
+
+## 属性
+
+### nameStr
+
+nameStr 代表了这是哪个 bundle 的管理器，必须继承
+
+### isValid
+
+管理器有效状态，如果在 Bundle 名为 `nameStr` 的 Bundle 内的场景时，此值为 true，否则为 false
+
+### nodePoolTab
+
+节点池表，你可以通过 `管理器对象.nodePoolTab["xxx"]` 的方法获取到一个 `NodePool` 节点池对象，在 `close` 时被清理
+
+### event
+
+[事件对象](../../../getting-started/quick-start-guide/event)，默认为空，如果此属性有值将在 `close` 时被调用 `clear` 清理所有事件
+
+### data
+
+[数据共享器](../../data/sharer)，默认为空，如果此属性有值将在 `close` 时被调用 `reset` 重置数据
+
+---
+
+## 生命周期函数
+
+### init
+
+从其他 bundle 的场景切换到此 bundle 的场景之前调用
+
+> 在编辑器环境下 main bundle 管理器 init 会被调用
+
+### open
+
+从其他 bundle 的场景切换到此 bundle 的场景时调用
+
+> 在编辑器环境下 main bundle 管理器 open 会被调用
+
+### close
+
+从此 bundle 的场景切换到其他 bundle 的场景时调用
+
+> main bundle 管理器的 close 不会被触发
+
+---
+
+## 示例
+
+```ts
+class MainBundle extends mk.Bundle_.BundleManageBase {
+    nameStr = 'main';
+}
+
+export default new MainBundle();
+```
