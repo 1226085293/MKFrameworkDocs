@@ -4,10 +4,9 @@
     "private": true,
     "scripts": {
         "dev": "next dev",
-        "build": "cross-env NODE_ENV=production next build",
+        "build": "cross-env NODE_ENV=production next build && next-sitemap && npm run postbuild",
         "preview": "cd out && npx http-server -c-1 --cors",
-        "build-preview": "npm run build && npm run preview",
-        "build:debug": "cross-env NEXT_DEBUG=true next build",
+        "postbuild": "node build-post",
         "start": "next start",
         "lint": "next lint",
         "contentlayer": "contentlayer build"
@@ -34,6 +33,7 @@
         "next": "15.0.4",
         "next-contentlayer": "^0.3.3",
         "next-mdx-remote": "^5.0.0",
+        "next-sitemap": "^4.2.3",
         "next-themes": "^0.3.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
