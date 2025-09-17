@@ -4,7 +4,7 @@ description: 基于框架的 MVVM 使用规范 —— View 带 view-only data，
 order: 2
 ---
 
-本文提供工程可直接复用的 MVVM 规范与模板。设计原则简明：
+本文提供工程 MVVM 规范与模板。设计原则简明：
 
 -   **View** 负责展示（持有 view-only `data` 并绑定 UI，公开受控的更新接口）
 -   **Control** 作为 **ViewModel / 命令中心**，负责处理用户输入、调用 Model API、并通过 **View 的公开函数** 请求 View 更新展示态
@@ -69,7 +69,9 @@ class MyModel extends mk.MVCModelBase {
 }
 ```
 
-### 2. View（视图层 — 持有 view-only `data` 并监听；对外提供更新接口）
+### 2. View（视图层）
+
+使用自身 data 作为视图绑定；对外提供更新接口
 
 ```ts
 class MyView extends mk.MVCViewBase<MyModel> {
@@ -143,7 +145,9 @@ class MyView extends mk.MVCViewBase<MyModel> {
 
 要点：对外仅暴露受控方法（`applyModelSnapshot`、`setToggleState` 等），内部才直接操作 `this.data`，从而保证更新路径可控。
 
-### 3. Control（ViewModel / 命令中心 — 仅调用 View 的事件与公开函数）
+### 3. Control（ViewModel / 命令中心）
+
+负责与 Model 通信，仅调用 View 的事件与公开函数
 
 ```ts
 class MyControl extends mk.MVCControlBase<MyModel, MyView> {
