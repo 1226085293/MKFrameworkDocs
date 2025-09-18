@@ -15,7 +15,7 @@ const allDocs = readJsonFile('./.contentlayer/generated/Doc/_index.json');
 module.exports = {
     siteUrl: 'https://mkframework.muzzik.cc', // 替换为你的域名
     generateRobotsTxt: true, // 自动生成 robots.txt
-    outputDir: './out', // 指定输出目录为 'out'
+    outDir: './out', // 指定输出目录为 'out'
     robotsTxtOptions: {
         policies: [
             { userAgent: '*', allow: '/' },
@@ -40,7 +40,6 @@ module.exports = {
         '*.css',
         '*.js'
     ],
-
     // 动态处理每个 URL 的配置
     transform: async (config, path) => {
         // 处理博客页面
@@ -71,7 +70,6 @@ module.exports = {
                     loc: path,
                     changefreq: 'monthly',
                     priority: 0.9,
-                    lastmod: doc.updatedAt ? new Date(doc.updatedAt).toISOString() : new Date().toISOString(),
                 };
             }
         }
@@ -81,7 +79,6 @@ module.exports = {
             loc: path,
             changefreq: config.changefreq,
             priority: config.priority,
-            lastmod: new Date().toISOString(),
         };
     },
 
@@ -109,7 +106,6 @@ module.exports = {
                 loc: `/docs/${doc.slug}`,
                 changefreq: 'monthly',
                 priority: 0.9,
-                lastmod: doc.updatedAt ? new Date(doc.updatedAt).toISOString() : new Date().toISOString(),
             });
         });
 
