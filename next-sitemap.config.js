@@ -27,7 +27,19 @@ module.exports = {
     priority: 0.7,
     sitemapSize: 5000, // 每个 sitemap 文件的最大 URL 数
     generateIndexSitemap: false, // 禁用生成 sitemap index 文件
-    exclude: ['/404', '/500'], // 排除特定页面
+    // 排除特定页面
+    exclude: [
+        '/404',
+        '/500',
+        '*.jpg',
+        '*.jpeg',
+        '*.png',
+        '*.gif',
+        '*.webp',
+        '*.svg',
+        '*.css',
+        '*.js'
+    ],
 
     // 动态处理每个 URL 的配置
     transform: async (config, path) => {
@@ -52,6 +64,9 @@ module.exports = {
             const doc = allDocs.find((doc) => doc.slug === pathName);
 
             if (doc) {
+                if (doc.noLink) {
+                    return null;
+                }
                 return {
                     loc: path,
                     changefreq: 'monthly',
@@ -86,6 +101,10 @@ module.exports = {
 
         // 添加文档页面
         allDocs.forEach((doc) => {
+            if (doc.noLink) {
+                return;
+            }
+
             result.push({
                 loc: `/docs/${doc.slug}`,
                 changefreq: 'monthly',
@@ -94,27 +113,6 @@ module.exports = {
             });
         });
 
-        // 添加根路径 /docs
-        const firstPage = getPageRoutes()[0];
-        if (firstPage) {
-            result.push({
-                loc: '/docs',
-                changefreq: 'monthly',
-                priority: 0.9,
-                lastmod: new Date().toISOString(),
-            });
-        }
-
         return result;
     },
 };
-
-// 辅助函数：获取页面路由
-function getPageRoutes() {
-    // 这里需要根据你的实际逻辑实现
-    // 例如，从 allDocs 中获取所有页面路由
-    return allDocs.map((doc) => ({
-        href: `/docs/${doc.slug}`,
-        title: doc.title,
-    }));
-}
