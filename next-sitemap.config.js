@@ -31,14 +31,6 @@ module.exports = {
     exclude: [
         '/404',
         '/500',
-        '*.jpg',
-        '*.jpeg',
-        '*.png',
-        '*.gif',
-        '*.webp',
-        '*.svg',
-        '*.css',
-        '*.js'
     ],
     // 动态处理每个 URL 的配置
     transform: async (config, path) => {
