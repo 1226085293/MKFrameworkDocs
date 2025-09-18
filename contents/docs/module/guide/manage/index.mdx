@@ -243,19 +243,19 @@ guide.isPause = false;
 
 **Q：如何中断引导？**
 
-A: 在 `stepUpdateCallbackFunc` 中返回 `null` 或 `undefined`。或者手动调用 `finish()` 或设置 `isPause = true`
+在 `stepUpdateCallbackFunc` 中返回 `null` 或 `undefined`。或者手动调用 `finish()` 或设置 `isPause = true`
 
 **Q：如何预加载资源？**
 
-A: 在步骤的 `preLoad()` 方法中加载资源，管理器会根据步骤脚本的 `nextStepNumList` 自动调用
+在步骤的 `preLoad()` 方法中加载资源，管理器会根据步骤脚本的 `nextStepNumList` 自动调用
 
 **Q：如何实现分支引导？**
 
-A: 设置 `nextStepNumList = [2, 3]`，表示多路径，然后在步骤中根据条件手动调用 `setStep(2)` 或 `setStep(3)`
+设置 `nextStepNumList = [2, 3]`，表示多路径，然后在步骤中根据条件手动调用 `setStep(2)` 或 `setStep(3)`
 
 **Q：如何跨场景引导？**
 
-A: 在步骤中设置 bundle 和 scene 名，例如 `sceneStr = "resources.lobby"`，管理器会自动切换场景并加载资源
+在步骤中设置 bundle 和 scene 名，例如 `sceneStr = "resources.lobby"`，管理器会自动切换场景并加载资源
 
 ---
 

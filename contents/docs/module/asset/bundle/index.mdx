@@ -221,11 +221,11 @@ await mk.bundle.reload({
 
 **Q：什么时候触发 `beforeBundleSwitch` / `afterBundleSwitch`？**
 
-A：仅在真实切换 bundle（`bundle.name !== this._bundleStr`）时触发；在 `loadScene` 的切换流程中，先发 `beforeBundleSwitch`，成功切换后会发 `afterBundleSwitch`。监听者可通过 `event.request` 阻塞或异步等待。
+仅在真实切换 bundle（`bundle.name !== this._bundleStr`）时触发；在 `loadScene` 的切换流程中，先发 `beforeBundleSwitch`，成功切换后会发 `afterBundleSwitch`。监听者可通过 `event.request` 阻塞或异步等待。
 
 **Q：reload 会卸载哪些东西？**
 
-A：reload 会尝试清理脚本缓存（System / scriptCache）、注销 ccclass、释放 bundle 资源并从 `assetManager` 中移除旧 bundle。务必保证没有遗留的全局引用或未释放资源，否则可能抛异常或行为异常。`reload` 不在 PREVIEW 模式下支持。
+reload 会尝试清理脚本缓存（System / scriptCache）、注销 ccclass、释放 bundle 资源并从 `assetManager` 中移除旧 bundle。务必保证没有遗留的全局引用或未释放资源，否则可能抛异常或行为异常。`reload` 不在 PREVIEW 模式下支持。
 
 ---
 
