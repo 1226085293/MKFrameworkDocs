@@ -1,0 +1,83 @@
+---
+title: 搭建公用框架仓库
+description:
+order: 0
+---
+
+## 介绍
+
+如果你修改了框架代码，但是你有几个项目都需要用你修改后的框架代码，不想要一个个复制粘贴，怎么简单的实现？
+有以下方式
+
+-   方式 1: 创建自己的框架仓库，同时可以自动合并 MK 框架的后续更新
+
+-   方式 2: 快速实现，只同步必要代码，但是后续需要手动合并 MK 框架的后续更新
+
+## 方式 1
+
+### 1. 创建框架仓库分支
+
+在 [github 或者 gitee](/docs/introduce#开源) 对框架仓库进行 Frok 操作
+
+![fork](/docs/b56fb92a-e51d-4bbb-a5fc-d2cec7b1ca22.png)
+
+如果你选择在 github 进行 Frok 操作，你还需要将其导入到 gitee 中
+
+### 2. 修改框架安装插件
+
+在 Cocos 商店[下载框架安装插件](/docs/getting-started/install)后，打开 `extensions\MKFramework\source\Install.ts` 文件，
+你会看到如下代码
+
+```ts:Install.ts
+/** 用户名 */
+const owner = "muzzik";
+/** 仓库路径 */
+const repo = "MKFramework";
+```
+
+将其中的 **用户名** 和 **仓库路径** 替换为你的 gitee 仓库信息
+
+> 例如：你的仓库链接为 `https://gitee.com/abc/MyMKFramework`，用户名就是 `abc`，仓库路径就是 `MyMKFramework`
+
+修改完成后，在插件根目录执行 `npm run build` 来编译插件
+
+![编译插件](/docs/f8a0231b-d8c0-44d6-9b12-cbc38798fb55.png)
+
+### 3. 打包插件安装包
+
+将插件源码打包为一个 zip
+
+![生成压缩包](/docs/dd73eafa486e45d39646864591b2ce57.png)
+
+### 其他项目使用
+
+1. 解压 zip
+
+将之前生成的 zip 解压到 `项目根目录\extensions\MKFramework`
+
+2. 安装框架
+
+执行步骤 2 及之后的所有步骤，[点此查看](/docs/getting-started/install)
+
+### 参考
+
+-   Fork 仓库与上游仓库的同步：https://zhuanlan.zhihu.com/p/715381563
+
+## 方式 2
+
+### 1. 创建仓库
+
+创建一个 gitee 仓库，然后上传 `项目根目录\extensions\MKFramework\assets\MKFramework` 下的代码到仓库
+
+### 2. 创建拉取脚本
+
+你可以创建一个批处理脚本，执行以下步骤
+
+1. 删除 `项目根目录\extensions\MKFramework\assets\MKFramework` 下所有内容
+2. 拉取 gitee 仓库的代码到本地的 `项目根目录\extensions\MKFramework\assets\MKFramework` 位置
+
+### 其他项目使用
+
+1. 安装原本的 MK 框架，详情请查看[安装步骤](/docs/getting-started/install)
+
+2. 执行你之前写的批处理脚本
