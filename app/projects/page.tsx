@@ -116,20 +116,6 @@ export default function ProjectsPage() {
     const loadProjects = useCallback(async () => {
         // 检查本地缓存
         const cachedData = localStorage.getItem('projects-cache');
-        const cachedTimestamp = localStorage.getItem('projects-cache-timestamp');
-
-        // 如果缓存未过期（1小时内），使用缓存数据
-        if (cachedData && cachedTimestamp) {
-            const now = new Date().getTime();
-            const cacheTime = parseInt(cachedTimestamp);
-
-            if (now - cacheTime < 60 * 60 * 1000) {
-                // 1小时缓存
-                setProjects(JSON.parse(cachedData));
-                setLoading(false);
-                return;
-            }
-        }
 
         if (!token) {
             setError('配置错误：缺少 GitHub Token');
@@ -253,15 +239,23 @@ function ProjectCard({ title, description, image, links }: any) {
                     </p>
                 </div>
 
-                {/* 修改点：按钮容器改为右下角对齐 */}
+                {/* 按钮容器 - 右下角 */}
                 <div className="mt-3 flex justify-end">
                     {hasMultipleLinks ? (
                         <div className="group/link relative">
-                            <button className="inline-flex items-center justify-between gap-2 text-sm font-medium text-primary bg-primary/5 rounded-full px-4 py-2 cursor-default">
+                            {/* 悬停缓冲区域 - 按钮上方 */}
+                            <div className="absolute bottom-full left-0 right-0 h-4 opacity-0 group-hover/link:opacity-100 transition-opacity"></div>
+
+                            <button className="relative z-10 inline-flex items-center justify-between gap-2 text-sm font-medium text-primary bg-primary/5 rounded-full px-4 py-2 cursor-default transition-colors group-hover/link:bg-primary/10">
                                 <span>访问项目 ({links.length})</span>
                                 <ChevronUp className="h-4 w-4 transition-transform duration-200 group-hover/link:rotate-180" />
                             </button>
-                            <div className="absolute bottom-full right-0 mb-2 hidden group-hover/link:flex flex-col gap-2 bg-card border rounded-lg p-2 shadow-lg z-10 min-w-[180px]">
+
+                            {/* 优化后的菜单 - 与按钮紧密连接 */}
+                            <div className="absolute bottom-full right-0 mb-2 flex flex-col gap-2 bg-card border rounded-lg p-1 shadow-lg z-0 min-w-[180px] opacity-0 group-hover/link:opacity-100 transition-all duration-300 group-hover/link:translate-y-0 translate-y-2 invisible group-hover/link:visible">
+                                {/* 悬停缓冲区域 - 菜单顶部 */}
+                                <div className="absolute bottom-full left-0 right-0 h-4 opacity-0 group-hover/link:opacity-100 transition-opacity"></div>
+
                                 {links.map((link: any, index: number) => (
                                     <Link
                                         key={index}
@@ -271,8 +265,8 @@ function ProjectCard({ title, description, image, links }: any) {
                                         className="px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-md transition-colors flex items-center justify-between"
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        <span>{link.name}</span>
-                                        <ArrowUpRight className="h-4 w-4" />
+                                        <span className="truncate">{link.name}</span>
+                                        <ArrowUpRight className="h-4 w-4 flex-shrink-0" />
                                     </Link>
                                 ))}
                             </div>
