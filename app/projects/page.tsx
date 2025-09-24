@@ -7,12 +7,6 @@ import Link from 'next/link';
 import { ArrowUpRight, Plus, ChevronUp } from 'lucide-react';
 import siteConfig from '@/site-config';
 
-// 工具函数
-function extractImageUrl(imageTag: string): string {
-    const match = imageTag.match(/src="([^"]+)"/);
-    return match ? match[1] : '';
-}
-
 function parseProjectsFromBody(body: string) {
     const projectBlocks = body.split(/(?=title:)/).filter((block) => block.trim());
     const projects = [];
@@ -141,7 +135,7 @@ export default function ProjectsPage() {
 
     useEffect(() => {
         loadProjects();
-    }, []);
+    }, [loadProjects]);
 
     return (
         <div className="flex flex-col gap-1 sm:min-h-[91vh] min-h-[88vh] pt-2 w-full">
