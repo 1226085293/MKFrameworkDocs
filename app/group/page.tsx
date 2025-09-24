@@ -66,7 +66,7 @@ export default function QqWxGroupPage() {
                                 <div className="relative">
                                     <div className="bg-white p-4 rounded-xl border shadow-sm">
                                         <img
-                                            src="/qq.jpg"
+                                            src="/group/qq.jpg"
                                             alt="QQ群二维码"
                                             className="w-64 h-64 object-cover"
                                         />
@@ -96,7 +96,9 @@ export default function QqWxGroupPage() {
                                     <div>
                                         <h4 className="font-medium mb-2">添加方式</h4>
                                         <p className="text-sm text-muted-foreground">
-                                            扫码或点击下方申请入群按钮，备注"Cocos"，管理员审核后即可入群
+                                            {
+                                                '扫码或点击下方申请入群按钮，备注"Cocos"，管理员审核后即可入群'
+                                            }
                                         </p>
                                     </div>
 
@@ -188,7 +190,7 @@ export default function QqWxGroupPage() {
                                 <div className="relative">
                                     <div className="bg-white p-4 rounded-xl border shadow-sm">
                                         <img
-                                            src="/wx.jpg"
+                                            src="/group/wx.jpg"
                                             alt="微信个人二维码"
                                             className="w-64 h-64 object-cover"
                                         />
@@ -218,7 +220,7 @@ export default function QqWxGroupPage() {
                                     <div>
                                         <h4 className="font-medium mb-2">添加方式</h4>
                                         <p className="text-sm text-muted-foreground">
-                                            扫码添加管理员微信，备注"进群"，通过后会被邀请进群
+                                            {'扫码添加管理员微信，备注"进群"，通过后会被邀请进群'}
                                         </p>
                                     </div>
 

@@ -1,9 +1,8 @@
 'use client';
 
 import { ModeToggle } from '@/components/theme-toggle';
-import { GithubIcon, CommandIcon, ChevronDown } from 'lucide-react';
+import { CommandIcon, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
-import { buttonVariants } from './ui/button';
 import Anchor from './anchor';
 import { SheetLeftbar } from './leftbar';
 import { SheetClose } from '@/components/ui/sheet';
