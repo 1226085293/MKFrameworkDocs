@@ -207,7 +207,11 @@ function ProjectCard({ title, description, image, links }: any) {
     const hasSingleLink = links && links.length === 1;
 
     return (
-        <div className="group flex flex-col border rounded-lg overflow-hidden bg-card hover:shadow-md transition-all duration-200 w-[360px] h-[400px]">
+        <div
+            className="group flex flex-col border rounded-lg overflow-hidden bg-card transition-all duration-200 w-[360px] h-[400px] 
+            hover:shadow-lg dark:hover:shadow-primary/20 
+            dark:border-gray-700 dark:hover:border-primary/20"
+        >
             {/* 图片容器 - 添加悬停缩放效果 */}
             <div className="relative w-full aspect-video overflow-hidden">
                 {image ? (
