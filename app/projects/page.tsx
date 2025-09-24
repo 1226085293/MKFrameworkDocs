@@ -1,7 +1,7 @@
 // app/projects/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, Plus, ChevronUp } from 'lucide-react';
@@ -113,7 +113,24 @@ export default function ProjectsPage() {
 
     const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN;
 
-    const loadProjects = async () => {
+    const loadProjects = useCallback(async () => {
+        // 检查本地缓存
+        const cachedData = localStorage.getItem('projects-cache');
+        const cachedTimestamp = localStorage.getItem('projects-cache-timestamp');
+
+        // 如果缓存未过期（1小时内），使用缓存数据
+        if (cachedData && cachedTimestamp) {
+            const now = new Date().getTime();
+            const cacheTime = parseInt(cachedTimestamp);
+
+            if (now - cacheTime < 60 * 60 * 1000) {
+                // 1小时缓存
+                setProjects(JSON.parse(cachedData));
+                setLoading(false);
+                return;
+            }
+        }
+
         if (!token) {
             setError('配置错误：缺少 GitHub Token');
             setLoading(false);
@@ -125,13 +142,29 @@ export default function ProjectsPage() {
             setError(null);
             const data = await fetchProjects(token);
             setProjects(data);
+
+            // 保存到本地缓存
+            localStorage.setItem('projects-cache', JSON.stringify(data));
+            localStorage.setItem('projects-cache-timestamp', new Date().getTime().toString());
         } catch (err: any) {
             console.error('Load failed:', err);
-            setError(err.message || '加载失败，请稍后重试');
+
+            // 如果是因为速率限制，尝试使用缓存（即使过期）
+            if (err.message.includes('rate limit')) {
+                if (cachedData) {
+                    setProjects(JSON.parse(cachedData));
+                    setError('数据来自缓存（API速率限制中）');
+                    setLoading(false);
+                    return;
+                }
+                setError('API速率限制，请稍后再试');
+            } else {
+                setError(err.message || '加载失败，请稍后重试');
+            }
         } finally {
             setLoading(false);
         }
-    };
+    }, [token]);
 
     useEffect(() => {
         loadProjects();
