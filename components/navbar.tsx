@@ -138,55 +138,49 @@ function DiscussMenuItemDesktop({ item }: any) {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const submenuRef = useRef<HTMLDivElement>(null);
-
-    // 存储当前激活的菜单项
-    const activeItemRef = useRef<string | null>(null);
-    // 存储菜单激活时间戳
-    const activationTimeRef = useRef<number>(0);
+    const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     const handleMouseEnter = () => {
-        // 设置当前菜单项为激活状态
-        activeItemRef.current = item.title;
-        activationTimeRef.current = Date.now();
+        // 清除任何待关闭的定时器
+        if (closeTimerRef.current) {
+            clearTimeout(closeTimerRef.current);
+            closeTimerRef.current = null;
+        }
         setIsOpen(true);
     };
 
-    // 全局鼠标移动监听
+    const handleMouseLeave = () => {
+        // 设置一个短暂的延迟，以便用户可以移动到子菜单上
+        closeTimerRef.current = setTimeout(() => {
+            // 检查鼠标是否在子菜单上
+            const isOverSubmenu = submenuRef.current && submenuRef.current.matches(':hover');
+
+            if (!isOverSubmenu) {
+                setIsOpen(false);
+            }
+        }, 100);
+    };
+
+    // 添加全局鼠标移动监听，用于检测快速移动
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
-            if (!containerRef.current) return;
+            if (!containerRef.current || !isOpen) return;
 
             const container = containerRef.current;
             const containerRect = container.getBoundingClientRect();
 
-            // 计算容器扩展区域（包括下方子菜单区域）
-            const extendedRect = {
-                left: containerRect.left,
-                right: containerRect.right,
-                top: containerRect.top,
-                bottom: containerRect.bottom + 300, // 扩展300px向下区域
-            };
-
-            // 检查鼠标是否在扩展区域内
+            // 检查鼠标是否在菜单项容器或下方一定范围内
             const isInExtendedArea =
-                e.clientX >= extendedRect.left &&
-                e.clientX <= extendedRect.right &&
-                e.clientY >= extendedRect.top &&
-                e.clientY <= extendedRect.bottom;
+                e.clientX >= containerRect.left &&
+                e.clientX <= containerRect.right &&
+                e.clientY >= containerRect.top &&
+                e.clientY <= containerRect.bottom + 20; // 20px 的容差区域
 
+            // 如果鼠标在扩展区域内，清除关闭定时器
             if (isInExtendedArea) {
-                // 如果鼠标在扩展区域内，保持菜单打开
-                if (!isOpen) {
-                    activeItemRef.current = item.title;
-                    setIsOpen(true);
-                }
-            } else {
-                // 如果鼠标离开扩展区域，关闭菜单
-                const now = Date.now();
-                // 防止快速移动导致的误关闭（100ms内不关闭）
-                if (now - activationTimeRef.current > 100) {
-                    setIsOpen(false);
-                    activeItemRef.current = null;
+                if (closeTimerRef.current) {
+                    clearTimeout(closeTimerRef.current);
+                    closeTimerRef.current = null;
                 }
             }
 
@@ -200,53 +194,82 @@ function DiscussMenuItemDesktop({ item }: any) {
                     e.clientY <= submenuRect.bottom;
 
                 if (isInSubmenu) {
-                    activeItemRef.current = item.title;
+                    // 清除任何待关闭的定时器
+                    if (closeTimerRef.current) {
+                        clearTimeout(closeTimerRef.current);
+                        closeTimerRef.current = null;
+                    }
                 }
             }
         };
 
         document.addEventListener('mousemove', handleMouseMove);
-        return () => document.removeEventListener('mousemove', handleMouseMove);
-    }, [isOpen, item.title]);
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            // 清除定时器
+            if (closeTimerRef.current) {
+                clearTimeout(closeTimerRef.current);
+            }
+        };
+    }, [isOpen]);
 
     return (
-        <div ref={containerRef} className="relative" onMouseEnter={handleMouseEnter}>
+        <div
+            ref={containerRef}
+            className="relative"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+        >
             <button className="flex items-center gap-1 sm:text-sm text-[14.5px] dark:text-stone-300/85 text-stone-800 hover:text-primary transition-colors">
                 {item.title}
                 <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover/discuss:rotate-180" />
             </button>
 
             {isOpen && (
-                <div
-                    ref={submenuRef}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-40 bg-card border rounded-lg shadow-lg z-50 p-2 flex flex-col gap-1"
-                >
-                    {Object.entries(item.hrefs).map(([platform, url]: [string, any]) => {
-                        const isInternalLink = typeof url === 'string' && url.startsWith('/');
+                <>
+                    {/* 透明缓冲区域 - 覆盖在菜单项和子菜单之间 */}
+                    <div
+                        className="absolute top-full left-0 w-full h-4 z-40"
+                        style={{ transform: 'translateY(-50%)' }}
+                        onMouseEnter={() => {
+                            if (closeTimerRef.current) {
+                                clearTimeout(closeTimerRef.current);
+                                closeTimerRef.current = null;
+                            }
+                        }}
+                    />
 
-                        return isInternalLink ? (
-                            <Link
-                                key={platform}
-                                href={url}
-                                className="px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-center dark:text-stone-300/85 text-stone-800"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                {platform}
-                            </Link>
-                        ) : (
-                            <Anchor
-                                key={platform}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-center dark:text-stone-300/85 text-stone-800"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                {platform}
-                            </Anchor>
-                        );
-                    })}
-                </div>
+                    <div
+                        ref={submenuRef}
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-40 bg-card border rounded-lg shadow-lg z-50 p-2 flex flex-col gap-1"
+                    >
+                        {Object.entries(item.hrefs).map(([platform, url]: [string, any]) => {
+                            const isInternalLink = typeof url === 'string' && url.startsWith('/');
+
+                            return isInternalLink ? (
+                                <Link
+                                    key={platform}
+                                    href={url}
+                                    className="px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-center dark:text-stone-300/85 text-stone-800"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {platform}
+                                </Link>
+                            ) : (
+                                <Anchor
+                                    key={platform}
+                                    href={url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-center dark:text-stone-300/85 text-stone-800"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {platform}
+                                </Anchor>
+                            );
+                        })}
+                    </div>
+                </>
             )}
         </div>
     );
