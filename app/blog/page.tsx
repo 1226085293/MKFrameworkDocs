@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { allBlogs } from 'contentlayer/generated';
 
 export const metadata: Metadata = {
-    title: 'MKFrameworkDocs - Blog',
+    title: 'MKFramework - Blog',
 };
 
 // 定义作者类型

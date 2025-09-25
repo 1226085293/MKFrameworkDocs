@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Users, QrCode, Smartphone, Mail, ArrowUpRight } from 'lucide-react';
 import siteConfig from '@/site-config';
+import Image from 'next/image';
 
 export default function QqWxGroupPage() {
     const [activeTab, setActiveTab] = useState('qq');
@@ -53,10 +54,13 @@ export default function QqWxGroupPage() {
                         <div className="flex-1 flex flex-col items-center">
                             <div className="relative">
                                 <div className="bg-white p-4 rounded-xl border shadow-sm">
-                                    <img
+                                    <Image
                                         src="/group/qq.jpg"
                                         alt="QQ群二维码"
                                         className="w-64 h-64 object-cover"
+                                        width={256}
+                                        height={256}
+                                        quality={90}
                                     />
                                 </div>
                                 <div className="absolute -bottom-3 -right-3 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-md">
@@ -173,10 +177,13 @@ export default function QqWxGroupPage() {
                         <div className="flex-1 flex flex-col items-center">
                             <div className="relative">
                                 <div className="bg-white p-4 rounded-xl border shadow-sm">
-                                    <img
+                                    <Image
                                         src="/group/wx.jpg"
                                         alt="微信个人二维码"
                                         className="w-64 h-64 object-cover"
+                                        width={256}
+                                        height={256}
+                                        quality={90}
                                     />
                                 </div>
                                 <div className="absolute -bottom-3 -right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-md">

@@ -21,7 +21,7 @@ const monoFont = Space_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'MKFrameworkDocs',
+    title: 'MKFramework',
     metadataBase: new URL('https://mkframework.muzzik.cc/'),
     description:
         'CocosCreator 游戏框架, 免费，开源，类型安全，完善的生命周期/新手引导/资源管理系统，支持纯脚本/组件式开发，支持单脚本多预制',

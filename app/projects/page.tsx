@@ -65,7 +65,7 @@ const fetchProjects = async (token: string) => {
         headers: {
             Authorization: `bearer ${token}`,
             'Content-Type': 'application/json',
-            'User-Agent': 'MKFrameworkDocs-Client',
+            'User-Agent': 'MKFramework-Client',
         },
         body: JSON.stringify({
             query: `

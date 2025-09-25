@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Heart, QrCode, Smile, Star, Zap } from 'lucide-react';
+import Image from 'next/image';
 
 export default function DonatePage() {
     const [activeMethod, setActiveMethod] = useState('alipay');
@@ -75,7 +76,7 @@ export default function DonatePage() {
                                     <div className="flex justify-center">
                                         <div className="relative">
                                             <div className="bg-white p-4 rounded-xl border shadow-lg">
-                                                <img
+                                                <Image
                                                     src={`/donate/${
                                                         activeMethod === 'alipay'
                                                             ? 'zfb.jpg'
@@ -87,6 +88,9 @@ export default function DonatePage() {
                                                             : '微信'
                                                     }收款码`}
                                                     className="w-64 h-64 object-cover"
+                                                    width={256}
+                                                    height={256}
+                                                    quality={90}
                                                 />
                                             </div>
                                             <div className="absolute -bottom-3 -right-3 bg-white dark:bg-background px-3 py-1 rounded-full text-xs font-medium shadow-md flex items-center gap-1">
