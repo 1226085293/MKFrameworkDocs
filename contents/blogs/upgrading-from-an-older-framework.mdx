@@ -1,0 +1,48 @@
+---
+title: 从旧框架升级到驼峰版本
+description: 框架的升级教程
+date: 2025-9-25 11:27:00
+authors:
+    - avatar: 'https://forum.cocos.org/user_avatar/forum.cocos.org/1226085293/120/86149_2.png'
+      handle: Muzzik
+      username: 马赛克
+      handleUrl: 'https://forum.cocos.org/u/1226085293/summary'
+cover: 'https://www.computerhope.com/jargon/p/program.png'
+---
+
+## 为何修改命名风格？
+
+由于用户最常使用的是驼峰风格代码，为了贴合用户习惯，所以从 1.1.2 版本开始，框架的代码就修改为了驼峰风格。
+对于 1.1.1 及以下的框架用户，请按照以下教程升级你的框架到最新版本
+
+---
+
+## 准备工作
+
+1. 备份自己的项目
+
+1. 克隆仓库 `https://github.com/1226085293/MKFrameworkUpgrade`
+
+## 开始升级
+
+1. 在 `MKFrameworkUpgrade` 文件夹下执行命令 `npm i` 安装依赖项
+
+1. 在`MKFrameworkUpgrade` 文件夹下执行命令 `npm run start Cocos项目根路径`
+
+    > Cocos 项目根路径替换为你升级的项目根路径
+
+1. 升级完成，运行项目检查升级情况
+
+## 遇到问题？
+
+**Q：为什么只替换了框架的代码风格？**
+
+升级工具只提供对框架的风格转换，不会对用户代码造成额外修改
+
+**Q：升级后框架接口不存在？**
+
+框架升级工具使用的是正则匹配替换框架接口，所以有可能出现遗漏。你可以参考文档修改到最新的接口
+
+---
+
+如果遇到问题可以在下方评论区反馈，自己无法解决的问题可以点击导航栏中的 **交流** 联系作者
