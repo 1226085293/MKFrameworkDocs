@@ -4,18 +4,11 @@ import { useState, useEffect } from 'react';
 import { Heart, QrCode, Smile, Star, Zap } from 'lucide-react';
 
 export default function DonatePage() {
-    const [loading, setLoading] = useState(true);
     const [activeMethod, setActiveMethod] = useState('alipay');
-
-    // 模拟加载二维码
-    useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 800);
-        return () => clearTimeout(timer);
-    }, []);
 
     return (
         <div className="h-auto py-12">
-            <div className="container max-w-4xl mx-auto px-4">
+            <div className="w-auto max-w-4xl mx-auto">
                 <div className="rounded-xl">
                     <div className="p-4 md:p-6">
                         <div className="text-center mb-10">
@@ -80,49 +73,29 @@ export default function DonatePage() {
 
                                     {/* 二维码展示 */}
                                     <div className="flex justify-center">
-                                        {loading ? (
-                                            <div className="bg-gray-200 animate-pulse rounded-xl w-64 h-64 flex items-center justify-center">
-                                                {activeMethod === 'alipay' ? (
-                                                    <div className="bg-blue-500/20 w-16 h-16 rounded-xl flex items-center justify-center">
-                                                        <div className="bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center">
-                                                            <div className="bg-white w-4 h-4 rounded-full"></div>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="bg-green-500/20 w-16 h-16 rounded-xl flex items-center justify-center">
-                                                        <div className="bg-green-500 w-8 h-8 rounded-full flex items-center justify-center">
-                                                            <div className="bg-white w-4 h-4 rounded-full"></div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="relative">
-                                                <div className="bg-white p-4 rounded-xl border shadow-lg">
-                                                    <img
-                                                        src={`/donate/${
-                                                            activeMethod === 'alipay'
-                                                                ? 'zfb.jpg'
-                                                                : 'wx.jpg'
-                                                        }`}
-                                                        alt={`${
-                                                            activeMethod === 'alipay'
-                                                                ? '支付宝'
-                                                                : '微信'
-                                                        }收款码`}
-                                                        className="w-64 h-64 object-cover"
-                                                    />
-                                                </div>
-                                                <div className="absolute -bottom-3 -right-3 bg-white dark:bg-background px-3 py-1 rounded-full text-xs font-medium shadow-md flex items-center gap-1">
-                                                    <QrCode className="h-3 w-3" />
-                                                    <span>
-                                                        {activeMethod === 'alipay'
+                                        <div className="relative">
+                                            <div className="bg-white p-4 rounded-xl border shadow-lg">
+                                                <img
+                                                    src={`/donate/${
+                                                        activeMethod === 'alipay'
+                                                            ? 'zfb.jpg'
+                                                            : 'wx.jpg'
+                                                    }`}
+                                                    alt={`${
+                                                        activeMethod === 'alipay'
                                                             ? '支付宝'
-                                                            : '微信'}
-                                                    </span>
-                                                </div>
+                                                            : '微信'
+                                                    }收款码`}
+                                                    className="w-64 h-64 object-cover"
+                                                />
                                             </div>
-                                        )}
+                                            <div className="absolute -bottom-3 -right-3 bg-white dark:bg-background px-3 py-1 rounded-full text-xs font-medium shadow-md flex items-center gap-1">
+                                                <QrCode className="h-3 w-3" />
+                                                <span>
+                                                    {activeMethod === 'alipay' ? '支付宝' : '微信'}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -142,15 +115,15 @@ export default function DonatePage() {
                                                 <ul className="text-sm text-muted-foreground space-y-1">
                                                     <li className="flex items-start">
                                                         <Smile className="h-4 w-4 mt-0.5 text-green-500 mr-2 flex-shrink-0" />
-                                                        <span>捐赠者昵称和头像将在首页展示</span>
-                                                    </li>
-                                                    <li className="flex items-start">
-                                                        <Smile className="h-4 w-4 mt-0.5 text-green-500 mr-2 flex-shrink-0" />
                                                         <span>框架需求优先处理</span>
                                                     </li>
                                                     <li className="flex items-start">
                                                         <Smile className="h-4 w-4 mt-0.5 text-green-500 mr-2 flex-shrink-0" />
                                                         <span>作者实时沟通解惑</span>
+                                                    </li>
+                                                    <li className="flex items-start">
+                                                        <Smile className="h-4 w-4 mt-0.5 text-green-500 mr-2 flex-shrink-0" />
+                                                        <span>捐赠者昵称和头像将在首页展示</span>
                                                     </li>
                                                 </ul>
                                             </div>

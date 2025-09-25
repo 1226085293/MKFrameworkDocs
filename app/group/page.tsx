@@ -7,14 +7,7 @@ import siteConfig from '@/site-config';
 
 export default function QqWxGroupPage() {
     const [activeTab, setActiveTab] = useState('qq');
-    const [loading, setLoading] = useState(true);
     const [copySuccess, setCopySuccess] = useState(false);
-
-    // 模拟加载二维码
-    useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 800);
-        return () => clearTimeout(timer);
-    }, []);
 
     // 复制文本到剪贴板
     const copyToClipboard = (text: string) => {
@@ -58,24 +51,18 @@ export default function QqWxGroupPage() {
                 <div className="max-w-4xl mx-auto">
                     <div className="flex flex-col md:flex-row gap-8 items-center">
                         <div className="flex-1 flex flex-col items-center">
-                            {loading ? (
-                                <div className="bg-gray-200 animate-pulse rounded-lg w-64 h-64 flex items-center justify-center">
-                                    <Users className="h-24 w-24 text-blue-500/30" />
+                            <div className="relative">
+                                <div className="bg-white p-4 rounded-xl border shadow-sm">
+                                    <img
+                                        src="/group/qq.jpg"
+                                        alt="QQ群二维码"
+                                        className="w-64 h-64 object-cover"
+                                    />
                                 </div>
-                            ) : (
-                                <div className="relative">
-                                    <div className="bg-white p-4 rounded-xl border shadow-sm">
-                                        <img
-                                            src="/group/qq.jpg"
-                                            alt="QQ群二维码"
-                                            className="w-64 h-64 object-cover"
-                                        />
-                                    </div>
-                                    <div className="absolute -bottom-3 -right-3 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-md">
-                                        扫码加入
-                                    </div>
+                                <div className="absolute -bottom-3 -right-3 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-md">
+                                    扫码加入
                                 </div>
-                            )}
+                            </div>
                         </div>
 
                         <div className="flex-1 w-full">
@@ -110,7 +97,9 @@ export default function QqWxGroupPage() {
                                         <div className="bg-white dark:bg-background rounded-lg p-4 text-sm space-y-2">
                                             <p className="flex items-start">
                                                 <span className="font-medium mr-2">1.</span>
-                                                <span>在群内交流框架和Cocos相关的问题</span>
+                                                <span>
+                                                    可以在群内交流和Cocos相关的问题，不局限于框架
+                                                </span>
                                             </p>
                                             <p className="flex items-start">
                                                 <span className="font-medium mr-2">2.</span>
@@ -182,24 +171,18 @@ export default function QqWxGroupPage() {
                 <div className="max-w-4xl mx-auto">
                     <div className="flex flex-col md:flex-row gap-8 items-center">
                         <div className="flex-1 flex flex-col items-center">
-                            {loading ? (
-                                <div className="bg-gray-200 animate-pulse rounded-lg w-64 h-64 flex items-center justify-center">
-                                    <MessageSquare className="h-24 w-24 text-green-500/30" />
+                            <div className="relative">
+                                <div className="bg-white p-4 rounded-xl border shadow-sm">
+                                    <img
+                                        src="/group/wx.jpg"
+                                        alt="微信个人二维码"
+                                        className="w-64 h-64 object-cover"
+                                    />
                                 </div>
-                            ) : (
-                                <div className="relative">
-                                    <div className="bg-white p-4 rounded-xl border shadow-sm">
-                                        <img
-                                            src="/group/wx.jpg"
-                                            alt="微信个人二维码"
-                                            className="w-64 h-64 object-cover"
-                                        />
-                                    </div>
-                                    <div className="absolute -bottom-3 -right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-md">
-                                        扫码添加
-                                    </div>
+                                <div className="absolute -bottom-3 -right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-md">
+                                    扫码添加
                                 </div>
-                            )}
+                            </div>
                         </div>
 
                         <div className="flex-1 w-full">
@@ -232,7 +215,9 @@ export default function QqWxGroupPage() {
                                         <div className="bg-white dark:bg-background rounded-lg p-4 text-sm space-y-2">
                                             <p className="flex items-start">
                                                 <span className="font-medium mr-2">1.</span>
-                                                <span>在群内交流框架和Cocos相关的问题</span>
+                                                <span>
+                                                    可以在群内交流和Cocos相关的问题，不局限于框架
+                                                </span>
                                             </p>
                                             <p className="flex items-start">
                                                 <span className="font-medium mr-2">2.</span>

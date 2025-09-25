@@ -4,7 +4,7 @@ class SiteConfig {
     /** 项目 github 仓库 */
     projectGithubRepo = 'https://github.com/1226085293/MKFramework';
     /** 项目 gitee 仓库 */
-    projectGiteeRepo = 'https://github.com/1226085293/MKFramework';
+    projectGiteeRepo = 'https://gitee.com/muzzik/MKFramework';
     /** cocos 帖子地址 */
     cocosPostUrl = 'https://forum.cocos.org/t/topic/159492';
     /** 站点仓库集合 */
