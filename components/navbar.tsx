@@ -136,52 +136,99 @@ export function NavMenu({ isSheet = false }: { isSheet?: boolean }) {
 // 桌面端讨论菜单项
 function DiscussMenuItemDesktop({ item }: any) {
     const [isOpen, setIsOpen] = useState(false);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const submenuRef = useRef<HTMLDivElement>(null);
+
+    // 存储当前激活的菜单项
+    const activeItemRef = useRef<string | null>(null);
+    // 存储菜单激活时间戳
+    const activationTimeRef = useRef<number>(0);
 
     const handleMouseEnter = () => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-        }
+        // 设置当前菜单项为激活状态
+        activeItemRef.current = item.title;
+        activationTimeRef.current = Date.now();
         setIsOpen(true);
     };
 
-    const handleMouseLeave = () => {
-        timeoutRef.current = setTimeout(() => {
-            setIsOpen(false);
-        }, 200);
-    };
-
+    // 全局鼠标移动监听
     useEffect(() => {
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!containerRef.current) return;
+
+            const container = containerRef.current;
+            const containerRect = container.getBoundingClientRect();
+
+            // 计算容器扩展区域（包括下方子菜单区域）
+            const extendedRect = {
+                left: containerRect.left,
+                right: containerRect.right,
+                top: containerRect.top,
+                bottom: containerRect.bottom + 300, // 扩展300px向下区域
+            };
+
+            // 检查鼠标是否在扩展区域内
+            const isInExtendedArea =
+                e.clientX >= extendedRect.left &&
+                e.clientX <= extendedRect.right &&
+                e.clientY >= extendedRect.top &&
+                e.clientY <= extendedRect.bottom;
+
+            if (isInExtendedArea) {
+                // 如果鼠标在扩展区域内，保持菜单打开
+                if (!isOpen) {
+                    activeItemRef.current = item.title;
+                    setIsOpen(true);
+                }
+            } else {
+                // 如果鼠标离开扩展区域，关闭菜单
+                const now = Date.now();
+                // 防止快速移动导致的误关闭（100ms内不关闭）
+                if (now - activationTimeRef.current > 100) {
+                    setIsOpen(false);
+                    activeItemRef.current = null;
+                }
+            }
+
+            // 检查鼠标是否在子菜单内
+            if (submenuRef.current) {
+                const submenuRect = submenuRef.current.getBoundingClientRect();
+                const isInSubmenu =
+                    e.clientX >= submenuRect.left &&
+                    e.clientX <= submenuRect.right &&
+                    e.clientY >= submenuRect.top &&
+                    e.clientY <= submenuRect.bottom;
+
+                if (isInSubmenu) {
+                    activeItemRef.current = item.title;
+                }
             }
         };
-    }, []);
+
+        document.addEventListener('mousemove', handleMouseMove);
+        return () => document.removeEventListener('mousemove', handleMouseMove);
+    }, [isOpen, item.title]);
 
     return (
-        <div
-            className="group/discuss relative"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-        >
+        <div ref={containerRef} className="relative" onMouseEnter={handleMouseEnter}>
             <button className="flex items-center gap-1 sm:text-sm text-[14.5px] dark:text-stone-300/85 text-stone-800 hover:text-primary transition-colors">
                 {item.title}
                 <ChevronDown className="h-4 w-4 transition-transform duration-200 group-hover/discuss:rotate-180" />
             </button>
 
             {isOpen && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-40 bg-card border rounded-lg shadow-lg z-50 p-2 flex flex-col gap-1">
+                <div
+                    ref={submenuRef}
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-40 bg-card border rounded-lg shadow-lg z-50 p-2 flex flex-col gap-1"
+                >
                     {Object.entries(item.hrefs).map(([platform, url]: [string, any]) => {
-                        // 判断是否为内部链接（以 / 开头）
                         const isInternalLink = typeof url === 'string' && url.startsWith('/');
 
                         return isInternalLink ? (
                             <Link
                                 key={platform}
                                 href={url}
-                                className="px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-center"
+                                className="px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-center dark:text-stone-300/85 text-stone-800"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 {platform}
@@ -192,7 +239,7 @@ function DiscussMenuItemDesktop({ item }: any) {
                                 href={url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-center"
+                                className="px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-center dark:text-stone-300/85 text-stone-800"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 {platform}
@@ -226,7 +273,6 @@ function DiscussMenuItemMobile({ item }: any) {
             {isOpen && (
                 <div className="ml-4 mt-2 flex flex-col gap-1">
                     {Object.entries(item.hrefs).map(([platform, url]: [string, any]) => {
-                        // 判断是否为内部链接（以 / 开头）
                         const isInternalLink = typeof url === 'string' && url.startsWith('/');
 
                         return isInternalLink ? (
