@@ -1,0 +1,66 @@
+---
+title: 纯脚本和组件式开发的区别及方法
+description:
+date: 2025-9-26 10:00:00
+authors:
+    - avatar: 'https://forum.cocos.org/user_avatar/forum.cocos.org/1226085293/120/86149_2.png'
+      handle: Muzzik
+      username: 马赛克
+      handleUrl: 'https://forum.cocos.org/u/1226085293/summary'
+cover: https://cdn.pixabay.com/photo/2016/09/30/13/40/puzzle-1705339_1280.jpg
+---
+
+## 介绍
+
+纯脚本开发：除部分工具组件外，例如节点适配、虚拟列表等不在节点上挂载任何用户脚本
+
+组件式开发：挂载用户脚本到节点上，通过组件的生命周期驱动逻辑执行
+
+## 组件式开发
+
+这很简单，只需要你将父类是 `Component` 的组件脚本拖动到节点上即可
+
+## 纯脚本开发
+
+### 场景加载后的代码执行
+
+怎么在场景加载后驱动代码执行？有两种方式
+
+#### 1. 场景切换事件
+
+你可以通过如下代码监听场景切换后的事件，再根据场景的名称执行不同的逻辑
+
+```ts
+director.on(Director.EVENT_AFTER_SCENE_LAUNCH, () => {
+    const scene = director.getScene()!;
+
+    console.log(scene.name);
+});
+```
+
+`Director.EVENT_AFTER_SCENE_LAUNCH` 事件在场景运行后触发，我们可以通过它执行场景加载后的代码
+
+#### 2. BundleManage
+
+1. 在运行项目后，main bundle 的 BundleManage 的生命周期函数 `open` 会被触发，可以在这里写初始化逻辑
+
+2. 在从一个 Bundle 内的 scene 切换到另一个 Bundle 内的 scene 时, 当前 bundle 的 BundleManage 的生命周期函数会被触发
+
+> 关于 bundle 管理器可以查看[此页面](/docs/module/asset/bundle/manage)
+
+### 对应预制体的代码执行
+
+在框架中，通过 `mk.uiManage.open` 打开指定的模块时，模块资源的预制体根节点如果不存在模块类型组件，
+框架则会通过 `addComponent` 添加模块类组件到根节点
+
+```ts
+mk.uiManage.regis(ModuleA, 'db://assets/resources/ModuleA.prefab', null);
+
+mk.uiManage.open(ModuleA);
+```
+
+例如 `ModuleA.prefab` 的根节点没有挂载 `ModuleA` 组件，在执行 `mk.uiManage.open` 时框架会添加 `ModuleA` 组件到预制体实例化后的根节点上
+
+---
+
+通过上面的两种方式就可以实现非组件式开发
