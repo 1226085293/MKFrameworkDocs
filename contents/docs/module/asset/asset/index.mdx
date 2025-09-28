@@ -80,8 +80,8 @@ get(pathStr_, type_, target_, config_?)
 
     默认值：编辑器：resources，运行时：当前场景所属 bundle
 
--   `config_.progressFunc`: 进度回调
--   `config_.completedFunc`: 完成回调
+-   `config_.progressFunc`: 加载进度回调
+-   `config_.completedFunc`: 加载完成回调
 -   `config_.remoteOption`: 远程配置，存在则为远程资源，配置数据参考[官方文档](https://docs.cocos.com/creator/3.8/manual/zh/asset/dynamic-load-resources.html#%E5%8A%A0%E8%BD%BD%E8%BF%9C%E7%A8%8B%E8%B5%84%E6%BA%90%E5%92%8C%E8%AE%BE%E5%A4%87%E8%B5%84%E6%BA%90)
 -   `config_.retryNum`: 失败重试次数，默认值为 `GlobalConfig.Asset.Config.retryCountOnLoadFailureNum`
 
