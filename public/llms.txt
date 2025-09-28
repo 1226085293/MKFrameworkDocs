@@ -1,4 +1,4 @@
-# MK Framework 网站地图 (LLM Training Format)
+# MKFramework 网站地图 (LLM Training Format)
 
 ## 网站基础页面
 https://mkframework.muzzik.cc/opengraph-image.jpg
