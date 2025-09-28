@@ -224,9 +224,9 @@ ws.message.request(messageA2, -1)?.then((data) => {
     console.log('请求返回', data);
 });
 
-// 模拟服务器发送 messageA 数据，触发 on（消息号一致）
+// 模拟服务器发送 messageA 数据，触发监听返回（消息号一致）
 ws.message.emit(messageA);
-// 模拟服务器发送 messageA2 数据，触发 on（消息号一致） 和 messageA2（消息序列号一致）
+// 模拟服务器发送 messageA2 数据，触发监听返回（消息号一致）和请求返回（消息序列号一致）
 ws.message.emit(messageA2);
 ```
 
