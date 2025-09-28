@@ -65,8 +65,7 @@ mk.uiManage.event.on(mk.uiManage.event.key.open, (key_: mk.UIManage_.TypeOpenKey
 
 #### 要点
 
--   source 可以传递 Record 对象用于代表不同 UI 类型的资源来源
--   会在内部为每个不同 `type` 的资源建立资源对象池
+-   source 可以传递 Record 对象用于代表不同类型的资源来源（参见下方示例）
 -   如果传入 `target`，则由 target 控制何时触发 `unregis(key)`
 
 #### 示例
@@ -79,7 +78,7 @@ await mk.uiManage.regis(
     Test,
     {
         default: 'Module/Test/Test111.prefab',
-        default: 'Module/Test/Test222.prefab',
+        type2: 'Module/Test/Test222.prefab',
     },
     this
 );
@@ -173,10 +172,10 @@ const test = await mk.uiManage.open(Test, { init: { id: 1 }, type: 'default' });
 
 -   `args`：可以是 `Node` / `Constructor<mk.ViewBase>` / `mk.ViewBase` 实例
 -   `config`：可选，关闭配置
--   `config.type`：模块类型
--   `config.isAll`：关闭全部模块
--   `config.isDestroy`：销毁节点
--   `config.isDestroyChildren`：销毁动态子节点（动态子节点是通过 `mk.uiManage.open` 加载到模块节点下的其他模块）
+-   `config.type`：模块类型，默认值 `default`
+-   `config.isAll`：关闭全部模块，默认值 `false`
+-   `config.isDestroy`：销毁节点，默认值 `false`
+-   `config.isDestroyChildren`：销毁动态子节点（动态子节点是通过 `mk.uiManage.open` 加载到模块节点下的其他模块），默认值 `isDestroy`
 
 #### 要点
 
