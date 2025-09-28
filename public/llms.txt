@@ -1,0 +1,100 @@
+# MK Framework 网站地图 (LLM Training Format)
+
+## 网站基础页面
+https://mkframework.muzzik.cc/opengraph-image.jpg
+https://mkframework.muzzik.cc
+https://mkframework.muzzik.cc/donate
+https://mkframework.muzzik.cc/group
+https://mkframework.muzzik.cc/projects
+https://mkframework.muzzik.cc/blog
+
+## 博客内容
+https://mkframework.muzzik.cc/blog/framework-design-ideas
+https://mkframework.muzzik.cc/blog/script-and-component-development
+https://mkframework.muzzik.cc/blog/upgrading-from-an-older-framework
+
+## 文档系统
+
+### 高级教程
+#### 自定义模块
+https://mkframework.muzzik.cc/docs/advanced-tutorials/custom
+https://mkframework.muzzik.cc/docs/advanced-tutorials/custom/repository
+
+#### 树优化
+https://mkframework.muzzik.cc/docs/advanced-tutorials/tree-shaking
+
+### 扩展功能
+#### 组件扩展
+https://mkframework.muzzik.cc/docs/extensions/component
+
+#### 开发工具
+https://mkframework.muzzik.cc/docs/extensions/devtools/excel
+https://mkframework.muzzik.cc/docs/extensions/devtools/font
+https://mkframework.muzzik.cc/docs/extensions/devtools/image
+https://mkframework.muzzik.cc/docs/extensions/devtools/preview
+
+#### 库扩展
+https://mkframework.muzzik.cc/docs/extensions/library/behavior
+https://mkframework.muzzik.cc/docs/extensions/library/collision
+https://mkframework.muzzik.cc/docs/extensions/library/ecs
+https://mkframework.muzzik.cc/docs/extensions/library/minigame
+https://mkframework.muzzik.cc/docs/extensions/library/path
+
+#### 服务器扩展
+https://mkframework.muzzik.cc/docs/extensions/server
+
+### 入门指南
+https://mkframework.muzzik.cc/docs/getting-started/install
+https://mkframework.muzzik.cc/docs/getting-started/quick-start-guide
+
+#### 资源管理
+https://mkframework.muzzik.cc/docs/getting-started/quick-start-guide/asset
+https://mkframework.muzzik.cc/docs/getting-started/quick-start-guide/asset/task
+https://mkframework.muzzik.cc/docs/getting-started/quick-start-guide/audio
+https://mkframework.muzzik.cc/docs/getting-started/quick-start-guide/audio/task
+https://mkframework.muzzik.cc/docs/getting-started/quick-start-guide/event
+https://mkframework.muzzik.cc/docs/getting-started/quick-start-guide/event/task
+https://mkframework.muzzik.cc/docs/getting-started/quick-start-guide/ui-manage
+https://mkframework.muzzik.cc/docs/getting-started/quick-start-guide/ui-manage/task
+
+### 框架介绍
+https://mkframework.muzzik.cc/docs/introduce
+
+### 核心模块
+https://mkframework.muzzik.cc/docs/module/asset
+https://mkframework.muzzik.cc/docs/module/asset/asset
+https://mkframework.muzzik.cc/docs/module/asset/bundle
+https://mkframework.muzzik.cc/docs/module/asset/bundle/manage
+https://mkframework.muzzik.cc/docs/module/audio
+https://mkframework.muzzik.cc/docs/module/audio/group
+https://mkframework.muzzik.cc/docs/module/audio/manage
+https://mkframework.muzzik.cc/docs/module/audio/unit
+https://mkframework.muzzik.cc/docs/module/data
+https://mkframework.muzzik.cc/docs/module/data/monitor
+https://mkframework.muzzik.cc/docs/module/data/sharer
+https://mkframework.muzzik.cc/docs/module/data/storage
+https://mkframework.muzzik.cc/docs/module/guide
+https://mkframework.muzzik.cc/docs/module/guide/manage
+https://mkframework.muzzik.cc/docs/module/guide/mask
+https://mkframework.muzzik.cc/docs/module/guide/step
+https://mkframework.muzzik.cc/docs/module/language
+https://mkframework.muzzik.cc/docs/module/language/label
+https://mkframework.muzzik.cc/docs/module/language/manage
+https://mkframework.muzzik.cc/docs/module/language/node
+https://mkframework.muzzik.cc/docs/module/language/texture
+https://mkframework.muzzik.cc/docs/module/module
+https://mkframework.muzzik.cc/docs/module/module/mvc
+https://mkframework.muzzik.cc/docs/module/module/mvvm
+https://mkframework.muzzik.cc/docs/module/module/ui
+https://mkframework.muzzik.cc/docs/module/module/ui/layer
+https://mkframework.muzzik.cc/docs/module/module/ui/life-cycle
+https://mkframework.muzzik.cc/docs/module/module/ui/scene-drive
+https://mkframework.muzzik.cc/docs/module/module/ui/static-view-base
+https://mkframework.muzzik.cc/docs/module/module/ui/ui-manage
+https://mkframework.muzzik.cc/docs/module/module/ui/view-base
+https://mkframework.muzzik.cc/docs/module/network
+https://mkframework.muzzik.cc/docs/module/network/http
+https://mkframework.muzzik.cc/docs/module/network/websocket
+https://mkframework.muzzik.cc/docs/module/other
+https://mkframework.muzzik.cc/docs/module/other/adaptation
+https://mkframework.muzzik.cc/docs/module/other/codec
