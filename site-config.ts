@@ -20,6 +20,16 @@ class SiteConfig {
         link: 'https://qm.qq.com/q/l53vHThl3a',
         number: '348096019',
     };
+    /** 赞助列表 */
+    donateList: {
+        avatar: string;
+        name: string;
+    }[] = [
+        {
+            avatar: 'https://q1.qlogo.cn/g?b=qq&nk=3548450021&s=640',
+            name: 'Surprise',
+        },
+    ];
     /** 评论系统配置 */
     giscus = {
         repo: this.siteRepos.github.replace('https://github.com/', '') as `${string}/${string}`,
