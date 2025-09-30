@@ -41,7 +41,7 @@ export default function Home() {
 
             {/* ================== 赞助列表 ================== */}
             <div className="w-full max-w-3xl flex flex-col items-center justify-center absolute bottom-24">
-                <h2 className="text-2xl md:text-2xl font-bold mb-8 text-gray-800">赞助列表</h2>
+                <h2 className="text-2xl md:text-2xl font-bold mb-8 ">赞助列表</h2>
                 <div className="flex justify-center items-center relative -space-x-4">
                     {/* 最初展示的siteConfig.donateList数据 */}
                     {siteConfig.donateList.slice(0, 5).map((sponsor, index) => (
