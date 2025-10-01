@@ -8,7 +8,7 @@ export default function Home() {
     const routes = getRoutes();
 
     return (
-        <div className="flex sm:min-h-[87.5vh] min-h-[82vh] flex-col sm:items-center justify-center text-center sm:py-8 py-14">
+        <div className="flex sm:min-h-[87.5vh] min-h-[82vh] flex-col sm:items-center justify-center text-center sm:pb-8 pb-14 pt-40 sm:pt-40">
             <h1 className="text-[1.80rem] leading-8 sm:px-8 md:leading-[4.5rem] font-bold mb-4 sm:text-6xl text-left sm:text-center">
                 MKFramework 游戏框架
             </h1>
@@ -40,7 +40,7 @@ export default function Home() {
             </div>
 
             {/* ================== 赞助列表 ================== */}
-            <div className="w-full max-w-3xl flex flex-col items-center justify-center absolute bottom-24">
+            <div className="w-[90vw] max-w-3xl flex flex-col items-center justify-center pt-20">
                 <h2 className="text-2xl md:text-2xl font-bold mb-8 ">赞助列表</h2>
                 <div className="flex justify-center items-center relative -space-x-4">
                     {/* 最初展示的siteConfig.donateList数据 */}
