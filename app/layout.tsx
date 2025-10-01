@@ -45,6 +45,18 @@ export default function RootLayout({
                     content="kQDVFhUTNG12MduVr7DiXr2BFyYzW2urmCHB7o2uvmM"
                 />
                 <meta name="algolia-site-verification" content="5EA7CE09166D90A7" />
+                {/* Google 跟踪代码 */}
+                <script async src={`https://www.googletagmanager.com/gtag/js?id=G-759L83P9B3`} />
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-759L83P9B3');
+            `,
+                    }}
+                />
             </head>
             <body
                 className={`${sansFont.variable} ${monoFont.variable} font-regular antialiased tracking-wide`}
