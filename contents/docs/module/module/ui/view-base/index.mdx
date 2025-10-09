@@ -123,6 +123,36 @@ protected async open(): Promise<void> {
 | `openAnimationStr`        | 打开动画         | `string`  | 打开动画的 key（编辑器中通过枚举选择，实际运行时取对应函数） |
 | `closeAnimationStr`       | 关闭动画         | `string`  | 关闭动画的 key（编辑器中通过枚举选择，实际运行时取对应函数） |
 
+#### 配置动画
+
+你需要在编辑器可执行的环境下添加动画函数，以打开动画举例
+
+```ts
+// 增加一个动画函数，返回动画完成结束的 Promise 任务
+GlobalConfig.View.config.windowAnimationTab.open['默认'] = (node) => {
+    node = node.getChildByName('窗口') ?? node;
+
+    return new Promise<void>((resolveFunc) => {
+        cc.tween(node)
+            .to(0.2, { scale: cc.v3(1.1, 1.1) })
+            .to(0.1, { scale: cc.v3(0.95, 0.95) })
+            .to(0.05, { scale: cc.v3(1, 1, 1) })
+            .call(() => {
+                resolveFunc();
+            })
+            .start();
+    });
+};
+```
+
+编辑器可执行的环境：
+
+-   class 块外部
+
+-   使用了 [@executeInEditMode](https://docs.cocos.com/creator/3.8/manual/zh/scripting/decorator.html#executeineditmode) 装饰器的组件的生命周期函数内
+
+-   main bundle 的 [BundleManage](/docs/module/asset/bundle/manage#生命周期函数/open) 的 open 函数内
+
 ---
 
 ### 编辑器快捷操作
