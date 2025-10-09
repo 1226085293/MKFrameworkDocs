@@ -57,19 +57,28 @@ order: 0
 ```ts
 /** 中文(中华人民共和国) */
 zhCn: {
-    dire: Layout.HorizontalDirection.LEFT_TO_RIGHT, // 文本方向：从左到右
+    // 文本方向：从左到右
+    dire: Layout.HorizontalDirection.LEFT_TO_RIGHT,
+    // 支持语种（sys.languageCode 的值）
+    supportStrList: ["zh"],
 },
 ```
 
-上述代码定义了一个名为 `zhCn` 的语言类型，其文本方向为从左到右。
+上述代码定义了一个名为 `zhCn` 的语言类型，其文本方向为从左到右，支持的语种为 "zh"。
 
 ### 默认语种
 
 通过 `defaultTypeStr` 配置默认语言类型：
 
 ```ts
-defaultTypeStr: types.zhCn;
+// 默认为中文
+defaultTypeStr = types.zhCn;
+// 根据地区动态匹配默认语言
+defaultTypeStr = 'auto';
 ```
+
+当 `defaultTypeStr` 为 `auto` 时，框架会匹配 `privateTypeTab` 中 `supportStrList` 和 `sys.languageCode` 相同的语种作为默认语言，
+如果 `sys.languageCode` 为多级字符串例如 "zh-cn"，框架会先匹配 "zh-cn" 再匹配 "zh"
 
 ### 多语言参数前后缀
 
