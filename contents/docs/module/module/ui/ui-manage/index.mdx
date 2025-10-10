@@ -62,7 +62,7 @@ mk.uiManage.event.on(mk.uiManage.event.key.open, (key_: mk.UIManage_.TypeOpenKey
 
 -   `key`：模块类型（`Constructor<mk.ViewBase>`）
 -   `source`：注册资源来源（`Prefab | string | Node | Record<type, Prefab|string|Node>`）
--   `target`：跟随释放对象，为 `null` 则不跟随
+-   `target`：[资源跟随释放对象](/docs/module/asset/asset#概念/资源跟随释放对象)
 -   `config`：可选，注册配置
 -   `config.isRepeat`：此模块是否可以创建多个，默认 false
 -   `config.parent`：此模块的默认父节点，默认 canvas 节点

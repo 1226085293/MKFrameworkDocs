@@ -21,7 +21,7 @@ mk.asset.get('资源路径', SpriteFrame, 资源跟随释放对象, {
 
 -   `资源路径`：bundle 下的资源路径
 -   `SpriteFrame`：资源类型
--   `资源跟随释放对象`：可以填写 `mk.ViewBase` 或者 `mk.StaticViewBase` 对象，资源将在对象的 close 后释放
+-   `资源跟随释放对象`：资源的生命周期由此对象控制，具体[参考此处](/docs/module/asset/asset#概念/资源跟随释放对象)
 -   `bundleStr`：bundle 名称
 
 ## 加载远程资源

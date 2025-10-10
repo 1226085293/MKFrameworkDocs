@@ -16,6 +16,38 @@ order: 0
 -   释放时清理资源的动态合图（如果启用）
 -   路径优化：自动处理图片后缀（`SpriteFrame` / `Texture2D`），自动去掉文件扩展名
 
+## 概念
+
+### 资源跟随释放对象
+
+    不止 `mk.asset`，框架所有加载资源的地方都要求你传递它，例如音频、UI 注册
+
+    什么是 **资源跟随释放对象**？ 资源跟随释放对象的类型是 `Node | TypeFollowReleaseObject | null`，
+
+    - 传递 null 时：
+        代表自行管理资源，你只需要手动调用资源的 `decRef` 后资源即会被释放（加载几次则调用几次）
+
+    - 传递 Node 时：
+        框架内的 `MKFollowNodeRelease` 组件将在节点销毁后调用一次资源的 `decRef`
+
+    - 传递 TypeFollowReleaseObject 对象时：
+
+        `TypeFollowReleaseObject` 结构如下
+        ![跟随释放对象类型](/docs/f9dfeba8-7279-4679-848b-baceabf87b20.png)
+
+        followRelease: `mk.asset` 会在资源加载完成时调用跟随释放对象的 `followRelease`，参数为资源，然后由跟随释放对象自己决定什么时候调用资源的 `decRef`
+
+        目前框架中已扩展的类型有 `mk.LifeCycle` 和 `mk.Bundle_.BundleManageBase`
+
+        -   `mk.LifeCycle`
+
+            作为 `mk.LifeCycle` 的子类，如果你传递 `mk.ViewBase`, `mk.StaticViewBase`, `mk.SceneDrive` 类型的对象，资源会在生命周期的 lateClose 中被减少引用计数
+
+        -   `mk.Bundle_.BundleManageBase`
+
+            bundle 管理器，你可以在下一篇文章中了解它，如果你传递这个类型的对象，资源会在从当前 bundle 的 scene 切换到其他 bundle 的 scene 后，
+            资源会被减少引用计数
+
 ## 方法
 
 ### get
@@ -54,27 +86,7 @@ get(pathStr_, type_, target_, config_?)
         在编辑器环境下加载资源，你必须传递 db 路径，例如 `'db://xxx/xxx.png'`
 
 -   `type_`: 资源类型，例如 Prefab, SpriteFrame, Texture2D 等...
-
 -   `target_`: 资源跟随释放对象
-
-    不止 `mk.asset`，框架所有加载资源的地方都要求你传递它，例如音频、UI 注册
-
-    什么是 **资源跟随释放对象**？ 资源跟随释放对象的类型是 `MKRelease_.TypeFollowReleaseObject<Asset>`，有两个函数
-    ![跟随释放对象类型](/docs/f9dfeba8-7279-4679-848b-baceabf87b20.png)
-
-    followRelease: `mk.asset` 会在资源加载完成时调用跟随释放对象的 `followRelease`，然后由跟随释放对象自己决定什么时候调用资源的 `decRef`
-
-    目前框架中已扩展的类型有 `mk.LifeCycle` 和 `mk.Bundle_.BundleManageBase`
-
-    -   `mk.LifeCycle`
-
-        作为 `mk.LifeCycle` 的子类，如果你传递 `mk.ViewBase`, `mk.StaticViewBase`, `mk.SceneDrive` 类型的对象，资源会在生命周期的 lateClose 中被减少引用计数
-
-    -   `mk.Bundle_.BundleManageBase`
-
-        bundle 管理器，你可以在下一篇文章中了解它，如果你传递这个类型的对象，资源会在从当前 bundle 的 scene 切换到其他 bundle 的 scene 后，
-        资源会被减少引用计数
-
 -   `config_`: 加载配置，可选
 -   `config_.bundleStr`: bundle 名
 
