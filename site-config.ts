@@ -29,6 +29,10 @@ class SiteConfig {
             avatar: 'https://q1.qlogo.cn/g?b=qq&nk=3548450021&s=640',
             name: 'Surprise',
         },
+        {
+            avatar: '/donate/avatar/QQ20251014-145523.png',
+            name: '丁',
+        },
     ];
     /** 评论系统配置 */
     giscus = {

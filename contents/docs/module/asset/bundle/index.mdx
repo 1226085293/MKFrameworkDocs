@@ -132,10 +132,8 @@ mk.bundle.set({
 
 {/* prettier-ignore */}
 <Note type="warning" title="注意">
-    PREVIEW 模式不支持重载
-
-    不能在正在运行该 bundle 的场景内重载（防止资源被释放报错）
-
+   - PREVIEW 模式不支持 reload
+   - 在当前 Bundle 的场景内 reload 当前 Bundle 的操作将延迟在切换场景后执行
 </Note>
 
 #### 参数
@@ -231,7 +229,6 @@ reload 会尝试清理脚本缓存（System / scriptCache）、注销 ccclass、
 
 ## 风险与最佳实践
 
--   在调用 `reload` 前：确保当前运行场景不是被 reload 的 bundle（不能在该 bundle 的场景内重载）。
 -   使用 `BundleManageBase` 管理资源和网络，所有通过 `followRelease` 注册的对象会在 `close()` 时自动释放，降低内存泄漏风险。
--   对于复杂热更场景，先在测试环境多次验证脚本卸载与资源释放顺序，避免遗留无效 ccclass 导致 `js.unregisterClass` 出错。
+-   对于复杂热更场景，先在测试环境验证，避免遗留无效 ccclas
 -   `loadScene` 的事件机制是可等待的（`event.request`），良好使用可避免场景切换中途被破坏的状态（比如弹窗未关闭、数据未 flush）。
