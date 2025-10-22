@@ -1,0 +1,43 @@
+---
+title: 框架推荐的项目结构
+description:
+date: 2025-10-22 17:35:00
+authors:
+    - avatar: 'https://forum.cocos.org/user_avatar/forum.cocos.org/1226085293/120/86149_2.png'
+      handle: Muzzik
+      username: 马赛克
+      handleUrl: 'https://forum.cocos.org/u/1226085293/summary'
+cover: https://cdn.pixabay.com/photo/2015/01/09/11/09/meeting-594091_1280.jpg
+---
+
+## 场景
+
+框架推荐每个 Bundle 有一个自己的场景（公共资源 Bundle 除外），因为这样才能让 BundleManage 的生命周期生效，
+如果你不使用 BundleManage 也可以使用单场景来进行开发
+
+## 资源/脚本结构
+
+传统的方式是资源和脚本分为两个文件夹存放，但是这样在项目体量增大时导致开发极其不便，你需要上下跳转文件夹才能进行开发，
+所以框架推荐使用一个模块一个文件夹，模块内包含自己的预制体、音频、图片等等。这样可以方便模块移植和删除
+
+## Bundle 划分
+
+### 首场景 Bundle
+
+首场景 Bundle 也叫做 main Bundle，这是引擎默认的 Bundle，即首场景及其依赖资源的所属 Bundle，
+我们在这里存放首屏展示的资源，然后检测更新跳转到热更或者登录页面
+
+### 热更 Bundle
+
+如果你需要热更，那就得创建一个热更 Bundle，其内存放热更界面资源和代码逻辑
+
+### 大厅 Bundle
+
+从首场景或者热更场景可以跳转到大厅 Bundle 的场景，并根据你的游戏逻辑从这个 Bundle 加载登录界面或者大厅界面
+
+大厅 Bundle 之所以单独划分可以方便缩小首包大小，如果你想做到极致首包大小也可以把登陆界面单独划分为一个 Bundle，
+这样首包只需要包含首场景、热更、登录三个 Bundle
+
+### 子游戏 Bundle
+
+你可以把每个子游戏划分为各个独立的 bundle 方便框架通过 Bundle 热更实现游戏内动态下载子游戏
