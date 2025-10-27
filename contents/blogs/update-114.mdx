@@ -1,0 +1,48 @@
+---
+title: 1.1.4 更新公告
+description:
+date: 2025-10-27 10:00:00
+authors:
+    - avatar: 'https://forum.cocos.org/user_avatar/forum.cocos.org/1226085293/120/86149_2.png'
+      handle: Muzzik
+      username: 马赛克
+      handleUrl: 'https://forum.cocos.org/u/1226085293/summary'
+cover: https://cdn.pixabay.com/photo/2020/05/25/17/13/mockup-5219535_640.jpg
+---
+
+## 添加
+
+-   添加编辑器预览支持：你现在可以使用编辑器预览模式来调试你的代码了
+
+-   增加根据地区设置默认语言的功能：
+    在 GlobalConfig 配置支持语种(supportStrList)后，再把默认语言(defaultTypeStr)设置为 "auto"，
+    即可根据配置和地区自动切换语言
+    ![默认语言配置](/blog/3d8f103b-6876-405a-88ff-9a0e413bcff6.png)
+
+-   添加跟随节点释放功能：任何资源加载接口都可以传递跟随释放参数为节点了，资源将跟随节点的 destroy 释放
+
+-   添加热更当前 Bundle 支持：你可以对当前 Bundle 执行 reload 了，实际热更操作将在切换到其他 Bundle 的场景后执行
+
+## 修复
+
+-   防止父节点 active 为 false 时 `mk.uiManage.open` 卡住导致异步返回空值
+
+-   修复 `mk.bundle.loadScene` 返回值错误
+
+## What's Changed
+
+-   添加编辑器预览支持 by @1226085293 in https://github.com/1226085293/MKFramework/pull/125
+-   优化初始化数据不存在时防止报错 by @1226085293 in https://github.com/1226085293/MKFramework/pull/126
+-   增加根据地区设置默认语言的功能 by @1226085293 in https://github.com/1226085293/MKFramework/pull/128
+-   添加跟随节点释放功能 by @1226085293 in https://github.com/1226085293/MKFramework/pull/129
+-   修复循环引用 by @1226085293 in https://github.com/1226085293/MKFramework/pull/130
+-   优化 audio unit 的跟随释放逻辑 by @1226085293 in https://github.com/1226085293/MKFramework/pull/131
+-   删除错误打印 by @1226085293 in https://github.com/1226085293/MKFramework/pull/132
+-   添加热更当前 Bundle 支持 by @1226085293 in https://github.com/1226085293/MKFramework/pull/133
+-   删除 Bundle 配置 bundleConfigID by @1226085293 in https://github.com/1226085293/MKFramework/pull/134
+-   修复编辑器预览属性面板展示错误 by @1226085293 in https://github.com/1226085293/MKFramework/pull/136
+-   防止父节点 active 为 false 时 open 卡住导致异步返回空值 by @1226085293 in https://github.com/1226085293/MKFramework/pull/138
+-   修复 loadScene 返回值错误 by @1226085293 in https://github.com/1226085293/MKFramework/pull/139
+-   Bump axios from 1.8.2 to 1.12.0 in /extensions/MKFramework by @dependabot[bot] in https://github.com/1226085293/MKFramework/pull/127
+
+**Full Changelog**: https://github.com/1226085293/MKFramework/compare/v1.1.3...v1.1.4
