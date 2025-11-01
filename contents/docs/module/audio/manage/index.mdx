@@ -7,6 +7,12 @@ order: 0
 
 `mk.audio` 是框架的音频管理器，支持音频多分组管理，动态加载，最大播放数量控制优化，内置自动切换的通用/微信双版本代码
 
+## 属性
+
+### groupMap
+
+groupMap 是包含了所有音频分组（包含音频类型和自定义的分组）的只读 Map，类型为 `ReadonlyMap<number, Audio_.Group>`
+
 ## 方法
 
 ### add
@@ -81,6 +87,14 @@ mk.audio.play(this.music, 'db://assets/resources/xxx.mp3');
 停止当前的所有音频，但不包括之后播放的音频
 
 如果要阻止后续播放音频，可以使用 [getGroup](#方法/getGroup)
+
+#### 参数
+
+`stopAll(isPreventPlay_)`
+
+-   `isPreventPlay_`: 可选（默认 false），是否阻止后续音频播放
+
+    如果为 true，则后续可以通过执行[音频类型](/docs/module/audio#概念必读/音频类型)分组的 `stop(false)` 来恢复播放能力
 
 例如
 
