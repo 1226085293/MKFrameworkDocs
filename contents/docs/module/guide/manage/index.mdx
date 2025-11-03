@@ -47,13 +47,13 @@ const guideManager = new mk.GuideManage({
 
 ### 公共属性
 
-| 属性名       | 类型                           | 说明                                                |
-| ------------ | ------------------------------ | --------------------------------------------------- |
-| `event`      | `MKEventTarget<EventProtocol>` | 事件中心，用于监听引导生命周期事件                  |
-| `stepMap`    | `Map<number, MKGuideStepBase>` | 已注册步骤的映射表，key 为步骤编号                  |
-| `isPause`    | `boolean`                      | 获取/设置暂停状态（setter 触发事件）                |
-| `isFinish`   | `boolean`                      | 获取完成状态（只读，等于 `endStepNum` 时为 `true`） |
-| `endStepNum` | `number`                       | 获取结束步骤编号（只读）                            |
+| 属性名       | 类型                           | 说明                                 |
+| ------------ | ------------------------------ | ------------------------------------ |
+| `event`      | `MKEventTarget<EventProtocol>` | 事件中心，用于监听引导生命周期事件   |
+| `stepMap`    | `Map<number, MKGuideStepBase>` | 已注册步骤的映射表，key 为步骤编号   |
+| `isPause`    | `boolean`                      | 获取/设置暂停状态（setter 触发事件） |
+| `isFinish`   | `boolean`                      | 获取完成状态（只读）                 |
+| `endStepNum` | `number`                       | 获取结束步骤编号（只读）             |
 
 ---
 
@@ -84,7 +84,9 @@ regis(step_: MKGuideStepBase | MKGuideStepBase[]): void
 run(): Promise<void>
 ```
 
-运行当前步骤，自动取消暂停状态并更新视图。
+运行当前步骤，自动取消暂停状态并更新视图
+
+> 用户通常不需要手动调用此接口，除非在暂停状态下恢复当前步骤运行。
 
 **执行流程：**
 
@@ -105,7 +107,7 @@ run(): Promise<void>
 setStep(stepNum_: number, initData_?: any): Promise<void>
 ```
 
-跳转到指定步骤。
+更新当前步骤，并在 `isPause` 为 `false` 的情况下自动执行 `run()`
 
 **参数：**
 
@@ -114,8 +116,9 @@ setStep(stepNum_: number, initData_?: any): Promise<void>
 
 **行为：**
 
--   **暂停状态下**：仅更新步骤数据，不执行生命周期
--   **正常状态下**：执行完整步骤切换流程
+-   **正常状态下**: 执行完整步骤切换流程
+-   **暂停状态下**: 仅更新步骤数据，不执行生命周期
+-   **完成状态下**: 重置完成状态（isFinish）为 `false`，重新执行引导
 -   切换前触发 `beforeSwitch` 事件
 -   到达 `endStepNum` 时自动调用 `finish()`
 
@@ -143,13 +146,12 @@ getStep(): number
 finish(): void
 ```
 
-手动完成引导。
+手动完成引导，如果初始化参数传递了结束步骤（endStepNum）且当前步骤不为结束步骤则会跳转到结束步骤
 
 **行为：**
 
--   设置 `isPause = true`
+-   设置 `isPause` 和 `isFinish` 为 `true`
 -   触发 `finish` 事件
--   不自动重置步骤数据
 
 > **适用场景**：强制结束引导，如用户跳过、超时等。
 
@@ -160,15 +162,14 @@ finish(): void
 通过 `isPause` 属性控制引导状态：
 
 ```ts
-guideManager.isPause = true; // 暂停
-guideManager.isPause = false; // 恢复
+guideManager.isPause = true; // 暂停，触发 pause 事件
+guideManager.isPause = false; // 恢复，触发 resume 事件
 ```
 
 **说明：**
 
--   状态变化时会自动触发 `pause` 或 `resume` 事件
--   暂停状态下仍可切换步骤，但不会执行步骤生命周期
--   恢复后继续执行未完成的步骤
+-   暂停状态下仍可切换步骤，只会更新步骤数据，但不会执行步骤生命周期
+-   `isPause = false` 仅为恢复暂停但不会执行当前步骤的生命周期，如果你想要执行当前步骤生命周期并恢复暂停状态可以使用 `run()`;
 
 ---
 
@@ -206,8 +207,8 @@ guideManager.event.on(guideManager.event.key.loadingStep, () => {
 ```ts
 // 1. 创建管理器
 const guide = new mk.GuideManage({
-    nameStr: '首次登录引导',
-    endStepNum: 3,
+    nameStr: '测试引导',
+    endStepNum: 999,
     operateTab: {
         tip: {
             load: () => showTip(),
@@ -217,24 +218,18 @@ const guide = new mk.GuideManage({
 });
 
 // 2. 注册步骤
-const steps = [new FirstStep(1), new SecondStep(2), new ThirdStep(3)];
-guide.regis(steps);
+guide.regis([new FirstStep(1), new SecondStep(2)]);
 
 // 3. 监听事件
 guide.event.on(guide.event.key.finish, () => {
     console.log('✅ 引导完成');
 });
 
-guide.event.on(guide.event.key.break, () => {
-    console.warn('⚠️ 引导中断');
-});
-
 // 4. 开始引导
-await guide.setStep(1);
+guide.setStep(1);
 
-// 5. 手动暂停/恢复
-guide.isPause = true;
-guide.isPause = false;
+// 5. 结束引导，跳转到 endStepNum 步骤或调用 finish 函数
+guide.setStep(999); // guide.finish();
 ```
 
 ---
@@ -243,7 +238,9 @@ guide.isPause = false;
 
 **Q：如何中断引导？**
 
-在 `stepUpdateCallbackFunc` 中返回 `null` 或 `undefined`。或者手动调用 `finish()` 或设置 `isPause = true`
+1. 在 `stepUpdateCallbackFunc` 中返回 `null` 或 `undefined`，代表步骤数据不存在中断引导，触发 `break` 事件
+1. 调用 `finish()` 提前结束引导
+1. 设置 `isPause = true` 暂停引导生命周期，但是 `setStep` 仍然可以更新步骤数据
 
 **Q：如何预加载资源？**
 
@@ -255,7 +252,7 @@ guide.isPause = false;
 
 **Q：如何跨场景引导？**
 
-在步骤中设置 bundle 和 scene 名，例如 `sceneStr = "resources.lobby"`，管理器会自动切换场景并加载资源
+在步骤中设置 bundle 和 scene 名，例如 `sceneStr = "resources.lobby"`，管理器会自动切换到 resources Bundle 中的 lobby 场景
 
 ---
 
