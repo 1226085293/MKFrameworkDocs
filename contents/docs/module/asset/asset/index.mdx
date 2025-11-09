@@ -83,7 +83,8 @@ get(pathStr_, type_, target_, config_?)
 
     -   **编辑器环境**
 
-        在编辑器环境下加载资源，你必须传递 db 路径，例如 `'db://xxx/xxx.png'`
+        在编辑器环境下加载资源，你必须传递 db 路径，例如 `'db://xxx/xxx.png'`，
+        受环境限制，编辑器加载图片只支持 `ImageAsset` 类型
 
 -   `type_`: 资源类型，例如 Prefab, SpriteFrame, Texture2D 等...
 -   `target_`: 资源跟随释放对象
