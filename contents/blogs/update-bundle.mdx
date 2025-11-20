@@ -22,6 +22,8 @@ cover: https://cdn.pixabay.com/photo/2019/06/15/09/29/package-4275116_1280.jpg
 
 ![bundle文件夹](/blog/c135b0dd-e5c3-480f-aec2-eb4c16d4f173.png)
 
+如果你不删除这些 Bundle 文件夹，那么打包后这些即为本地 Bundle
+
 构建后 bundle 内容分为两种情况：
 
 -   非小游戏：构建后 Bundle 文件夹内包含了对应项目文件夹中的所有资源、代码
@@ -38,8 +40,6 @@ cover: https://cdn.pixabay.com/photo/2019/06/15/09/29/package-4275116_1280.jpg
 ![bundle版本](/blog/7c115264-6142-46e8-840c-14819193d077.png)
 
 其中 `index.dead1.js` 中的 `dead1` 就是 Bundle 的版本号
-
-如果你不删除这些 Bundle 文件夹，那么打包后这些即为本地 Bundle
 
 # 热更篇
 
@@ -69,7 +69,7 @@ cover: https://cdn.pixabay.com/photo/2019/06/15/09/29/package-4275116_1280.jpg
 mk.bundle.reload({
     bundleStr: 'Decorator',
     originStr: 'https://abcd.com/Decorator',
-    versionStr: 'abcd2',
+    versionStr: 'dead1',
 });
 ```
 
