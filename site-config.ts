@@ -33,6 +33,10 @@ class SiteConfig {
             avatar: '/donate/avatar/QQ20251014-145523.png',
             name: '丁',
         },
+        {
+            avatar: '/donate/avatar/微信图片_2025-11-20_104641_695.jpg',
+            name: '夏雨晴空',
+        },
     ];
     /** 评论系统配置 */
     giscus = {
