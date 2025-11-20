@@ -1,0 +1,79 @@
+---
+title: Bundle 热更详解
+description:
+date: 2025-11-20 11:17:00
+authors:
+    - avatar: 'https://forum.cocos.org/user_avatar/forum.cocos.org/1226085293/120/86149_2.png'
+      handle: Muzzik
+      username: 马赛克
+      handleUrl: 'https://forum.cocos.org/u/1226085293/summary'
+cover: https://cdn.pixabay.com/photo/2019/06/15/09/29/package-4275116_1280.jpg
+---
+
+# 基础篇
+
+## 设置 Bundle
+
+在资源管理器中选中任一文件夹，可以看到属性面板可以设置它为 Bundle 的选项
+
+![设置bundle](/blog/4ad17692-1920-4725-a694-0f31eea5e7b3.png)
+
+当设置文件夹为 Bundle 后，构建后输出目录会存在对应的 Bundle 文件夹
+
+![bundle文件夹](/blog/c135b0dd-e5c3-480f-aec2-eb4c16d4f173.png)
+
+构建后 bundle 内容分为两种情况：
+
+-   非小游戏：构建后 Bundle 文件夹内包含了对应项目文件夹中的所有资源、代码
+-   小游戏：由于小游戏平台限制代码动态加载，所以构建后 Bundle 文件夹只存在资源，而原本 Bundle 内的代码都在主包
+
+## 构建 Bundle
+
+热更 Bundle 必须使用版本号，也就是 MD5，在构建选项勾选 MD5 缓存
+
+![bundle文件](/blog/ea02af58-d01a-4fd5-ae8f-346f7a8b8c6a.png)
+
+然后在构建输出的 Bundle 目录你可以看到
+
+![bundle版本](/blog/7c115264-6142-46e8-840c-14819193d077.png)
+
+其中 `index.dead1.js` 中的 `dead1` 就是 Bundle 的版本号
+
+如果你不删除这些 Bundle 文件夹，那么打包后这些即为本地 Bundle
+
+# 热更篇
+
+首先你需要一个远程文件服务器，例如阿里云的 OSS
+
+## 检测更新
+
+首先在远程文件服务器添加一个 Bundle 版本文件，其中存储 Bundle 名和最新的版本号，例如
+
+```json
+{
+    "Decorator": "abcd2"
+}
+```
+
+然后在游戏内通过 http 请求拉取远程版本文件可以获取最新的版本号，
+再通过 `cc.assetManager.downloader.bundleVers["bundle名"]` 获取本地的 Bundle 版本进行对比，
+如果不一致则代表可以进行热更
+
+## 进行热更
+
+如果你想要热更 Bundle，除了版本文件外，你还得把构建后的 Bundle 目录放在远程文件服务器上，
+例如 Decorator Bundle 的 index 文件地址为 `https://abcd.com/Decorator/index.dead1.js`，
+那么 Decorator Bundle 的远程地址即为 `https://abcd.com/Decorator`，然后可以调用如下代码进行 Bundle 热更
+
+```ts
+mk.bundle.reload({
+    bundleStr: 'Decorator',
+    originStr: 'https://abcd.com/Decorator',
+    versionStr: 'abcd2',
+});
+```
+
+## 热更顺序
+
+Bundle 热更需要注意顺序问题，以 A、B 两个 Bundle 举例，B 使用了 A 的脚本，
+那么正确的热更顺序就应该为 A -> B，如果你先热更 B，再热更 A，那么 B 使用的 A 脚本还是上个版本的 A 脚本
