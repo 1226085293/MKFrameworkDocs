@@ -1,0 +1,80 @@
+---
+title: 1.1.5 更新公告
+description:
+date: 2025-11-25 13:40:00
+authors:
+    - avatar: 'https://forum.cocos.org/user_avatar/forum.cocos.org/1226085293/120/86149_2.png'
+      handle: Muzzik
+      username: 马赛克
+      handleUrl: 'https://forum.cocos.org/u/1226085293/summary'
+cover: https://cdn.pixabay.com/photo/2020/05/25/17/13/mockup-5219535_640.jpg
+---
+
+## 变更
+
+-   增加 main bundle 的 close 调用逻辑
+
+-   添加释放与远程图片关联的动态图集资源
+-   mk.audio.play 接口支持资源路径
+-   优化暂停停止音频的逻辑
+-   支持当前的引导步骤跳转当前步骤
+-   添加音频播放间隔限制
+-   支持可在模块 open 未完成时执行 close 并打断 open 流程
+-   单独展示区分层级大小
+
+## 修复
+
+-   修复编辑器预览模式会触发两次 EVENT_BEFORE_SCENE_LAUNCH 导致场景数据错误的问题
+
+-   修复多次加载资源时填写同一跟随释放对象但是没有释放资源
+-   修复编辑器预览时报错
+-   修复 d.ts 导入模块错误
+-   修复小游戏平台存储错误
+-   修复多语言编辑器预览模式切换语言无效
+-   修复引导管理器没有触发最后一步的 unload
+-   修复默认 Bundle 错误
+-   修复切换打印器类型后报错
+-   修复异步对象池 initTask 状态错误
+-   修复克隆音频单元没有完全释放
+-   修复项目设置导致编辑器报错
+
+## What's Changed
+
+-   修复编辑器预览模式会触发两次 EVENT_BEFORE_SCENE_LAUNCH 导致场景数据错误的问题 by @1226085293 in https://github.com/1226085293/MKFramework/pull/140
+-   修复多次加载资源时填写同一跟随释放对象但是没有释放资源 by @1226085293 in https://github.com/1226085293/MKFramework/pull/142
+-   Bump validator from 13.12.0 to 13.15.20 in /extensions/MKFramework by @dependabot[bot] in https://github.com/1226085293/MKFramework/pull/141
+-   格式化 by @1226085293 in https://github.com/1226085293/MKFramework/pull/143
+-   修复编辑器预览时报错 by @1226085293 in https://github.com/1226085293/MKFramework/pull/144
+-   修复导入模块错误 by @1226085293 in https://github.com/1226085293/MKFramework/pull/145
+-   修复微信小游戏存储错误 by @1226085293 in https://github.com/1226085293/MKFramework/pull/146
+-   387 版本适配 by @1226085293 in https://github.com/1226085293/MKFramework/pull/147
+-   mk.audio.play 接口支持资源路径 by @1226085293 in https://github.com/1226085293/MKFramework/pull/148
+-   音频系统优化 by @1226085293 in https://github.com/1226085293/MKFramework/pull/149
+-   优化新手引导 by @1226085293 in https://github.com/1226085293/MKFramework/pull/150
+-   去除多余的 `Promise<void>` by @1226085293 in https://github.com/1226085293/MKFramework/pull/151
+-   修复多语言编辑器预览模式切换语言无效 by @1226085293 in https://github.com/1226085293/MKFramework/pull/152
+-   修复引导管理器没有触发最后一步的 unload by @1226085293 in https://github.com/1226085293/MKFramework/pull/154
+-   修复引导管理器重启逻辑 bug by @1226085293 in https://github.com/1226085293/MKFramework/pull/155
+-   支持当前步骤跳转当前步骤 by @1226085293 in https://github.com/1226085293/MKFramework/pull/156
+-   更新 d.ts by @1226085293 in https://github.com/1226085293/MKFramework/pull/157
+-   优化暂停停止音频的逻辑 by @1226085293 in https://github.com/1226085293/MKFramework/pull/158
+-   修复枚举遍历错误 by @1226085293 in https://github.com/1226085293/MKFramework/pull/159
+-   增加 main bundle 的 close 调用逻辑 by @1226085293 in https://github.com/1226085293/MKFramework/pull/160
+-   添加释放与远程图片关联的动态图集资源 by @1226085293 in https://github.com/1226085293/MKFramework/pull/161
+-   优化 setStep 注释 by @1226085293 in https://github.com/1226085293/MKFramework/pull/162
+-   修复默认 Bundle 错误 by @1226085293 in https://github.com/1226085293/MKFramework/pull/163
+-   删除多余注释 by @1226085293 in https://github.com/1226085293/MKFramework/pull/164
+-   删除插件 by @1226085293 in https://github.com/1226085293/MKFramework/pull/165
+-   删除 QuickPlugin by @1226085293 in https://github.com/1226085293/MKFramework/pull/166
+-   修复切换打印器类型后报错 by @1226085293 in https://github.com/1226085293/MKFramework/pull/168
+-   修复异步对象池 initTask 状态错误 by @1226085293 in https://github.com/1226085293/MKFramework/pull/169
+-   添加音频播放间隔限制 by @1226085293 in https://github.com/1226085293/MKFramework/pull/172
+-   Bump glob from 10.3.4 to 10.5.0 in /tool/typedoc by @dependabot[bot] in https://github.com/1226085293/MKFramework/pull/171
+-   Bump glob from 11.0.3 to 11.1.0 in /extensions/MKFramework by @dependabot[bot] in https://github.com/1226085293/MKFramework/pull/170
+-   Bump js-yaml from 4.1.0 to 4.1.1 by @dependabot[bot] in https://github.com/1226085293/MKFramework/pull/167
+-   修复克隆音频单元没有完全释放 by @1226085293 in https://github.com/1226085293/MKFramework/pull/173
+-   增加模块 open 未完成时打断并执行 close by @1226085293 in https://github.com/1226085293/MKFramework/pull/174
+-   单独展示区分层级大小 by @1226085293 in https://github.com/1226085293/MKFramework/pull/175
+-   修复项目设置导致编辑器报错 by @1226085293 in https://github.com/1226085293/MKFramework/pull/176
+
+**Full Changelog**: https://github.com/1226085293/MKFramework/compare/v1.1.4...v1.1.5
