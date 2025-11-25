@@ -1,0 +1,76 @@
+---
+title: 对象池
+description: 异步/同步对象池
+order: 2
+---
+
+框架内置了同步/异步对象池, 框架内的音频和 UI 管理器都用到了它，例如 `mk.uiMange.regis` 的 `config_` 参数内属性
+
+## 接口
+
+-   mk.ObjectPool: 异步对象池
+
+-   mk.ObjectPool.Sync: 同步对象池
+
+## 初始化参数
+
+```ts
+const pool = new mk.ObjectPool({
+    // 这里即为初始化参数
+});
+```
+
+异步/同步对象池的初始化参数名都是一致的，区别在于异步对象池的 `createFunc`, `resetFunc` 你可以传递异步函数
+
+-   createFunc: 返回新对象
+
+-   resetFunc(object, isCreate): 可选，重置对象，在 `createFunc` 后以及 put 时调用
+-   clearFunc(objectList): 可选，释放回调，参数为不再使用的对象列表
+-   destroyFunc: 可选，销毁回调，当调用对象池的 `destroy` 函数时被调用
+-   minHoldNum: 可选，最小保留数量, 池内对象小于此数量时扩充，默认 1
+-   maxHoldNum: 可选，最大保留数量, 可节省内存占用，-1 为不启用，默认 -1
+-   initFillNum: 可选，初始化扩充数量, 默认 0
+
+## 共同属性
+
+### config
+
+初始化数据
+
+### initTask
+
+初始化任务, 即填充 initFillNum 数量的对象任务
+
+### isValid
+
+有效状态, 默认为 true, `destroy` 后被置为 false
+
+## 共同方法
+
+同步和异步对象池共有的方法，异步对象池的 put、get、clear、destroy 都为异步函数，同步对象池则为同步函数
+
+### put
+
+导入对象，当不需要再使用对象时调用它存入对象池
+
+### get
+
+获取对象，从对象池内获取对象，不足时则补充
+
+### clear
+
+清空对象池
+
+内部将调用初始化参数 `clearFunc` 清理所有池中对象
+
+### destroy
+
+销毁对象池，销毁后将不能再调用 get/out
+
+内部将调用 `clear` 和初始化参数 `destroyFunc`
+
+## 异步对象池方法
+
+### getSync
+
+同步获取对象，非异步函数，用于在某些特殊情况下同步获取当前池中对象，没有则返回 null

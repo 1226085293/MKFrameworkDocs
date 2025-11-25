@@ -9,6 +9,22 @@ order: 0
 
 ## 属性
 
+### audioIntervalMsLimitTab
+
+音频间隔限制表，用于限制同一音频资源在指定间隔内不能再次播放
+
+-   key: AudioClip 资源的 uuid
+-   value: 限制间隔时间（毫秒）
+
+#### 用例
+
+```ts
+mk.audio.audioIntervalMsLimitTab['AudioClip资源的uuid'] = 1000;
+
+// music 为 mk.Audio_.Unit 类型
+mk.audio.audioIntervalMsLimitTab[music.clip!.uuid] = 1000;
+```
+
 ### groupMap
 
 groupMap 是包含了所有音频分组（包含音频类型和自定义的分组）的只读 Map，类型为 `ReadonlyMap<number, Audio_.Group>`
