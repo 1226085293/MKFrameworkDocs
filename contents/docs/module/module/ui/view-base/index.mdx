@@ -162,8 +162,7 @@ GlobalConfig.View.config.windowAnimationTab.open['默认'] = (node) => {
 #### isAutoMask（添加遮罩）
 
 -   类型：`boolean`
--   说明：自动在视图根节点下添加 **遮罩节点**，关闭时自动销毁。
--   遮罩节点来源于 `GlobalConfig.View.maskDataTab.prefabPathStr`。
+-   说明：设为 true 即为在根节点下添加 **遮罩** 节点，设置为 false 时移除遮罩节点
 
 #### isAutoWidget（0 边距 widget）
 
@@ -174,17 +173,3 @@ GlobalConfig.View.config.windowAnimationTab.open['默认'] = (node) => {
 
 -   类型：`boolean`
 -   说明：在节点上添加 **BlockInputEvents**，阻止事件穿透。
-
----
-
-### 遮罩逻辑
-
--   `isAutoMask = true` 时：
-
-    -   通过 `GlobalConfig.View.maskDataTab.prefabPathStr` 资源实例化遮罩 prefab
-    -   命名为 `GlobalConfig.View.maskDataTab.nodeNameStr`
-    -   放置在节点层级最底部
-
--   `isAutoMask = false` 时：
-
-    -   自动销毁遮罩节点
