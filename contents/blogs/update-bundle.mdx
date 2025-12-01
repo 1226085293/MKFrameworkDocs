@@ -47,6 +47,8 @@ cover: https://cdn.pixabay.com/photo/2019/06/15/09/29/package-4275116_1280.jpg
 
 ## 检测更新
 
+### 获取远程版本号
+
 首先在远程文件服务器添加一个 Bundle 版本文件，其中存储 Bundle 名和最新的版本号，例如
 
 ```json
@@ -55,9 +57,17 @@ cover: https://cdn.pixabay.com/photo/2019/06/15/09/29/package-4275116_1280.jpg
 }
 ```
 
-然后在游戏内通过 http 请求拉取远程版本文件可以获取最新的版本号，
-再通过 `cc.assetManager.downloader.bundleVers["bundle名"]` 获取本地的 Bundle 版本进行对比，
-如果不一致则代表可以进行热更
+然后在游戏内通过 http 请求拉取远程版本文件可以获取最新的版本号
+
+### 检测更新
+
+在首次加载 Bundle 前，需要调用 `mk.bundle.getCache`，根据返回值做不同处理
+
+-   返回 null：代表没有加载过远程 bundle，可以通过 `cc.assetManager.downloader.bundleVers["bundle名"]`
+    获取本地的 Bundle 版本和远程版本进行对比，如果不一致则代表可以进行热更
+
+-   返回 Bundle 信息：返回值就是缓存中上次加载的远程 bundle 信息，使用 `versionStr` 和远程版本对比，
+    不一致则代表存在更新，如果一致就使用 `getCache` 返回的信息加载 bundle（引擎已缓存不会重新下载）
 
 ## 进行热更
 

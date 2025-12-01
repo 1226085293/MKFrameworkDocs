@@ -134,7 +134,7 @@ mk.bundle.set({
 <Note type="warning" title="注意">
    - PREVIEW 模式不支持 reload
    - 需要在打包时开启 md5
-   - 在当前 Bundle 的场景内 reload 当前 Bundle 的操作将延迟在切换场景后执行
+   - 在当前 Bundle 的场景内 reload 当前 Bundle 的操作将延迟到切换到其他 Bundle 的场景后执行
 </Note>
 
 #### 参数
@@ -177,6 +177,16 @@ mk.bundle.set({
         使用 `export` 关键字导出 class 也能让框架拿到正常清理 `ResourcesA` 缓存
 
 > 注意：reload 过程会**卸载旧脚本/资源**，若存在跨 bundle 单例或未清理的全局引用、定时器、事件等，会导致错误。热更前请确保 bundle 数据被已正确清理
+
+### getCache
+
+用于获取缓存中最新的 bundle 信息（上次加载的 Bundle Url 及版本号）
+
+#### 参数
+
+`getCache(bundleStr_)`
+
+-   `bundleStr_`: bundle 名
 
 ---
 
