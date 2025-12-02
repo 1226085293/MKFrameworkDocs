@@ -39,11 +39,12 @@ cover: https://cdn.pixabay.com/photo/2019/06/15/09/29/package-4275116_1280.jpg
 
 ![bundle版本](/blog/7c115264-6142-46e8-840c-14819193d077.png)
 
-其中 `index.dead1.js` 中的 `dead1` 就是 Bundle 的版本号
+其中 `index.dead1.js` 中的 `dead1` 就是 Decorator Bundle 的版本号
 
 # 热更篇
 
-首先你需要一个远程文件服务器，例如阿里云的 OSS
+首先你需要一个远程文件服务器，例如阿里云的 OSS，本地测试也可以使用 `npx http-server`
+在当前目录开启一个 http 服务器
 
 ## 检测更新
 
@@ -57,7 +58,8 @@ cover: https://cdn.pixabay.com/photo/2019/06/15/09/29/package-4275116_1280.jpg
 }
 ```
 
-然后在游戏内通过 http 请求拉取远程版本文件可以获取最新的版本号
+然后在游戏内通过 http 请求拉取远程版本文件可以获取最新的版本号，你可以根据业务逻辑自行添加更多数据，
+例如更新失败后回退的版本号，不同平台的版本号等等..
 
 ### 检测更新
 
