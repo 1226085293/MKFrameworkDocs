@@ -34,6 +34,7 @@ rectangle "被父级调用" as n8
 rectangle "uiManage.close" as n9
 rectangle "close" as n10
 rectangle "递归调用子模块" as n11
+rectangle "lateClose" as n12
 
 n1 --> n7
 n7 --> n3
@@ -46,6 +47,7 @@ n2 --> n3
 n9 --> n10
 n10 --> n11
 n11 --> n10
+n11 --> n12
 @enduml
 ```
 
@@ -108,6 +110,72 @@ n11 --> n10
 适合在此处执行：
 
 -   定时器、缓动等清理操作
+
+### lateClose
+
+模块及子模块关闭后的回调。
+
+代表子模块的的 close 和 lateClose 已被调用完毕。`mk.LifeCycle` 会在 lateClose 内执行[自动清理机制](./life-cycle#特殊机制/自动清理机制)
+
+---
+
+## 属性
+
+### initData
+
+模块的初始化数据，由 [外部传递](./life-cycle#生命周期函数/init)，无需手动赋值
+
+#### 防止类型错误
+
+由于 initData 是外部数据，怎么防止外部传递错误的类型数据？你只需要在自己的模块内声明类型即可，例如：
+
+```ts
+export class Test extends mk.ViewBase {
+    initData!: { a: number };
+}
+```
+
+当你这样设置后，外部就只能传递类型为 `{ a: number }` 的数据，在多人编码时作用很大
+
+> 即使外部调用模块的 init 函数，因为设置了[父类自启函数](./life-cycle#特殊机制/父类自启函数)，`mk.LifeCycle` 父类也会自动赋值 initData，无需手动 `this.initData = data;`
+
+### data
+
+可自动重置的模块数据
+
+如果它是一个 class 对象，那么它将在 lateClose 中自动重置，解决了复用模块时手动重置数据的痛点
+
+例如：
+
+```ts
+export class Test extends mk.ViewBase {
+    data = new (class {
+        /** 菜单下标 */
+        menuIndex = 0;
+    })();
+}
+```
+
+即使你的模块在运行中修改了 data 中的数据，例如用户切换菜单修改了 `this.data.menuIndex` 为 1，
+在模块关闭后，`this.data.menuIndex` 数据会被重置为默认值 0
+
+### eventTargetList
+
+事件对象列表
+
+当你使用框架的 `mk.EventTarget` 类型对象，或者 `mk.network.Websocket` 对象的 message 属性进行事件监听且 on 或 once 的 target\_
+参数为 `mk.LifeCycle` 对象
+
+那么 on 或 once 内会调用 `target_.eventTargetList.push(this)`，
+当模块 lateClose 时将调用自身 eventTargetList 列表中所有事件对象的 `targetOff(this)` 取消绑定到自身的事件
+
+### valid
+
+有效状态，表示模块未在(关闭/关闭中)状态
+
+### isStatic
+
+是否为静态模块，及非 `mk.uiManage.open` 打开的模块
 
 ---
 
