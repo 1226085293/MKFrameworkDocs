@@ -37,6 +37,10 @@ class SiteConfig {
             avatar: '/donate/avatar/微信图片_2025-11-20_104641_695.jpg',
             name: '夏雨晴空',
         },
+        {
+            avatar: 'https://q1.qlogo.cn/g?b=qq&nk=3829030269&s=640',
+            name: 'Mirror',
+        },
     ];
     /** 评论系统配置 */
     giscus = {
