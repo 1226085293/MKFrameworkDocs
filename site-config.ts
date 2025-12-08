@@ -41,6 +41,10 @@ class SiteConfig {
             avatar: 'https://q1.qlogo.cn/g?b=qq&nk=3829030269&s=640',
             name: 'Mirror',
         },
+        {
+            avatar: 'https://q1.qlogo.cn/g?b=qq&nk=2771622571&s=640',
+            name: '张鱼丸',
+        },
     ];
     /** 评论系统配置 */
     giscus = {
