@@ -44,7 +44,7 @@ export default function Home() {
                 <h2 className="text-2xl md:text-2xl font-bold mb-8 ">赞助列表</h2>
                 <div className="flex justify-center items-center relative -space-x-4">
                     {/* 最初展示的siteConfig.donateList数据 */}
-                    {siteConfig.donateList.slice(0, 5).map((sponsor, index) => (
+                    {siteConfig.donateList.map((sponsor, index) => (
                         <div
                             key={index}
                             className="group relative z-10 transition-all duration-300 hover:z-30 hover:scale-110"
@@ -65,7 +65,7 @@ export default function Home() {
                     ))}
 
                     {/* 补充的默认头像 */}
-                    {Array.from({ length: 5 }, (v, index) => (
+                    {Array.from({ length: 3 }, (v, index) => (
                         <div
                             key={`default-${index}`}
                             className="group relative z-10 transition-all duration-300 hover:z-30 hover:scale-110"

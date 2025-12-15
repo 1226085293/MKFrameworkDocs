@@ -45,6 +45,10 @@ class SiteConfig {
             avatar: 'https://q1.qlogo.cn/g?b=qq&nk=2771622571&s=640',
             name: '张鱼丸',
         },
+        {
+            avatar: "./donate/avatar/IMG_7577.jpg",
+            name: '974',
+        },
     ];
     /** 评论系统配置 */
     giscus = {
