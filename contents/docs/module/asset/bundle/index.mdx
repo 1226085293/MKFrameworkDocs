@@ -151,32 +151,37 @@ mk.bundle.set({
 
 #### 必要条件
 
-**获取 ccclass 组件类型**：由于内部会清理 ccclass 组件脚本缓存，所以你必须确保框架能获取到 ccclass 类型才能使用 `reload`，
-框架内部使用以下方式获取 ccclass 类型
+**获取 ccclass 组件类型**: 由于需要清理引擎内 ccclass 组件脚本缓存，但框架只能获取到所有 ccclass 组件（不能识别所属 Bundle），
+或者 Bundle 中脚本导出的组件类型，所以必须保证框架能获取所有属于这个 Bundle 的组件类型，框架提供了两种方式
 
-    - **ccclass 装饰器参数匹配**
+    1. **ccclass 装饰器参数匹配**
 
         框架内置的正则匹配是 `$\{bundle名}(_|/)\`，以 `reload` resources bundle 举例
         ```ts
         @ccclass("resources/A")
-        class ResourcesA { ... }
+        class ResourcesA extends XXX { ... }
 
         @ccclass("resources_A")
-        class ResourcesA { ... }
+        class ResourcesA extends XXX { ... }
         ```
-        上面两种方式都能让框架正常清理 `ResourcesA` 缓存，你也可以传递自己的正则表达式(`bundleInfo_.ccclassRegexp`)
+        上面两种方式都能让框架识别这个组件类型属于名为 resources 的 Bundle
+        > 自定义正则表达式: bundleInfo_.ccclassRegexp
 
 
-    - **导出 ccclass 类型**
+    2. **导出 ccclass 类型**
 
         ```ts
-        @ccclass("resourcesA")
-        export class ResourcesA { ... }
+        @ccclass("A")
+        export class A { ... }
         ```
 
-        使用 `export` 关键字导出 class 也能让框架拿到正常清理 `ResourcesA` 缓存
+        使用 `export` 关键字导出组件的 class 也能让框架识别并清理 `A` 组件的缓存
+        > 此方式不适用于多重嵌套，例如把 A 放在 namespace 或者 module 块中导出，框架不会获取到这个组件
 
-> 注意：reload 过程会**卸载旧脚本/资源**，若存在跨 bundle 单例或未清理的全局引用、定时器、事件等，会导致错误。热更前请确保 bundle 数据被已正确清理
+#### 注意事项
+
+reload 过程会**卸载旧脚本/资源**，若存在跨 bundle 单例或未清理的全局引用、定时器、事件等，会导致错误。
+热更前请确保 bundle 数据被已正确清理
 
 ### getCache
 
