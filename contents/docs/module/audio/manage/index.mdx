@@ -5,7 +5,19 @@ order: 0
 
 ## 介绍
 
-`mk.audio` 是框架的音频管理器，支持音频多分组管理，动态加载，最大播放数量控制优化，内置自动切换的通用/微信双版本代码
+`mk.audio` 是框架的音频管理器，支持音频多分组管理，动态加载，最大播放数量控制优化，音频播放间隔控制
+
+## 前置知识
+
+### 同时最大播放数量
+
+引擎存在同时最大播放数量限制（AudioSource.maxAudioChannel），所以框架对其增加强制播放配置，
+当调用 play 接口时，强制播放的值为 `config_.isForce`，如果未传递则默认值为 `GlobalConfig.Audio.isForce`
+
+-   强制播放为 true 时: 当前播放的音频单元中找到停止优先级（stopPriorityNum）最高的音频，优先级相同则选择最先播放的音频，
+    然后停止这个音频，播放当前音频
+
+-   强制播放为 false 时: 阻止当前音频播放
 
 ## 属性
 
@@ -90,6 +102,7 @@ mk.audio.play('db://assets/resources/xxx.mp3');
 -   `config_`: 可选，播放配置
 -   `config_.isLoop`: 设置音频单元是否循环（包括之后）
 -   `config_.volumeNum`: 设置音频单元的音量（包括之后）
+-   `config_.isForce`: 是否在超出最大播放数量时强制播放
 
 > 如果 `audio_` 是资源路径，则默认为音频类型为音效
 
