@@ -77,3 +77,20 @@ namespace GlobalConfig {
     ![填充宽](/docs/ff80167b-c0ab-4cf9-805a-5c2c0a357770.png)
 -   填充高
     ![填充高](/docs/f72f72be-b113-41b5-acca-53f547a4c9e3.png)
+
+## 常见问题（FAQ）
+
+**Q：Widget 4 边距为 0 但是没充满屏幕**
+
+Widget 是依靠父节点的大小定位的，所以 4 边距为 0 时大小应该和父节点一致
+
+**Q：Canvas 节点下的 Widget 靠某一边 0 边距超出了屏幕**
+
+说明适配大小大于实际显示尺寸，检查场景的配置是否错误，
+场景的错误配置会导致适配结果错误，首先选中 Canvas 节点
+
+![场景配置](/docs/2dae21a1-aebe-4b5d-9934-6375c245b53a.png)
+
+1. 确保 Canvas 上的 Camera Component 属性是 2D 摄像机（Canvas 下默认会存在一个 2D Camera）
+
+2. 确保 Canvas 上的 Widget 组件四边距都为 0
