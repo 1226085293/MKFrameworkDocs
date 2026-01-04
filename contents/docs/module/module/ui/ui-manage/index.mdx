@@ -65,7 +65,7 @@ mk.uiManage.event.on(mk.uiManage.event.key.open, (key_: mk.UIManage_.TypeOpenKey
 -   `target`：[资源跟随释放对象](/docs/module/asset/asset#概念/资源跟随释放对象)
 -   `config`：可选，注册配置
 -   `config.isRepeat`：此模块是否可以创建多个，默认 false
--   `config.parent`：此模块的默认父节点，默认 canvas 节点
+-   `config.parent`：此模块的默认父节点，默认 canvas 节点，不存在则为 scene
 -   `config.loadConfig`：加载资源时传给 `mk.asset.get` 的配置
 -   `config.poolMinHoldNum`：对象池最小保留数量（不足时扩充数），默认 `isRepeat ? 8 : 1`
 -   `config.poolMaxHoldNum`：对象池最大保留数量（-1 表示不启用），默认 -1

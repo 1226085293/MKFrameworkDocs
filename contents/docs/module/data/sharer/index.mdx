@@ -12,7 +12,7 @@ order: 1
 
 ```ts
 class Data {
-    test!: number;
+    test = 1;
 }
 
 let data = mk.dataSharer(Data);
@@ -36,15 +36,31 @@ let data = mk.dataSharer(Data);
 
 `data.request(data.key.test)`
 
+#### 参数
+
+`request(key_)`
+
+- `key_`: 请求的数据键
+
 ---
 
 ### reset
 
-重置数据，重置当前所有数据到 class 中的默认值，例如示例中的 test 为 `undefined`
+重置数据，重置当前所有数据到 class 中的默认值或者参数传递的数据源，例如 `data.test = 2`
+后调用 `reset()`，那么 test 将变为默认值 1
 
 #### 示例
 
-`data.reset()`
+```ts
+data.reset()
+data.reset(data_)
+```
+
+#### 参数
+
+`data.reset(data_)`
+
+- `data_`: 可选，重置数据来源，默认为 new class
 
 ---
 
